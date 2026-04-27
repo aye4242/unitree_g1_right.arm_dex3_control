@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "/opt/ros/foxy/share/ament_cmake_core/cmake/package_templates/templates_2_cmake.py", line 21, in <module>
+    from ament_package.templates import get_environment_hook_template_path
+  File "/opt/ros/foxy/lib/python3.8/site-packages/ament_package/templates.py", line 18, in <module>
+    import pkg_resources
+ModuleNotFoundError: No module named 'pkg_resources'
+CMake Error at /opt/ros/foxy/share/ament_cmake_core/cmake/ament_cmake_package_templates-extras.cmake:41 (message):
+  execute_process(/home/unitree/miniforge3/bin/python3
+  /opt/ros/foxy/share/ament_cmake_core/cmake/package_templates/templates_2_cmake.py
+  /home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/ament_cmake_package_templates/templates.cmake)
+  returned error code 1
+Call Stack (most recent call first):
+  /opt/ros/foxy/share/ament_cmake_core/cmake/ament_cmake_coreConfig.cmake:41 (include)
+  /opt/ros/foxy/share/ament_cmake/cmake/ament_cmake_export_dependencies-extras.cmake:15 (find_package)
+  /opt/ros/foxy/share/ament_cmake/cmake/ament_cmakeConfig.cmake:41 (include)
+  CMakeLists.txt:21 (find_package)
+
+

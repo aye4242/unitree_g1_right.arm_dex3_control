@@ -1,0 +1,1 @@
+/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/ament_cmake_environment_hooks/local_setup.bash

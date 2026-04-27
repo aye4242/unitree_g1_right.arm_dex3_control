@@ -1,0 +1,10 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/visual_detection_yolo_tester.dir/src/visual_detection_yolo_tester.cpp.o"
+  "visual_detection_yolo_tester"
+  "visual_detection_yolo_tester.pdb"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/visual_detection_yolo_tester.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

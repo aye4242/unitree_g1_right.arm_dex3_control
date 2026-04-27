@@ -1,0 +1,174 @@
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_34d2b/fast && /usr/bin/make -f CMakeFiles/cmTC_34d2b.dir/build.make CMakeFiles/cmTC_34d2b.dir/build
+make[1]: Entering directory '/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_34d2b.dir/src.c.o
+/usr/bin/cc   -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_34d2b.dir/src.c.o   -c /home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_34d2b
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_34d2b.dir/link.txt --verbose=1
+/usr/bin/cc  -DCMAKE_HAVE_LIBC_PTHREAD    CMakeFiles/cmTC_34d2b.dir/src.c.o  -o cmTC_34d2b 
+/usr/bin/ld: CMakeFiles/cmTC_34d2b.dir/src.c.o: in function `main':
+src.c:(.text+0x48): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text+0x50): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text+0x5c): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_34d2b.dir/build.make:87: cmTC_34d2b] Error 1
+make[1]: Leaving directory '/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_34d2b/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_cf26e/fast && /usr/bin/make -f CMakeFiles/cmTC_cf26e.dir/build.make CMakeFiles/cmTC_cf26e.dir/build
+make[1]: Entering directory '/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_cf26e.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_cf26e.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.16/Modules/CheckFunctionExists.c
+Linking C executable cmTC_cf26e
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_cf26e.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_cf26e.dir/CheckFunctionExists.c.o  -o cmTC_cf26e  -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_cf26e.dir/build.make:87: cmTC_cf26e] Error 1
+make[1]: Leaving directory '/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_cf26e/fast] Error 2
+
+
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_17468/fast && /usr/bin/make -f CMakeFiles/cmTC_17468.dir/build.make CMakeFiles/cmTC_17468.dir/build
+make[1]: Entering directory '/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_17468.dir/src.c.o
+/usr/bin/cc   -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_17468.dir/src.c.o   -c /home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_17468
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_17468.dir/link.txt --verbose=1
+/usr/bin/cc  -DCMAKE_HAVE_LIBC_PTHREAD    CMakeFiles/cmTC_17468.dir/src.c.o  -o cmTC_17468 
+/usr/bin/ld: CMakeFiles/cmTC_17468.dir/src.c.o: in function `main':
+src.c:(.text+0x48): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text+0x50): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text+0x5c): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_17468.dir/build.make:87: cmTC_17468] Error 1
+make[1]: Leaving directory '/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_17468/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_ccf63/fast && /usr/bin/make -f CMakeFiles/cmTC_ccf63.dir/build.make CMakeFiles/cmTC_ccf63.dir/build
+make[1]: Entering directory '/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ccf63.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_ccf63.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.16/Modules/CheckFunctionExists.c
+Linking C executable cmTC_ccf63
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ccf63.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_ccf63.dir/CheckFunctionExists.c.o  -o cmTC_ccf63  -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_ccf63.dir/build.make:87: cmTC_ccf63] Error 1
+make[1]: Leaving directory '/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_ccf63/fast] Error 2
+
+
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_8c857/fast && /usr/bin/make -f CMakeFiles/cmTC_8c857.dir/build.make CMakeFiles/cmTC_8c857.dir/build
+make[1]: Entering directory '/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_8c857.dir/src.c.o
+/usr/bin/cc   -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_8c857.dir/src.c.o   -c /home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_8c857
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8c857.dir/link.txt --verbose=1
+/usr/bin/cc  -DCMAKE_HAVE_LIBC_PTHREAD    CMakeFiles/cmTC_8c857.dir/src.c.o  -o cmTC_8c857 
+/usr/bin/ld: CMakeFiles/cmTC_8c857.dir/src.c.o: in function `main':
+src.c:(.text+0x48): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text+0x50): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text+0x5c): undefined reference to `pthread_join'
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_8c857.dir/build.make:87: cmTC_8c857] Error 1
+make[1]: Leaving directory '/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_8c857/fast] Error 2
+
+
+Source file was:
+#include <pthread.h>
+
+void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_7e6cd/fast && /usr/bin/make -f CMakeFiles/cmTC_7e6cd.dir/build.make CMakeFiles/cmTC_7e6cd.dir/build
+make[1]: Entering directory '/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_7e6cd.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_7e6cd.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.16/Modules/CheckFunctionExists.c
+Linking C executable cmTC_7e6cd
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_7e6cd.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_7e6cd.dir/CheckFunctionExists.c.o  -o cmTC_7e6cd  -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+make[1]: *** [CMakeFiles/cmTC_7e6cd.dir/build.make:87: cmTC_7e6cd] Error 1
+make[1]: Leaving directory '/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_7e6cd/fast] Error 2
+
+
+

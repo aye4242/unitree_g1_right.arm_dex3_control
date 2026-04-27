@@ -1,0 +1,15 @@
+[0.074s] Invoking command in '/home/unitree/Desktop/unitree_dex3/build/bboxes_ex_msgs': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/foxy CONDA_PROMPT_MODIFIER=(grab) /usr/bin/cmake --build /home/unitree/Desktop/unitree_dex3/build/bboxes_ex_msgs -- -j8 -l8
+[0.208s] [  5%] Built target bboxes_ex_msgs__cpp
+[0.208s] [ 12%] Built target bboxes_ex_msgs__rosidl_generator_c
+[0.267s] [ 23%] Built target bboxes_ex_msgs__rosidl_typesupport_c
+[0.270s] [ 33%] Built target bboxes_ex_msgs__rosidl_typesupport_introspection_cpp
+[0.287s] [ 43%] Built target bboxes_ex_msgs__rosidl_typesupport_fastrtps_cpp
+[0.287s] [ 53%] Built target bboxes_ex_msgs__rosidl_typesupport_cpp
+[0.301s] [ 64%] Built target bboxes_ex_msgs__rosidl_typesupport_introspection_c
+[0.356s] [ 74%] Built target bboxes_ex_msgs__rosidl_typesupport_fastrtps_c
+[0.401s] [ 74%] Built target bboxes_ex_msgs
+[0.458s] [ 76%] Built target bboxes_ex_msgs__py
+[0.520s] [ 84%] Built target bboxes_ex_msgs__python
+[0.580s] [ 92%] Built target bboxes_ex_msgs__rosidl_typesupport_c__pyext
+[0.580s] [ 94%] Built target bboxes_ex_msgs__rosidl_typesupport_fastrtps_c__pyext
+[0.584s] [100%] Built target bboxes_ex_msgs__rosidl_typesupport_introspection_c__pyext

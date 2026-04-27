@@ -1,0 +1,63 @@
+[0.035s] Invoking command in '/home/unitree/Desktop/unitree_dex3/build/yolox_ros_cpp': CMAKE_PREFIX_PATH=/home/unitree/Desktop/unitree_dex3/install/yolox_cpp:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs:/home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp:/home/unitree/Desktop/unitree_dex3/install/unitree_g1_dex3_stack:/home/unitree/Desktop/unitree_dex3/install/trac_ik:/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib:/home/unitree/unitree_ros2/cyclonedds_ws/install:/home/unitree/cyclonedds_ws/install/rmw_cyclonedds_cpp:/home/unitree/cyclonedds_ws/install/cyclonedds:/opt/ros/foxy CONDA_PROMPT_MODIFIER=(base) LD_LIBRARY_PATH=/home/unitree/Desktop/unitree_dex3/install/yolox_cpp/lib:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs/lib:/home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/lib:/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib/lib:/usr/local/cuda-11.4/lib64:/usr/local/lib:/home/unitree/unitree_ros2/cyclonedds_ws/install/lib:/home/unitree/cyclonedds_ws/install/rmw_cyclonedds_cpp/lib:/home/unitree/cyclonedds_ws/install/cyclonedds/lib:/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/aarch64-linux-gnu:/opt/ros/foxy/lib /usr/bin/cmake --build /home/unitree/Desktop/unitree_dex3/build/yolox_ros_cpp -- -j8 -l8
+[0.214s] Scanning dependencies of target yolox_ros_cpp_components
+[0.215s] Scanning dependencies of target yolox_ros_cpp
+[0.248s] [ 50%] Building CXX object CMakeFiles/yolox_ros_cpp.dir/src/yolox_ros_cpp.cpp.o
+[0.248s] [ 50%] Building CXX object CMakeFiles/yolox_ros_cpp_components.dir/src/yolox_ros_cpp.cpp.o
+[6.108s] /home/unitree/Desktop/unitree_dex3/src/YOLOX-ROS/yolox_ros_cpp/yolox_ros_cpp/src/yolox_ros_cpp.cpp: In member function ‘bboxes_ex_msgs::msg::BoundingBoxes yolox_ros_cpp::YoloXNode::objects_to_bboxes(cv::Mat, std::vector<yolox_cpp::Object>, std_msgs::msg::Header)’:
+[6.109s] /home/unitree/Desktop/unitree_dex3/src/YOLOX-ROS/yolox_ros_cpp/yolox_ros_cpp/src/yolox_ros_cpp.cpp:169:77: warning: unused parameter ‘frame’ [-Wunused-parameter]
+[6.109s]   169 |     bboxes_ex_msgs::msg::BoundingBoxes YoloXNode::objects_to_bboxes(cv::Mat frame, std::vector<yolox_cpp::Object> objects, std_msgs::msg::Header header)
+[6.109s]       |                                                                     ~~~~~~~~^~~~~
+[6.901s] /home/unitree/Desktop/unitree_dex3/src/YOLOX-ROS/yolox_ros_cpp/yolox_ros_cpp/src/yolox_ros_cpp.cpp: In member function ‘bboxes_ex_msgs::msg::BoundingBoxes yolox_ros_cpp::YoloXNode::objects_to_bboxes(cv::Mat, std::vector<yolox_cpp::Object>, std_msgs::msg::Header)’:
+[6.901s] /home/unitree/Desktop/unitree_dex3/src/YOLOX-ROS/yolox_ros_cpp/yolox_ros_cpp/src/yolox_ros_cpp.cpp:169:77: warning: unused parameter ‘frame’ [-Wunused-parameter]
+[6.901s]   169 |     bboxes_ex_msgs::msg::BoundingBoxes YoloXNode::objects_to_bboxes(cv::Mat frame, std::vector<yolox_cpp::Object> objects, std_msgs::msg::Header header)
+[6.901s]       |                                                                     ~~~~~~~~^~~~~
+[11.379s] [ 75%] Linking CXX shared library libyolox_ros_cpp_components.so
+[11.974s] [ 75%] Built target yolox_ros_cpp_components
+[12.908s] [100%] Linking CXX executable yolox_ros_cpp
+[14.064s] [100%] Built target yolox_ros_cpp
+[14.089s] Invoked command in '/home/unitree/Desktop/unitree_dex3/build/yolox_ros_cpp' returned '0': CMAKE_PREFIX_PATH=/home/unitree/Desktop/unitree_dex3/install/yolox_cpp:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs:/home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp:/home/unitree/Desktop/unitree_dex3/install/unitree_g1_dex3_stack:/home/unitree/Desktop/unitree_dex3/install/trac_ik:/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib:/home/unitree/unitree_ros2/cyclonedds_ws/install:/home/unitree/cyclonedds_ws/install/rmw_cyclonedds_cpp:/home/unitree/cyclonedds_ws/install/cyclonedds:/opt/ros/foxy CONDA_PROMPT_MODIFIER=(base) LD_LIBRARY_PATH=/home/unitree/Desktop/unitree_dex3/install/yolox_cpp/lib:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs/lib:/home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/lib:/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib/lib:/usr/local/cuda-11.4/lib64:/usr/local/lib:/home/unitree/unitree_ros2/cyclonedds_ws/install/lib:/home/unitree/cyclonedds_ws/install/rmw_cyclonedds_cpp/lib:/home/unitree/cyclonedds_ws/install/cyclonedds/lib:/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/aarch64-linux-gnu:/opt/ros/foxy/lib /usr/bin/cmake --build /home/unitree/Desktop/unitree_dex3/build/yolox_ros_cpp -- -j8 -l8
+[14.117s] Invoking command in '/home/unitree/Desktop/unitree_dex3/build/yolox_ros_cpp': CMAKE_PREFIX_PATH=/home/unitree/Desktop/unitree_dex3/install/yolox_cpp:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs:/home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp:/home/unitree/Desktop/unitree_dex3/install/unitree_g1_dex3_stack:/home/unitree/Desktop/unitree_dex3/install/trac_ik:/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib:/home/unitree/unitree_ros2/cyclonedds_ws/install:/home/unitree/cyclonedds_ws/install/rmw_cyclonedds_cpp:/home/unitree/cyclonedds_ws/install/cyclonedds:/opt/ros/foxy CONDA_PROMPT_MODIFIER=(base) LD_LIBRARY_PATH=/home/unitree/Desktop/unitree_dex3/install/yolox_cpp/lib:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs/lib:/home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/lib:/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib/lib:/usr/local/cuda-11.4/lib64:/usr/local/lib:/home/unitree/unitree_ros2/cyclonedds_ws/install/lib:/home/unitree/cyclonedds_ws/install/rmw_cyclonedds_cpp/lib:/home/unitree/cyclonedds_ws/install/cyclonedds/lib:/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/aarch64-linux-gnu:/opt/ros/foxy/lib /usr/bin/cmake --install /home/unitree/Desktop/unitree_dex3/build/yolox_ros_cpp
+[14.136s] -- Install configuration: ""
+[14.137s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/lib/yolox_ros_cpp/yolox_ros_cpp
+[14.141s] -- Set runtime path of "/home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/lib/yolox_ros_cpp/yolox_ros_cpp" to ""
+[14.141s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/lib/libyolox_ros_cpp_components.so
+[14.147s] -- Set runtime path of "/home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/lib/libyolox_ros_cpp_components.so" to ""
+[14.148s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/launch
+[14.148s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/launch/yolox_openvino_ncs2.launch.py
+[14.148s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/launch/yolox_openvino.launch.py
+[14.149s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/launch/yolox_tflite.launch.py
+[14.149s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/launch/yolox_onnxruntime.launch.py
+[14.149s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/launch/yolox_tensorrt.launch.py
+[14.149s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/launch/yolox_tensorrt_jetson.launch.py
+[14.150s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/labels
+[14.150s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/labels/coco_names.txt
+[14.150s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights
+[14.150s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tflite
+[14.150s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tflite/download_model.bash
+[14.150s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino
+[14.151s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino/.gitignore
+[14.151s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino/download_openvino_s.bash
+[14.151s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino/README.md
+[14.151s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino/install.bash
+[14.151s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt
+[14.151s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/convert.bash
+[14.151s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights/onnx
+[14.152s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights/onnx/download.bash
+[14.152s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights/.gitkeep
+[14.153s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/ament_index/resource_index/package_run_dependencies/yolox_ros_cpp
+[14.153s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/ament_index/resource_index/parent_prefix_path/yolox_ros_cpp
+[14.154s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/environment/ament_prefix_path.sh
+[14.155s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/environment/ament_prefix_path.dsv
+[14.155s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/environment/path.sh
+[14.155s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/environment/path.dsv
+[14.156s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/local_setup.bash
+[14.156s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/local_setup.sh
+[14.157s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/local_setup.zsh
+[14.157s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/local_setup.dsv
+[14.157s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/package.dsv
+[14.157s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/ament_index/resource_index/packages/yolox_ros_cpp
+[14.157s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/ament_index/resource_index/rclcpp_components/yolox_ros_cpp
+[14.158s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/cmake/yolox_ros_cppConfig.cmake
+[14.159s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/cmake/yolox_ros_cppConfig-version.cmake
+[14.159s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/package.xml
+[14.161s] Invoked command in '/home/unitree/Desktop/unitree_dex3/build/yolox_ros_cpp' returned '0': CMAKE_PREFIX_PATH=/home/unitree/Desktop/unitree_dex3/install/yolox_cpp:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs:/home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp:/home/unitree/Desktop/unitree_dex3/install/unitree_g1_dex3_stack:/home/unitree/Desktop/unitree_dex3/install/trac_ik:/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib:/home/unitree/unitree_ros2/cyclonedds_ws/install:/home/unitree/cyclonedds_ws/install/rmw_cyclonedds_cpp:/home/unitree/cyclonedds_ws/install/cyclonedds:/opt/ros/foxy CONDA_PROMPT_MODIFIER=(base) LD_LIBRARY_PATH=/home/unitree/Desktop/unitree_dex3/install/yolox_cpp/lib:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs/lib:/home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/lib:/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib/lib:/usr/local/cuda-11.4/lib64:/usr/local/lib:/home/unitree/unitree_ros2/cyclonedds_ws/install/lib:/home/unitree/cyclonedds_ws/install/rmw_cyclonedds_cpp/lib:/home/unitree/cyclonedds_ws/install/cyclonedds/lib:/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/aarch64-linux-gnu:/opt/ros/foxy/lib /usr/bin/cmake --install /home/unitree/Desktop/unitree_dex3/build/yolox_ros_cpp

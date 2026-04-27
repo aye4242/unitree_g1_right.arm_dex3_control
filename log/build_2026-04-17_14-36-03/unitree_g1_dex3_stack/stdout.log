@@ -1,0 +1,6 @@
+[ 12%] Built target joint_trajectory_executor
+[ 25%] Built target project_to_3d_node
+[ 37%] Built target visual_detection_yolo_tester
+[ 50%] Built target detection_to_goal_node
+Scanning dependencies of target visual_detection_tester
+[ 56%] Building CXX object CMakeFiles/visual_detection_tester.dir/src/visual_detection_tester.cpp.o

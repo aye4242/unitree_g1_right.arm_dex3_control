@@ -1,0 +1,497 @@
+[0.032s] Invoking command in '/home/unitree/Desktop/unitree_dex3/build/fcl': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/foxy CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake /home/unitree/Desktop/unitree_dex3/src/fcl -DBUILD_TESTING=OFF -DFCL_STATIC_LIBRARY=OFF -DCMAKE_INSTALL_PREFIX=/home/unitree/Desktop/unitree_dex3/install/fcl
+[0.324s] -- The CXX compiler identification is GNU 9.4.0
+[0.347s] -- Check for working CXX compiler: /usr/bin/c++
+[0.558s] -- Check for working CXX compiler: /usr/bin/c++ -- works
+[0.565s] -- Detecting CXX compiler ABI info
+[0.779s] -- Detecting CXX compiler ABI info - done
+[0.805s] -- Detecting CXX compile features
+[0.807s] -- Detecting CXX compile features - done
+[0.817s] -- Set RPATH explicitly to '/home/unitree/Desktop/unitree_dex3/install/fcl/lib'
+[0.818s] -- Performing Test _compiler_supports_sse
+[0.874s] -- Performing Test _compiler_supports_sse - Failed
+[0.933s] -- Checking for one of the modules 'ccd;libccd'
+[1.151s] -- FCL uses OctoMap
+[1.160s] -- Performing Test COMPILER_SUPPORTS_VISIBILITY
+[1.346s] -- Performing Test COMPILER_SUPPORTS_VISIBILITY - Success
+[1.362s] -- Performing Test COMPILER_HAS_HIDDEN_VISIBILITY
+[1.611s] -- Performing Test COMPILER_HAS_HIDDEN_VISIBILITY - Success
+[1.611s] -- Performing Test COMPILER_HAS_HIDDEN_INLINE_VISIBILITY
+[1.876s] -- Performing Test COMPILER_HAS_HIDDEN_INLINE_VISIBILITY - Success
+[1.876s] -- Performing Test COMPILER_HAS_DEPRECATED_ATTR
+[2.072s] -- Performing Test COMPILER_HAS_DEPRECATED_ATTR - Success
+[2.100s] -- Configuring done
+[2.148s] -- Generating done
+[2.156s] -- Build files have been written to: /home/unitree/Desktop/unitree_dex3/build/fcl
+[2.180s] Invoked command in '/home/unitree/Desktop/unitree_dex3/build/fcl' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/foxy CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake /home/unitree/Desktop/unitree_dex3/src/fcl -DBUILD_TESTING=OFF -DFCL_STATIC_LIBRARY=OFF -DCMAKE_INSTALL_PREFIX=/home/unitree/Desktop/unitree_dex3/install/fcl
+[2.183s] Invoking command in '/home/unitree/Desktop/unitree_dex3/build/fcl': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/foxy CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --build /home/unitree/Desktop/unitree_dex3/build/fcl -- -j8 -l8
+[2.888s] Scanning dependencies of target fcl
+[3.037s] [  0%] Building CXX object src/CMakeFiles/fcl.dir/broadphase/broadphase_SSaP.cpp.o
+[7.637s] [  1%] Building CXX object src/CMakeFiles/fcl.dir/broadphase/broadphase_interval_tree.cpp.o
+[12.571s] [  2%] Building CXX object src/CMakeFiles/fcl.dir/broadphase/broadphase_spatialhash.cpp.o
+[17.077s] [  2%] Building CXX object src/CMakeFiles/fcl.dir/broadphase/detail/interval_tree.cpp.o
+[18.067s] [  3%] Building CXX object src/CMakeFiles/fcl.dir/broadphase/detail/interval_tree_node.cpp.o
+[18.622s] [  4%] Building CXX object src/CMakeFiles/fcl.dir/broadphase/detail/morton.cpp.o
+[21.211s] [  5%] Building CXX object src/CMakeFiles/fcl.dir/broadphase/detail/simple_interval.cpp.o
+[21.324s] [  6%] Building CXX object src/CMakeFiles/fcl.dir/broadphase/detail/spatial_hash.cpp.o
+[24.046s] [  7%] Building CXX object src/CMakeFiles/fcl.dir/common/detail/profiler.cpp.o
+[27.987s] [  8%] Building CXX object src/CMakeFiles/fcl.dir/common/exception.cpp.o
+[28.363s] [  9%] Building CXX object src/CMakeFiles/fcl.dir/common/time.cpp.o
+[28.556s] [ 10%] Building CXX object src/CMakeFiles/fcl.dir/geometry/bvh/BVH_utility.cpp.o
+[31.822s] [ 10%] Building CXX object src/CMakeFiles/fcl.dir/geometry/bvh/BV_node_base.cpp.o
+[34.310s] [ 11%] Building CXX object src/CMakeFiles/fcl.dir/geometry/bvh/detail/BVH_front.cpp.o
+[34.546s] [ 12%] Building CXX object src/CMakeFiles/fcl.dir/geometry/collision_geometry.cpp.o
+[37.174s] [ 13%] Building CXX object src/CMakeFiles/fcl.dir/geometry/octree/octree.cpp.o
+[44.596s] [ 14%] Building CXX object src/CMakeFiles/fcl.dir/geometry/shape/box.cpp.o
+[48.338s] [ 15%] Building CXX object src/CMakeFiles/fcl.dir/geometry/shape/capsule.cpp.o
+[52.065s] [ 16%] Building CXX object src/CMakeFiles/fcl.dir/geometry/shape/cone.cpp.o
+[55.286s] [ 17%] Building CXX object src/CMakeFiles/fcl.dir/geometry/shape/convex.cpp.o
+[61.222s] [ 18%] Building CXX object src/CMakeFiles/fcl.dir/geometry/shape/cylinder.cpp.o
+[64.511s] [ 19%] Building CXX object src/CMakeFiles/fcl.dir/geometry/shape/ellipsoid.cpp.o
+[68.165s] [ 19%] Building CXX object src/CMakeFiles/fcl.dir/geometry/shape/halfspace.cpp.o
+[71.459s] [ 20%] Building CXX object src/CMakeFiles/fcl.dir/geometry/shape/plane.cpp.o
+[74.890s] [ 21%] Building CXX object src/CMakeFiles/fcl.dir/geometry/shape/shape_base.cpp.o
+[77.449s] [ 22%] Building CXX object src/CMakeFiles/fcl.dir/geometry/shape/sphere.cpp.o
+[80.572s] [ 23%] Building CXX object src/CMakeFiles/fcl.dir/geometry/shape/triangle_p.cpp.o
+[83.658s] [ 24%] Building CXX object src/CMakeFiles/fcl.dir/geometry/shape/utility.cpp.o
+[90.285s] [ 25%] Building CXX object src/CMakeFiles/fcl.dir/math/bv/AABB.cpp.o
+[93.897s] [ 26%] Building CXX object src/CMakeFiles/fcl.dir/math/bv/OBB.cpp.o
+[100.281s] [ 27%] Building CXX object src/CMakeFiles/fcl.dir/math/bv/OBBRSS.cpp.o
+[103.180s] [ 27%] Building CXX object src/CMakeFiles/fcl.dir/math/bv/RSS.cpp.o
+[109.295s] [ 28%] Building CXX object src/CMakeFiles/fcl.dir/math/bv/kDOP.cpp.o
+[112.314s] [ 29%] Building CXX object src/CMakeFiles/fcl.dir/math/bv/kIOS.cpp.o
+[115.298s] [ 30%] Building CXX object src/CMakeFiles/fcl.dir/math/bv/utility.cpp.o
+[119.801s] [ 31%] Building CXX object src/CMakeFiles/fcl.dir/math/constants.cpp.o
+[122.017s] [ 32%] Building CXX object src/CMakeFiles/fcl.dir/math/detail/polysolver.cpp.o
+[124.153s] [ 33%] Building CXX object src/CMakeFiles/fcl.dir/math/detail/project.cpp.o
+[127.305s] [ 34%] Building CXX object src/CMakeFiles/fcl.dir/math/detail/seed.cpp.o
+[128.067s] [ 35%] Building CXX object src/CMakeFiles/fcl.dir/math/geometry.cpp.o
+[133.912s] [ 35%] Building CXX object src/CMakeFiles/fcl.dir/math/motion/interp_motion.cpp.o
+[140.019s] [ 36%] Building CXX object src/CMakeFiles/fcl.dir/math/motion/motion_base.cpp.o
+[142.735s] [ 37%] Building CXX object src/CMakeFiles/fcl.dir/math/motion/screw_motion.cpp.o
+[148.712s] [ 38%] Building CXX object src/CMakeFiles/fcl.dir/math/motion/spline_motion.cpp.o
+[155.374s] [ 39%] Building CXX object src/CMakeFiles/fcl.dir/math/motion/taylor_model/interval.cpp.o
+[157.730s] [ 40%] Building CXX object src/CMakeFiles/fcl.dir/math/motion/taylor_model/interval_matrix.cpp.o
+[160.374s] [ 41%] Building CXX object src/CMakeFiles/fcl.dir/math/motion/taylor_model/interval_vector.cpp.o
+[162.747s] [ 42%] Building CXX object src/CMakeFiles/fcl.dir/math/motion/taylor_model/taylor_matrix.cpp.o
+[167.037s] [ 43%] Building CXX object src/CMakeFiles/fcl.dir/math/motion/taylor_model/taylor_model.cpp.o
+[169.563s] [ 44%] Building CXX object src/CMakeFiles/fcl.dir/math/motion/taylor_model/taylor_vector.cpp.o
+[172.618s] [ 44%] Building CXX object src/CMakeFiles/fcl.dir/math/motion/taylor_model/time_interval.cpp.o
+[174.924s] [ 45%] Building CXX object src/CMakeFiles/fcl.dir/math/motion/translation_motion.cpp.o
+[178.067s] [ 46%] Building CXX object src/CMakeFiles/fcl.dir/math/motion/triangle_motion_bound_visitor.cpp.o
+[181.362s] [ 47%] Building CXX object src/CMakeFiles/fcl.dir/math/rng.cpp.o
+[183.781s] [ 48%] Building CXX object src/CMakeFiles/fcl.dir/math/sampler/sampler_base.cpp.o
+[185.973s] [ 49%] Building CXX object src/CMakeFiles/fcl.dir/math/sampler/sampler_se2.cpp.o
+[188.432s] [ 50%] Building CXX object src/CMakeFiles/fcl.dir/math/sampler/sampler_se2_disk.cpp.o
+[190.895s] [ 51%] Building CXX object src/CMakeFiles/fcl.dir/math/sampler/sampler_se3_euler.cpp.o
+[193.511s] [ 52%] Building CXX object src/CMakeFiles/fcl.dir/math/sampler/sampler_se3_euler_ball.cpp.o
+[196.123s] [ 52%] Building CXX object src/CMakeFiles/fcl.dir/math/sampler/sampler_se3_quat.cpp.o
+[198.635s] [ 53%] Building CXX object src/CMakeFiles/fcl.dir/math/sampler/sampler_se3_quat_ball.cpp.o
+[200.922s] [ 54%] Building CXX object src/CMakeFiles/fcl.dir/math/triangle.cpp.o
+[201.025s] [ 55%] Building CXX object src/CMakeFiles/fcl.dir/math/variance3.cpp.o
+[203.724s] [ 56%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/collision.cpp.o
+[214.758s] [ 57%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/collision_object.cpp.o
+[215.785s] [ 58%] Building CXX object src/CMakeFiles/fcl.dir/broadphase/broadphase_dynamic_AABB_tree_array.cpp.o
+[216.817s] [ 59%] Building CXX object src/CMakeFiles/fcl.dir/broadphase/broadphase_dynamic_AABB_tree.cpp.o
+[217.843s] [ 60%] Building CXX object src/CMakeFiles/fcl.dir/broadphase/broadphase_continuous_collision_manager.cpp.o
+[218.645s] [ 61%] Building CXX object src/CMakeFiles/fcl.dir/broadphase/broadphase_collision_manager.cpp.o
+[239.172s] [ 62%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/continuous_collision.cpp.o
+[240.190s] [ 62%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/contact_point.cpp.o
+[241.214s] [ 63%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/contact.cpp.o
+[242.258s] [ 64%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/collision_result.cpp.o
+[242.554s] [ 65%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/collision_request.cpp.o
+[243.632s] [ 66%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/continuous_collision_object.cpp.o
+[243.752s] [ 67%] Building CXX object src/CMakeFiles/fcl.dir/broadphase/broadphase_bruteforce.cpp.o
+[249.227s] [ 68%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/convexity_based_algorithm/gjk.cpp.o
+[250.256s] [ 69%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/convexity_based_algorithm/epa.cpp.o
+[251.297s] [ 70%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/cost_source.cpp.o
+[252.340s] [ 71%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/continuous_collision_result.cpp.o
+[253.033s] [ 72%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/continuous_collision_request.cpp.o
+[253.131s] [ 73%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/convexity_based_algorithm/gjk_libccd.cpp.o
+[253.177s] [ 74%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/convexity_based_algorithm/minkowski_diff.cpp.o
+[253.792s] [ 75%] Building CXX object src/CMakeFiles/fcl.dir/broadphase/broadphase_SaP.cpp.o
+[264.174s] [ 76%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/primitive_shape_algorithm/halfspace.cpp.o
+[264.175s] [ 77%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/primitive_shape_algorithm/capsule_capsule.cpp.o
+[265.204s] [ 78%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/primitive_shape_algorithm/box_box.cpp.o
+[266.250s] [ 79%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/gjk_solver_libccd.cpp.o
+[267.336s] [ 80%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/gjk_solver_indep.cpp.o
+[267.797s] [ 80%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/failed_at_this_configuration.cpp.o
+[268.641s] [ 81%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/primitive_shape_algorithm/intersect.cpp.o
+[268.647s] [ 82%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/primitive_shape_algorithm/plane.cpp.o
+[284.091s] [ 83%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/traversal/collision/collision_traversal_node_base.cpp.o
+[285.113s] [ 84%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/primitive_shape_algorithm/triangle_distance.cpp.o
+[285.139s] [ 85%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/primitive_shape_algorithm/sphere_triangle.cpp.o
+[286.172s] [ 86%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/primitive_shape_algorithm/sphere_sphere.cpp.o
+[286.548s] [ 87%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/primitive_shape_algorithm/sphere_cylinder.cpp.o
+[287.638s] [ 88%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/traversal/collision/mesh_collision_traversal_node.cpp.o
+[288.749s] [ 88%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/primitive_shape_algorithm/sphere_capsule.cpp.o
+[299.272s] [ 89%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/traversal/distance/mesh_distance_traversal_node.cpp.o
+[301.296s] [ 90%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/traversal/distance/mesh_conservative_advancement_traversal_node.cpp.o
+[303.328s] [ 91%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/traversal/distance/distance_traversal_node_base.cpp.o
+[319.188s] [ 92%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/distance.cpp.o
+[321.214s] [ 93%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/traversal/traversal_recurse.cpp.o
+[323.251s] [ 94%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/traversal/traversal_node_base.cpp.o
+[324.282s] [ 94%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/traversal/distance/conservative_advancement_stack_data.cpp.o
+[325.319s] [ 95%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/traversal/collision_node.cpp.o
+[325.664s] [ 96%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/traversal/collision/mesh_continuous_collision_traversal_node.cpp.o
+[325.723s] [ 97%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/distance_request.cpp.o
+[326.951s] [ 99%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/distance_result.cpp.o
+[326.951s] [ 99%] Building CXX object src/CMakeFiles/fcl.dir/narrowphase/detail/primitive_shape_algorithm/sphere_box.cpp.o
+[427.350s] [100%] Linking CXX shared library ../lib/libfcl.so
+[428.877s] [100%] Built target fcl
+[428.907s] Invoked command in '/home/unitree/Desktop/unitree_dex3/build/fcl' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/foxy CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --build /home/unitree/Desktop/unitree_dex3/build/fcl -- -j8 -l8
+[428.942s] Invoking command in '/home/unitree/Desktop/unitree_dex3/build/fcl': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/foxy CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --install /home/unitree/Desktop/unitree_dex3/build/fcl
+[428.960s] -- Install configuration: "Release"
+[428.961s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/lib/cmake/fcl/fcl-config.cmake
+[428.961s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/lib/cmake/fcl/fcl-config-version.cmake
+[428.962s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/lib/pkgconfig/fcl.pc
+[428.962s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/share/fcl/package.xml
+[428.963s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/lib/libfcl.so.0.7.0
+[428.984s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/lib/libfcl.so.0.7
+[428.984s] -- Set runtime path of "/home/unitree/Desktop/unitree_dex3/install/fcl/lib/libfcl.so.0.7.0" to "/home/unitree/Desktop/unitree_dex3/install/fcl/lib:/opt/ros/foxy/lib"
+[428.984s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/lib/libfcl.so
+[428.984s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/lib/cmake/fcl/fcl-targets.cmake
+[428.984s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/lib/cmake/fcl/fcl-targets-release.cmake
+[428.985s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include
+[428.985s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl
+[428.985s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/config.h
+[428.986s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/fcl.h
+[428.986s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/export.h
+[428.986s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/fcl/include
+[428.986s] -- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl
+[428.986s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry
+[428.987s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/collision_geometry.h
+[428.987s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/bvh
+[428.987s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/bvh/BVH_model-inl.h
+[428.987s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/bvh/BVH_internal.h
+[428.988s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/bvh/BVH_utility-inl.h
+[428.988s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/bvh/BVH_model.h
+[428.988s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/bvh/BV_node-inl.h
+[428.988s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/bvh/BV_node_base.h
+[428.989s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/bvh/detail
+[428.989s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/bvh/detail/BV_splitter.h
+[428.989s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/bvh/detail/BV_splitter-inl.h
+[428.989s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/bvh/detail/BV_fitter_base.h
+[428.989s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/bvh/detail/BV_fitter-inl.h
+[428.989s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/bvh/detail/BVH_front.h
+[428.990s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/bvh/detail/BV_splitter_base.h
+[428.990s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/bvh/detail/BV_fitter.h
+[428.990s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/bvh/BVH_utility.h
+[428.990s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/bvh/BV_node.h
+[428.990s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/geometric_shape_to_BVH_model-inl.h
+[428.990s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/geometric_shape_to_BVH_model.h
+[428.991s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape
+[428.991s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape/cylinder.h
+[428.991s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape/convex.h
+[428.991s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape/triangle_p-inl.h
+[428.991s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape/plane-inl.h
+[428.992s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape/convex-inl.h
+[428.992s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape/capsule.h
+[428.992s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape/triangle_p.h
+[428.992s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape/shape_base.h
+[428.992s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape/capsule-inl.h
+[428.993s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape/ellipsoid.h
+[428.993s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape/cone.h
+[428.993s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape/sphere-inl.h
+[428.993s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape/box.h
+[428.994s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape/cylinder-inl.h
+[428.994s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape/cone-inl.h
+[428.994s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape/sphere.h
+[428.994s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape/utility.h
+[428.994s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape/plane.h
+[428.994s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape/halfspace-inl.h
+[428.995s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape/utility-inl.h
+[428.995s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape/shape_base-inl.h
+[428.995s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape/halfspace.h
+[428.995s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape/box-inl.h
+[428.995s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/shape/ellipsoid-inl.h
+[428.996s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/collision_geometry-inl.h
+[428.996s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/octree
+[428.996s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/octree/octree.h
+[428.996s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/geometry/octree/octree-inl.h
+[428.996s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase
+[428.997s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/continuous_collision_request-inl.h
+[428.997s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/distance.h
+[429.003s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/contact-inl.h
+[429.004s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/cost_source.h
+[429.004s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/contact_point-inl.h
+[429.004s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/collision_request.h
+[429.005s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/collision_result-inl.h
+[429.006s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/distance_request.h
+[429.007s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/distance_request-inl.h
+[429.007s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/gjk_solver_type.h
+[429.008s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/collision.h
+[429.008s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/distance_result.h
+[429.008s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/continuous_collision_object.h
+[429.008s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/distance_result-inl.h
+[429.009s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/contact_point.h
+[429.009s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/collision_object.h
+[429.009s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/continuous_collision_request.h
+[429.009s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/continuous_collision_object-inl.h
+[429.010s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/collision_result.h
+[429.010s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/distance-inl.h
+[429.010s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/collision_request-inl.h
+[429.010s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/continuous_collision-inl.h
+[429.010s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/continuous_collision_result-inl.h
+[429.010s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/continuous_collision.h
+[429.010s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail
+[429.010s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/collision_func_matrix-inl.h
+[429.010s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/gjk_solver_libccd-inl.h
+[429.011s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/collision_func_matrix.h
+[429.011s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/distance_func_matrix-inl.h
+[429.011s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/failed_at_this_configuration.h
+[429.012s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/distance_func_matrix.h
+[429.012s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/conservative_advancement_func_matrix.h
+[429.012s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/conservative_advancement_func_matrix-inl.h
+[429.012s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/gjk_solver_libccd.h
+[429.012s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/convexity_based_algorithm
+[429.012s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/convexity_based_algorithm/polytope.h
+[429.013s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/convexity_based_algorithm/minkowski_diff-inl.h
+[429.013s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/convexity_based_algorithm/gjk-inl.h
+[429.013s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/convexity_based_algorithm/gjk_libccd-inl.h
+[429.013s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/convexity_based_algorithm/epa-inl.h
+[429.013s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/convexity_based_algorithm/minkowski_diff.h
+[429.013s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/convexity_based_algorithm/epa.h
+[429.014s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/convexity_based_algorithm/gjk.h
+[429.014s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/convexity_based_algorithm/support.h
+[429.014s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/convexity_based_algorithm/alloc.h
+[429.015s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/convexity_based_algorithm/simplex.h
+[429.015s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/convexity_based_algorithm/gjk_libccd.h
+[429.015s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/convexity_based_algorithm/list.h
+[429.015s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/gjk_solver_indep.h
+[429.016s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal
+[429.016s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/collision
+[429.016s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/collision/collision_traversal_node_base-inl.h
+[429.017s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/collision/shape_bvh_collision_traversal_node-inl.h
+[429.017s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/collision/mesh_shape_collision_traversal_node.h
+[429.017s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/collision/intersect-inl.h
+[429.017s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/collision/shape_mesh_collision_traversal_node-inl.h
+[429.017s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/collision/bvh_collision_traversal_node-inl.h
+[429.018s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/collision/bvh_collision_traversal_node.h
+[429.018s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/collision/intersect.h
+[429.018s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/collision/mesh_collision_traversal_node-inl.h
+[429.019s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/collision/mesh_continuous_collision_traversal_node.h
+[429.019s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/collision/shape_collision_traversal_node-inl.h
+[429.019s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/collision/shape_bvh_collision_traversal_node.h
+[429.020s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/collision/bvh_shape_collision_traversal_node-inl.h
+[429.020s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/collision/mesh_collision_traversal_node.h
+[429.020s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/collision/mesh_continuous_collision_traversal_node-inl.h
+[429.020s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/collision/mesh_shape_collision_traversal_node-inl.h
+[429.020s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/collision/shape_collision_traversal_node.h
+[429.021s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/collision/shape_mesh_collision_traversal_node.h
+[429.021s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/collision/bvh_shape_collision_traversal_node.h
+[429.021s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/collision/collision_traversal_node_base.h
+[429.022s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance
+[429.022s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/shape_mesh_conservative_advancement_traversal_node-inl.h
+[429.022s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/conservative_advancement_stack_data-inl.h
+[429.023s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/bvh_distance_traversal_node.h
+[429.023s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/bvh_shape_distance_traversal_node.h
+[429.023s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/shape_distance_traversal_node.h
+[429.024s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/shape_mesh_conservative_advancement_traversal_node.h
+[429.024s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/distance_traversal_node_base-inl.h
+[429.024s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/shape_bvh_distance_traversal_node-inl.h
+[429.024s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/bvh_shape_distance_traversal_node-inl.h
+[429.025s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/bvh_distance_traversal_node-inl.h
+[429.025s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/shape_mesh_distance_traversal_node.h
+[429.025s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/shape_conservative_advancement_traversal_node-inl.h
+[429.025s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/shape_bvh_distance_traversal_node.h
+[429.026s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/mesh_shape_conservative_advancement_traversal_node.h
+[429.026s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/mesh_conservative_advancement_traversal_node.h
+[429.026s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/shape_conservative_advancement_traversal_node.h
+[429.026s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/mesh_shape_conservative_advancement_traversal_node-inl.h
+[429.026s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/shape_mesh_distance_traversal_node-inl.h
+[429.027s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/mesh_distance_traversal_node-inl.h
+[429.027s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/mesh_distance_traversal_node.h
+[429.027s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/shape_distance_traversal_node-inl.h
+[429.028s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/distance_traversal_node_base.h
+[429.028s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/mesh_shape_distance_traversal_node.h
+[429.028s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/conservative_advancement_stack_data.h
+[429.028s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/mesh_conservative_advancement_traversal_node-inl.h
+[429.028s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/distance/mesh_shape_distance_traversal_node-inl.h
+[429.029s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/traversal_recurse-inl.h
+[429.029s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/collision_node.h
+[429.029s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/traversal_recurse.h
+[429.030s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/collision_node-inl.h
+[429.030s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/traversal_node_base.h
+[429.030s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree
+[429.031s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree/collision
+[429.031s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree/collision/mesh_octree_collision_traversal_node.h
+[429.031s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree/collision/octree_mesh_collision_traversal_node.h
+[429.031s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree/collision/octree_shape_collision_traversal_node-inl.h
+[429.032s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree/collision/mesh_octree_collision_traversal_node-inl.h
+[429.032s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree/collision/octree_collision_traversal_node-inl.h
+[429.032s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree/collision/octree_mesh_collision_traversal_node-inl.h
+[429.032s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree/collision/shape_octree_collision_traversal_node.h
+[429.033s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree/collision/octree_collision_traversal_node.h
+[429.033s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree/collision/octree_shape_collision_traversal_node.h
+[429.033s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree/collision/shape_octree_collision_traversal_node-inl.h
+[429.033s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree/distance
+[429.034s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree/distance/octree_distance_traversal_node-inl.h
+[429.034s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree/distance/shape_octree_distance_traversal_node.h
+[429.034s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree/distance/mesh_octree_distance_traversal_node-inl.h
+[429.035s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree/distance/octree_mesh_distance_traversal_node.h
+[429.035s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree/distance/shape_octree_distance_traversal_node-inl.h
+[429.035s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree/distance/octree_shape_distance_traversal_node.h
+[429.036s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree/distance/octree_mesh_distance_traversal_node-inl.h
+[429.036s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree/distance/octree_shape_distance_traversal_node-inl.h
+[429.036s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree/distance/mesh_octree_distance_traversal_node.h
+[429.037s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree/distance/octree_distance_traversal_node.h
+[429.037s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree/octree_solver-inl.h
+[429.037s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/octree/octree_solver.h
+[429.038s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/traversal/traversal_node_base-inl.h
+[429.038s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/gjk_solver_indep-inl.h
+[429.038s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/primitive_shape_algorithm
+[429.038s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/primitive_shape_algorithm/sphere_triangle.h
+[429.039s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/primitive_shape_algorithm/sphere_box-inl.h
+[429.039s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/primitive_shape_algorithm/plane-inl.h
+[429.039s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/primitive_shape_algorithm/capsule_capsule-inl.h
+[429.039s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/primitive_shape_algorithm/sphere_cylinder.h
+[429.039s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/primitive_shape_algorithm/sphere_capsule-inl.h
+[429.040s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/primitive_shape_algorithm/sphere_capsule.h
+[429.040s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/primitive_shape_algorithm/capsule_capsule.h
+[429.041s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/primitive_shape_algorithm/box_box-inl.h
+[429.041s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/primitive_shape_algorithm/sphere_box.h
+[429.041s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/primitive_shape_algorithm/sphere_cylinder-inl.h
+[429.042s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/primitive_shape_algorithm/triangle_distance-inl.h
+[429.042s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/primitive_shape_algorithm/plane.h
+[429.043s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/primitive_shape_algorithm/halfspace-inl.h
+[429.043s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/primitive_shape_algorithm/sphere_sphere.h
+[429.043s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/primitive_shape_algorithm/halfspace.h
+[429.043s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/primitive_shape_algorithm/triangle_distance.h
+[429.044s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/primitive_shape_algorithm/box_box.h
+[429.044s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/primitive_shape_algorithm/sphere_sphere-inl.h
+[429.045s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/detail/primitive_shape_algorithm/sphere_triangle-inl.h
+[429.045s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/contact.h
+[429.046s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/cost_source-inl.h
+[429.046s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/continuous_collision_result.h
+[429.046s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/collision_object-inl.h
+[429.047s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/narrowphase/collision-inl.h
+[429.047s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/common
+[429.047s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/common/time.h
+[429.048s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/common/unused.h
+[429.048s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/common/profiler.h
+[429.048s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/common/types.h
+[429.049s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/common/warning.h
+[429.049s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/common/exception.h
+[429.049s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/common/detail
+[429.049s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/common/detail/profiler.h
+[429.050s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math
+[429.050s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/rng-inl.h
+[429.050s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion
+[429.050s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/screw_motion.h
+[429.051s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/screw_motion-inl.h
+[429.051s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/translation_motion.h
+[429.051s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/translation_motion-inl.h
+[429.051s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/motion_base.h
+[429.052s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/tbv_motion_bound_visitor.h
+[429.052s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/spline_motion.h
+[429.052s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/motion_base-inl.h
+[429.052s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/triangle_motion_bound_visitor-inl.h
+[429.052s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/bv_motion_bound_visitor.h
+[429.052s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/taylor_model
+[429.052s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/taylor_model/interval_vector.h
+[429.053s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/taylor_model/interval_matrix-inl.h
+[429.053s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/taylor_model/taylor_vector.h
+[429.053s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/taylor_model/interval.h
+[429.053s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/taylor_model/taylor_vector-inl.h
+[429.053s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/taylor_model/taylor_model.h
+[429.053s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/taylor_model/taylor_model-inl.h
+[429.053s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/taylor_model/interval_vector-inl.h
+[429.053s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/taylor_model/taylor_matrix.h
+[429.054s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/taylor_model/interval-inl.h
+[429.054s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/taylor_model/time_interval.h
+[429.054s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/taylor_model/taylor_matrix-inl.h
+[429.054s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/taylor_model/time_interval-inl.h
+[429.054s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/taylor_model/interval_matrix.h
+[429.054s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/interp_motion.h
+[429.054s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/interp_motion-inl.h
+[429.054s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/tbv_motion_bound_visitor-inl.h
+[429.054s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/spline_motion-inl.h
+[429.055s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/motion/triangle_motion_bound_visitor.h
+[429.055s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/variance3-inl.h
+[429.055s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/constants.h
+[429.055s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/geometry-inl.h
+[429.056s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/bv
+[429.056s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/bv/kIOS.h
+[429.056s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/bv/OBB-inl.h
+[429.056s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/bv/RSS-inl.h
+[429.056s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/bv/OBB.h
+[429.056s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/bv/RSS.h
+[429.057s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/bv/OBBRSS-inl.h
+[429.058s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/bv/OBBRSS.h
+[429.058s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/bv/kIOS-inl.h
+[429.058s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/bv/kDOP-inl.h
+[429.060s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/bv/AABB.h
+[429.060s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/bv/kDOP.h
+[429.060s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/bv/utility.h
+[429.060s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/bv/utility-inl.h
+[429.060s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/bv/AABB-inl.h
+[429.061s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/sampler
+[429.061s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/sampler/sampler_se3_quat_ball.h
+[429.062s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/sampler/sampler_se3_euler_ball.h
+[429.062s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/sampler/sampler_se3_quat_ball-inl.h
+[429.062s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/sampler/sampler_base.h
+[429.062s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/sampler/sampler_se3_euler.h
+[429.062s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/sampler/sampler_r.h
+[429.063s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/sampler/sampler_se3_euler_ball-inl.h
+[429.063s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/sampler/sampler_se3_quat.h
+[429.063s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/sampler/sampler_se3_quat-inl.h
+[429.064s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/sampler/sampler_se2.h
+[429.064s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/sampler/sampler_r-inl.h
+[429.064s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/sampler/sampler_se3_euler-inl.h
+[429.065s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/sampler/sampler_se2-inl.h
+[429.065s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/sampler/sampler_se2_disk.h
+[429.066s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/sampler/sampler_se2_disk-inl.h
+[429.069s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/triangle.h
+[429.069s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/rng.h
+[429.069s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/detail
+[429.070s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/detail/project-inl.h
+[429.070s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/detail/polysolver.h
+[429.070s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/detail/seed.h
+[429.070s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/detail/polysolver-inl.h
+[429.070s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/detail/project.h
+[429.070s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/geometry.h
+[429.070s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/math/variance3.h
+[429.071s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase
+[429.071s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/broadphase_bruteforce-inl.h
+[429.071s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/broadphase_collision_manager-inl.h
+[429.071s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/broadphase_dynamic_AABB_tree-inl.h
+[429.071s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/broadphase_SSaP.h
+[429.071s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/broadphase_spatialhash-inl.h
+[429.071s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/broadphase_SaP.h
+[429.072s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/broadphase_continuous_collision_manager.h
+[429.072s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/default_broadphase_callbacks.h
+[429.072s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/broadphase_interval_tree.h
+[429.072s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/broadphase_SSaP-inl.h
+[429.072s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/broadphase_dynamic_AABB_tree_array-inl.h
+[429.072s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/broadphase_SaP-inl.h
+[429.072s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/broadphase_dynamic_AABB_tree.h
+[429.073s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/broadphase_collision_manager.h
+[429.073s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/broadphase_continuous_collision_manager-inl.h
+[429.073s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/broadphase_interval_tree-inl.h
+[429.073s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/broadphase_dynamic_AABB_tree_array.h
+[429.073s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/detail
+[429.073s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/detail/simple_interval.h
+[429.073s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/detail/hierarchy_tree_array-inl.h
+[429.073s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/detail/simple_interval-inl.h
+[429.073s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/detail/hierarchy_tree-inl.h
+[429.074s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/detail/spatial_hash.h
+[429.074s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/detail/node_base.h
+[429.074s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/detail/interval_tree.h
+[429.074s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/detail/simple_hash_table.h
+[429.074s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/detail/hierarchy_tree_array.h
+[429.074s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/detail/spatial_hash-inl.h
+[429.074s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/detail/morton.h
+[429.074s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/detail/hierarchy_tree.h
+[429.075s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/detail/interval_tree_node.h
+[429.076s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/detail/node_base-inl.h
+[429.077s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/detail/simple_hash_table-inl.h
+[429.077s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/detail/interval_tree-inl.h
+[429.078s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/detail/sparse_hash_table.h
+[429.078s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/detail/morton-inl.h
+[429.078s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/detail/node_base_array-inl.h
+[429.079s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/detail/sparse_hash_table-inl.h
+[429.080s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/detail/node_base_array.h
+[429.080s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/detail/interval_tree_node-inl.h
+[429.081s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/broadphase_spatialhash.h
+[429.081s] -- Installing: /home/unitree/Desktop/unitree_dex3/install/fcl/include/fcl/broadphase/broadphase_bruteforce.h
+[429.081s] Invoked command in '/home/unitree/Desktop/unitree_dex3/build/fcl' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/foxy CONDA_PROMPT_MODIFIER=(base) /usr/bin/cmake --install /home/unitree/Desktop/unitree_dex3/build/fcl

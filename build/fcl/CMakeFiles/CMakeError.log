@@ -1,0 +1,19 @@
+Performing C++ SOURCE FILE Test _compiler_supports_sse failed with the following output:
+Change Dir: /home/unitree/Desktop/unitree_dex3/build/fcl/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_6aa96/fast && /usr/bin/make -f CMakeFiles/cmTC_6aa96.dir/build.make CMakeFiles/cmTC_6aa96.dir/build
+make[1]: Entering directory '/home/unitree/Desktop/unitree_dex3/build/fcl/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_6aa96.dir/src.cxx.o
+/usr/bin/c++    -D_compiler_supports_sse   -mfpmath=sse -msse -msse2 -msse3 -mssse3 -o CMakeFiles/cmTC_6aa96.dir/src.cxx.o -c /home/unitree/Desktop/unitree_dex3/build/fcl/CMakeFiles/CMakeTmp/src.cxx
+c++: error: unrecognized command line option '-mfpmath=sse'
+c++: error: unrecognized command line option '-msse'
+c++: error: unrecognized command line option '-msse2'
+c++: error: unrecognized command line option '-msse3'
+c++: error: unrecognized command line option '-mssse3'
+make[1]: *** [CMakeFiles/cmTC_6aa96.dir/build.make:66: CMakeFiles/cmTC_6aa96.dir/src.cxx.o] Error 1
+make[1]: Leaving directory '/home/unitree/Desktop/unitree_dex3/build/fcl/CMakeFiles/CMakeTmp'
+make: *** [Makefile:121: cmTC_6aa96/fast] Error 2
+
+
+Source file was:
+int main() { return 0; }

@@ -1,0 +1,193 @@
+[0.041s] Invoking command in '/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack': AMENT_PREFIX_PATH=/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs:/home/unitree/unitree_ros2/cyclonedds_ws/install:/home/unitree/cyclonedds_ws/install/rmw_cyclonedds_cpp:/home/unitree/cyclonedds_ws/install/cyclonedds:/opt/ros/foxy CONDA_PROMPT_MODIFIER=(base) LD_LIBRARY_PATH=/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib/lib:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs/lib/python3.8/site-packages:${PYTHONPATH} /usr/bin/cmake /home/unitree/Desktop/unitree_dex3/src/unitree_g1_dex3_stack-main -DBUILD_IK_FCL_OMPL_PLANNER=ON -DCMAKE_INSTALL_PREFIX=/home/unitree/Desktop/unitree_dex3/install/unitree_g1_dex3_stack
+[0.210s] -- The C compiler identification is GNU 9.4.0
+[0.315s] -- The CXX compiler identification is GNU 9.4.0
+[0.343s] -- Check for working C compiler: /usr/bin/cc
+[0.486s] -- Check for working C compiler: /usr/bin/cc -- works
+[0.492s] -- Detecting C compiler ABI info
+[0.639s] -- Detecting C compiler ABI info - done
+[0.656s] -- Detecting C compile features
+[0.658s] -- Detecting C compile features - done
+[0.663s] -- Check for working CXX compiler: /usr/bin/c++
+[0.828s] -- Check for working CXX compiler: /usr/bin/c++ -- works
+[0.829s] -- Detecting CXX compiler ABI info
+[1.003s] -- Detecting CXX compiler ABI info - done
+[1.018s] -- Detecting CXX compile features
+[1.019s] -- Detecting CXX compile features - done
+[1.027s] -- Found ament_cmake: 0.9.12 (/opt/ros/foxy/share/ament_cmake/cmake)
+[1.109s] -- Found PythonInterp: /usr/bin/python3 (found suitable version "3.8.10", minimum required is "3") 
+[1.109s] -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+[1.610s] -- Found rclcpp: 2.4.3 (/opt/ros/foxy/share/rclcpp/cmake)
+[1.717s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[1.731s] -- Found rosidl_adapter: 1.3.1 (/opt/ros/foxy/share/rosidl_adapter/cmake)
+[2.043s] -- Found OpenSSL: /usr/lib/aarch64-linux-gnu/libcrypto.so (found version "1.1.1f")  
+[2.141s] -- Found FastRTPS: /opt/ros/foxy/include  
+[2.340s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[2.464s] -- Found rmw_implementation_cmake: 1.0.4 (/opt/ros/foxy/share/rmw_implementation_cmake/cmake)
+[2.467s] -- Using RMW implementation 'rmw_cyclonedds_cpp' as default
+[2.469s] -- Looking for pthread.h
+[2.677s] -- Looking for pthread.h - found
+[2.678s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+[2.899s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+[2.899s] -- Looking for pthread_create in pthreads
+[3.115s] -- Looking for pthread_create in pthreads - not found
+[3.115s] -- Looking for pthread_create in pthread
+[3.401s] -- Looking for pthread_create in pthread - found
+[3.404s] -- Found Threads: TRUE  
+[3.755s] -- Found sensor_msgs: 2.0.5 (/opt/ros/foxy/share/sensor_msgs/cmake)
+[3.974s] -- Found trajectory_msgs: 2.0.5 (/opt/ros/foxy/share/trajectory_msgs/cmake)
+[4.094s] -- Found unitree_hg: 0.0.0 (/home/unitree/unitree_ros2/cyclonedds_ws/install/share/unitree_hg/cmake)
+[4.236s] -- Found urdf: 2.4.0 (/opt/ros/foxy/share/urdf/cmake)
+[4.325s] -- Found kdl_parser: 2.4.1 (/opt/ros/foxy/share/kdl_parser/cmake)
+[4.338s] -- Found eigen3_cmake_module: 0.1.1 (/opt/ros/foxy/share/eigen3_cmake_module/cmake)
+[4.357s] -- Found Eigen3: TRUE (found version "3.3.7") 
+[4.377s] -- Found vision_msgs: 2.0.0 (/opt/ros/foxy/share/vision_msgs/cmake)
+[4.596s] -- Found cv_bridge: 3.0.7 (/opt/ros/foxy/share/cv_bridge/cmake)
+[4.654s] -- Found OpenCV: /usr (found version "4.2.0") 
+[4.656s] -- Found bboxes_ex_msgs: 0.0.1 (/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs/share/bboxes_ex_msgs/cmake)
+[4.719s] -- Found image_transport: 2.4.0 (/opt/ros/foxy/share/image_transport/cmake)
+[4.844s] -- Found pcl_conversions: 2.2.1 (/opt/ros/foxy/share/pcl_conversions/cmake)
+[5.125s] -- Found tf2: 0.13.14 (/opt/ros/foxy/share/tf2/cmake)
+[5.148s] -- Found tf2_ros: 0.13.14 (/opt/ros/foxy/share/tf2_ros/cmake)
+[5.659s] -- Found tf2_geometry_msgs: 0.13.14 (/opt/ros/foxy/share/tf2_geometry_msgs/cmake)
+[5.731s] -- Checking for module 'eigen3'
+[5.779s] --   Found eigen3, version 3.3.7
+[5.878s] -- Found Eigen: /usr/include/eigen3 (Required is at least version "3.1") 
+[5.878s] -- Eigen found (include: /usr/include/eigen3, version: 3.3.7)
+[5.997s] -- Found Boost: /usr/include (found suitable version "1.71.0", minimum required is "1.55.0") found components: system filesystem date_time iostreams regex 
+[6.033s] -- Checking for module 'flann'
+[6.081s] --   Found flann, version 1.9.1
+[6.207s] -- Found FLANN: /usr/lib/aarch64-linux-gnu/libflann_cpp.so  
+[6.309s] -- The imported target "vtkParseOGLExt" references the file
+[6.309s]    "/usr/bin/vtkParseOGLExt-7.1"
+[6.310s] but this file does not exist.  Possible reasons include:
+[6.310s] * The file was deleted, renamed, or moved to another location.
+[6.310s] * An install or uninstall procedure did not complete successfully.
+[6.310s] * The installation package was faulty and contained
+[6.311s]    "/usr/lib/cmake/vtk-7.1/VTKTargets.cmake"
+[6.311s] but not all the files it references.
+[6.311s] 
+[6.311s] -- The imported target "vtkRenderingPythonTkWidgets" references the file
+[6.312s]    "/usr/lib/aarch64-linux-gnu/libvtkRenderingPythonTkWidgets.so"
+[6.312s] but this file does not exist.  Possible reasons include:
+[6.312s] * The file was deleted, renamed, or moved to another location.
+[6.312s] * An install or uninstall procedure did not complete successfully.
+[6.312s] * The installation package was faulty and contained
+[6.313s]    "/usr/lib/cmake/vtk-7.1/VTKTargets.cmake"
+[6.313s] but not all the files it references.
+[6.313s] 
+[6.313s] -- The imported target "vtk" references the file
+[6.313s]    "/usr/bin/vtk"
+[6.313s] but this file does not exist.  Possible reasons include:
+[6.314s] * The file was deleted, renamed, or moved to another location.
+[6.314s] * An install or uninstall procedure did not complete successfully.
+[6.314s] * The installation package was faulty and contained
+[6.314s]    "/usr/lib/cmake/vtk-7.1/VTKTargets.cmake"
+[6.314s] but not all the files it references.
+[6.314s] 
+[6.314s] -- The imported target "pvtk" references the file
+[6.315s]    "/usr/bin/pvtk"
+[6.315s] but this file does not exist.  Possible reasons include:
+[6.315s] * The file was deleted, renamed, or moved to another location.
+[6.315s] * An install or uninstall procedure did not complete successfully.
+[6.315s] * The installation package was faulty and contained
+[6.315s]    "/usr/lib/cmake/vtk-7.1/VTKTargets.cmake"
+[6.315s] but not all the files it references.
+[6.316s] 
+[6.367s] -- Checking for module 'libusb-1.0'
+[6.411s] --   Found libusb-1.0, version 1.0.23
+[6.507s] -- Found USB_10: /usr/lib/aarch64-linux-gnu/libusb-1.0.so  
+[6.672s] -- Found OpenNI: /usr/lib/libOpenNI.so  
+[6.672s] -- OpenNI found (include: /usr/include/ni, lib: /usr/lib/libOpenNI.so)
+[6.861s] -- Found OpenNI2: /usr/lib/libOpenNI2.so  
+[6.862s] -- OpenNI2 found (include: /usr/include/openni2, lib: /usr/lib/libOpenNI2.so)
+[6.862s] ** WARNING ** io features related to pcap will be disabled
+[6.862s] ** WARNING ** io features related to png will be disabled
+[6.884s] -- Found libusb-1.0: /usr/include  
+[6.884s] ** WARNING ** io features related to libusb-1.0 will be disabled
+[6.897s] -- OpenNI found (include: /usr/include/ni, lib: /usr/lib/libOpenNI.so)
+[6.909s] -- OpenNI2 found (include: /usr/include/openni2, lib: /usr/lib/libOpenNI2.so)
+[6.964s] -- Found Qhull: optimized;/usr/lib/aarch64-linux-gnu/libqhull.so;debug;/usr/lib/aarch64-linux-gnu/libqhull.so  
+[6.964s] -- QHULL found (include: /usr/include, lib: optimized;/usr/lib/aarch64-linux-gnu/libqhull.so;debug;/usr/lib/aarch64-linux-gnu/libqhull.so)
+[6.978s] -- OpenNI found (include: /usr/include/ni, lib: /usr/lib/libOpenNI.so)
+[6.997s] -- looking for PCL_COMMON
+[6.999s] -- Found PCL_COMMON: /usr/lib/aarch64-linux-gnu/libpcl_common.so  
+[7.000s] -- looking for PCL_KDTREE
+[7.001s] -- Found PCL_KDTREE: /usr/lib/aarch64-linux-gnu/libpcl_kdtree.so  
+[7.002s] -- looking for PCL_OCTREE
+[7.003s] -- Found PCL_OCTREE: /usr/lib/aarch64-linux-gnu/libpcl_octree.so  
+[7.004s] -- looking for PCL_SEARCH
+[7.005s] -- Found PCL_SEARCH: /usr/lib/aarch64-linux-gnu/libpcl_search.so  
+[7.005s] -- looking for PCL_SAMPLE_CONSENSUS
+[7.007s] -- Found PCL_SAMPLE_CONSENSUS: /usr/lib/aarch64-linux-gnu/libpcl_sample_consensus.so  
+[7.007s] -- looking for PCL_FILTERS
+[7.008s] -- Found PCL_FILTERS: /usr/lib/aarch64-linux-gnu/libpcl_filters.so  
+[7.009s] -- looking for PCL_2D
+[7.009s] -- Found PCL_2D: /usr/include/pcl-1.10  
+[7.010s] -- looking for PCL_GEOMETRY
+[7.011s] -- Found PCL_GEOMETRY: /usr/include/pcl-1.10  
+[7.011s] -- looking for PCL_IO
+[7.013s] -- Found PCL_IO: /usr/lib/aarch64-linux-gnu/libpcl_io.so  
+[7.014s] -- looking for PCL_FEATURES
+[7.017s] -- Found PCL_FEATURES: /usr/lib/aarch64-linux-gnu/libpcl_features.so  
+[7.019s] -- looking for PCL_ML
+[7.019s] -- Found PCL_ML: /usr/lib/aarch64-linux-gnu/libpcl_ml.so  
+[7.019s] -- looking for PCL_SEGMENTATION
+[7.019s] -- Found PCL_SEGMENTATION: /usr/lib/aarch64-linux-gnu/libpcl_segmentation.so  
+[7.020s] -- looking for PCL_VISUALIZATION
+[7.022s] -- Found PCL_VISUALIZATION: /usr/lib/aarch64-linux-gnu/libpcl_visualization.so  
+[7.022s] -- looking for PCL_SURFACE
+[7.024s] -- Found PCL_SURFACE: /usr/lib/aarch64-linux-gnu/libpcl_surface.so  
+[7.025s] -- looking for PCL_REGISTRATION
+[7.026s] -- Found PCL_REGISTRATION: /usr/lib/aarch64-linux-gnu/libpcl_registration.so  
+[7.027s] -- looking for PCL_KEYPOINTS
+[7.028s] -- Found PCL_KEYPOINTS: /usr/lib/aarch64-linux-gnu/libpcl_keypoints.so  
+[7.029s] -- looking for PCL_TRACKING
+[7.030s] -- Found PCL_TRACKING: /usr/lib/aarch64-linux-gnu/libpcl_tracking.so  
+[7.031s] -- looking for PCL_RECOGNITION
+[7.032s] -- Found PCL_RECOGNITION: /usr/lib/aarch64-linux-gnu/libpcl_recognition.so  
+[7.033s] -- looking for PCL_STEREO
+[7.034s] -- Found PCL_STEREO: /usr/lib/aarch64-linux-gnu/libpcl_stereo.so  
+[7.035s] -- looking for PCL_APPS
+[7.036s] -- Found PCL_APPS: /usr/lib/aarch64-linux-gnu/libpcl_apps.so  
+[7.037s] -- looking for PCL_IN_HAND_SCANNER
+[7.038s] -- Found PCL_IN_HAND_SCANNER: /usr/include/pcl-1.10  
+[7.038s] -- looking for PCL_POINT_CLOUD_EDITOR
+[7.039s] -- Found PCL_POINT_CLOUD_EDITOR: /usr/include/pcl-1.10  
+[7.039s] -- looking for PCL_OUTOFCORE
+[7.041s] -- Found PCL_OUTOFCORE: /usr/lib/aarch64-linux-gnu/libpcl_outofcore.so  
+[7.041s] -- looking for PCL_PEOPLE
+[7.043s] -- Found PCL_PEOPLE: /usr/lib/aarch64-linux-gnu/libpcl_people.so  
+[7.044s] -- Found PCL: pcl_common;pcl_kdtree;pcl_octree;pcl_search;pcl_sample_consensus;pcl_filters;pcl_io;pcl_features;pcl_ml;pcl_segmentation;pcl_visualization;pcl_surface;pcl_registration;pcl_keypoints;pcl_tracking;pcl_recognition;pcl_stereo;pcl_apps;pcl_outofcore;pcl_people;/usr/lib/aarch64-linux-gnu/libboost_system.so;/usr/lib/aarch64-linux-gnu/libboost_filesystem.so;/usr/lib/aarch64-linux-gnu/libboost_date_time.so;/usr/lib/aarch64-linux-gnu/libboost_iostreams.so;/usr/lib/aarch64-linux-gnu/libboost_regex.so;optimized;/usr/lib/aarch64-linux-gnu/libqhull.so;debug;/usr/lib/aarch64-linux-gnu/libqhull.so;/usr/lib/libOpenNI.so;/usr/lib/libOpenNI2.so;vtkChartsCore;vtkCommonColor;vtkCommonCore;vtksys;vtkCommonDataModel;vtkCommonMath;vtkCommonMisc;vtkCommonSystem;vtkCommonTransforms;vtkCommonExecutionModel;vtkFiltersGeneral;vtkCommonComputationalGeometry;vtkFiltersCore;vtkInfovisCore;vtkFiltersExtraction;vtkFiltersStatistics;vtkImagingFourier;vtkImagingCore;vtkalglib;vtkRenderingContext2D;vtkRenderingCore;vtkFiltersGeometry;vtkFiltersSources;vtkRenderingFreeType;/usr/lib/aarch64-linux-gnu/libfreetype.so;/usr/lib/aarch64-linux-gnu/libz.so;vtkFiltersModeling;vtkImagingSources;vtkInteractionStyle;vtkInteractionWidgets;vtkFiltersHybrid;vtkImagingColor;vtkImagingGeneral;vtkImagingHybrid;vtkIOImage;vtkDICOMParser;vtkmetaio;/usr/lib/aarch64-linux-gnu/libjpeg.so;/usr/lib/aarch64-linux-gnu/libpng.so;/usr/lib/aarch64-linux-gnu/libtiff.so;vtkRenderingAnnotation;vtkRenderingVolume;vtkIOXML;vtkIOCore;vtkIOXMLParser;/usr/lib/aarch64-linux-gnu/libexpat.so;vtkIOGeometry;vtkIOLegacy;vtkIOPLY;vtkRenderingLOD;vtkViewsContext2D;vtkViewsCore;vtkRenderingContextOpenGL2;vtkRenderingOpenGL2;FLANN::FLANN  
+[7.047s] -- Found trac_ik_lib: 2.0.2 (/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib/share/trac_ik_lib/cmake)
+[7.087s] -- Found ompl: /opt/ros/foxy/include/ompl-1.5;/usr/include/eigen3  
+[7.096s] -- Found PkgConfig: /usr/bin/pkg-config (found version "0.29.1") 
+[7.098s] -- Checking for module 'fcl'
+[7.141s] --   Found fcl, version 0.5.0
+[7.254s] -- Found geometric_shapes: 2.1.2 (/opt/ros/foxy/share/geometric_shapes/cmake)
+[7.264s] -- Found Boost: /usr/include (found version "1.71.0") found components: filesystem 
+[7.544s] -- library: /usr/lib/aarch64-linux-gnu/libcurl.so
+[7.944s] -- Found ament_lint_auto: 0.9.8 (/opt/ros/foxy/share/ament_lint_auto/cmake)
+[8.094s] -- Configuring done
+[8.359s] -- Generating done
+[8.505s] -- Build files have been written to: /home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack
+[8.554s] Invoked command in '/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack' returned '0': AMENT_PREFIX_PATH=/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs:/home/unitree/unitree_ros2/cyclonedds_ws/install:/home/unitree/cyclonedds_ws/install/rmw_cyclonedds_cpp:/home/unitree/cyclonedds_ws/install/cyclonedds:/opt/ros/foxy CONDA_PROMPT_MODIFIER=(base) LD_LIBRARY_PATH=/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib/lib:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs/lib/python3.8/site-packages:${PYTHONPATH} /usr/bin/cmake /home/unitree/Desktop/unitree_dex3/src/unitree_g1_dex3_stack-main -DBUILD_IK_FCL_OMPL_PLANNER=ON -DCMAKE_INSTALL_PREFIX=/home/unitree/Desktop/unitree_dex3/install/unitree_g1_dex3_stack
+[8.560s] Invoking command in '/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack': AMENT_PREFIX_PATH=/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs:/home/unitree/unitree_ros2/cyclonedds_ws/install:/home/unitree/cyclonedds_ws/install/rmw_cyclonedds_cpp:/home/unitree/cyclonedds_ws/install/cyclonedds:/opt/ros/foxy CONDA_PROMPT_MODIFIER=(base) LD_LIBRARY_PATH=/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib/lib:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs/lib/python3.8/site-packages:${PYTHONPATH} /usr/bin/cmake --build /home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack -- -j8 -l8
+[8.720s] Scanning dependencies of target joint_state_publisher
+[8.729s] Scanning dependencies of target joint_trajectory_executor
+[8.761s] [  5%] Building CXX object CMakeFiles/joint_state_publisher.dir/src/joint_state_publisher.cpp.o
+[8.761s] [ 11%] Building CXX object CMakeFiles/joint_trajectory_executor.dir/src/joint_trajectory_executor.cpp.o
+[9.858s] Scanning dependencies of target ik_fcl_ompl_planner
+[9.952s] [ 16%] Building CXX object CMakeFiles/ik_fcl_ompl_planner.dir/src/ik_fcl_ompl_planner.cpp.o
+[10.442s] /home/unitree/Desktop/unitree_dex3/src/unitree_g1_dex3_stack-main/src/ik_fcl_ompl_planner.cpp:14:10: fatal error: fcl/fcl.h: No such file or directory
+[10.443s]    14 | #include <fcl/fcl.h>
+[10.443s]       |          ^~~~~~~~~~~
+[10.443s] compilation terminated.
+[10.457s] make[2]: *** [CMakeFiles/ik_fcl_ompl_planner.dir/build.make:63: CMakeFiles/ik_fcl_ompl_planner.dir/src/ik_fcl_ompl_planner.cpp.o] Error 1
+[10.457s] make[1]: *** [CMakeFiles/Makefile2:310: CMakeFiles/ik_fcl_ompl_planner.dir/all] Error 2
+[10.457s] make[1]: *** Waiting for unfinished jobs....
+[26.715s] [ 22%] Linking CXX executable joint_state_publisher
+[27.032s] [ 27%] Linking CXX executable joint_trajectory_executor
+[27.543s] [ 27%] Built target joint_state_publisher
+[27.937s] [ 27%] Built target joint_trajectory_executor
+[27.940s] make: *** [Makefile:141: all] Error 2
+[27.945s] Invoked command in '/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack' returned '2': AMENT_PREFIX_PATH=/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs:/home/unitree/unitree_ros2/cyclonedds_ws/install:/home/unitree/cyclonedds_ws/install/rmw_cyclonedds_cpp:/home/unitree/cyclonedds_ws/install/cyclonedds:/opt/ros/foxy CONDA_PROMPT_MODIFIER=(base) LD_LIBRARY_PATH=/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib/lib:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs/lib/python3.8/site-packages:${PYTHONPATH} /usr/bin/cmake --build /home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack -- -j8 -l8

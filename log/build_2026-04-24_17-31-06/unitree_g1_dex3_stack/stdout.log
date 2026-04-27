@@ -1,0 +1,10 @@
+[ 11%] Built target detection_to_goal_node
+[ 22%] Built target joint_trajectory_executor
+[ 33%] Built target joint_state_publisher
+[ 44%] Built target right_hand_pressure_monitor
+[ 66%] Built target visual_detection_yolo_tester
+[ 66%] Built target visual_detection_tester
+[ 77%] Built target dex3_controller
+[ 88%] Built target project_to_3d_node
+Scanning dependencies of target ik_fcl_ompl_planner
+[ 94%] Building CXX object CMakeFiles/ik_fcl_ompl_planner.dir/src/ik_fcl_ompl_planner.cpp.o

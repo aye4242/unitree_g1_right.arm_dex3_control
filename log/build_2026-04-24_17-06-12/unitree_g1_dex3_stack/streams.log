@@ -1,0 +1,40 @@
+[0.048s] Invoking command in '/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack': AMENT_PREFIX_PATH=/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs:/home/unitree/unitree_ros2/cyclonedds_ws/install:/home/unitree/cyclonedds_ws/install/rmw_cyclonedds_cpp:/home/unitree/cyclonedds_ws/install/cyclonedds:/opt/ros/foxy CONDA_PROMPT_MODIFIER=(base) LD_LIBRARY_PATH=/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib/lib:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs/lib/python3.8/site-packages:${PYTHONPATH} /usr/bin/cmake /home/unitree/Desktop/unitree_dex3/src/unitree_g1_dex3_stack-main -DBUILD_IK_FCL_OMPL_PLANNER=OFF -DCMAKE_INSTALL_PREFIX=/home/unitree/Desktop/unitree_dex3/install/unitree_g1_dex3_stack
+[0.361s] -- The C compiler identification is GNU 9.4.0
+[0.603s] -- The CXX compiler identification is GNU 9.4.0
+[0.636s] -- Check for working C compiler: /usr/bin/cc
+[0.978s] -- Check for working C compiler: /usr/bin/cc -- works
+[0.985s] -- Detecting C compiler ABI info
+[1.243s] -- Detecting C compiler ABI info - done
+[1.269s] -- Detecting C compile features
+[1.269s] -- Detecting C compile features - done
+[1.273s] -- Check for working CXX compiler: /usr/bin/c++
+[1.581s] -- Check for working CXX compiler: /usr/bin/c++ -- works
+[1.582s] -- Detecting CXX compiler ABI info
+[1.898s] -- Detecting CXX compiler ABI info - done
+[1.918s] -- Detecting CXX compile features
+[1.919s] -- Detecting CXX compile features - done
+[1.928s] -- Found ament_cmake: 0.9.12 (/opt/ros/foxy/share/ament_cmake/cmake)
+[2.044s] -- Found PythonInterp: /home/unitree/miniforge3/bin/python3 (found suitable version "3.13.12", minimum required is "3") 
+[2.044s] -- Using PYTHON_EXECUTABLE: /home/unitree/miniforge3/bin/python3
+[2.201s] Traceback (most recent call last):
+[2.211s]   File "/opt/ros/foxy/share/ament_cmake_core/cmake/package_templates/templates_2_cmake.py", line 21, in <module>
+[2.212s]     from ament_package.templates import get_environment_hook_template_path
+[2.212s]   File "/opt/ros/foxy/lib/python3.8/site-packages/ament_package/templates.py", line 18, in <module>
+[2.212s]     import pkg_resources
+[2.214s] ModuleNotFoundError: No module named 'pkg_resources'
+[2.241s] CMake Error at /opt/ros/foxy/share/ament_cmake_core/cmake/ament_cmake_package_templates-extras.cmake:41 (message):
+[2.241s]   execute_process(/home/unitree/miniforge3/bin/python3
+[2.241s]   /opt/ros/foxy/share/ament_cmake_core/cmake/package_templates/templates_2_cmake.py
+[2.241s]   /home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/ament_cmake_package_templates/templates.cmake)
+[2.241s]   returned error code 1
+[2.241s] Call Stack (most recent call first):
+[2.242s]   /opt/ros/foxy/share/ament_cmake_core/cmake/ament_cmake_coreConfig.cmake:41 (include)
+[2.242s]   /opt/ros/foxy/share/ament_cmake/cmake/ament_cmake_export_dependencies-extras.cmake:15 (find_package)
+[2.244s]   /opt/ros/foxy/share/ament_cmake/cmake/ament_cmakeConfig.cmake:41 (include)
+[2.245s]   CMakeLists.txt:21 (find_package)
+[2.245s] 
+[2.245s] 
+[2.245s] -- Configuring incomplete, errors occurred!
+[2.246s] See also "/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/CMakeFiles/CMakeOutput.log".
+[2.246s] See also "/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/CMakeFiles/CMakeError.log".
+[2.262s] Invoked command in '/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack' returned '1': AMENT_PREFIX_PATH=/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs:/home/unitree/unitree_ros2/cyclonedds_ws/install:/home/unitree/cyclonedds_ws/install/rmw_cyclonedds_cpp:/home/unitree/cyclonedds_ws/install/cyclonedds:/opt/ros/foxy CONDA_PROMPT_MODIFIER=(base) LD_LIBRARY_PATH=/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib/lib:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs/lib/python3.8/site-packages:${PYTHONPATH} /usr/bin/cmake /home/unitree/Desktop/unitree_dex3/src/unitree_g1_dex3_stack-main -DBUILD_IK_FCL_OMPL_PLANNER=OFF -DCMAKE_INSTALL_PREFIX=/home/unitree/Desktop/unitree_dex3/install/unitree_g1_dex3_stack

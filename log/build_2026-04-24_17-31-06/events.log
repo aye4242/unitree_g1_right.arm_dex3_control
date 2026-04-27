@@ -1,0 +1,268 @@
+[0.000000] (-) TimerEvent: {}
+[0.000269] (-) JobUnselected: {'identifier': 'bboxes_ex_msgs'}
+[0.000439] (-) JobUnselected: {'identifier': 'fcl'}
+[0.000832] (-) JobUnselected: {'identifier': 'trac_ik'}
+[0.001110] (-) JobUnselected: {'identifier': 'trac_ik_lib'}
+[0.001366] (-) JobUnselected: {'identifier': 'yolox_cpp'}
+[0.001477] (-) JobUnselected: {'identifier': 'yolox_ros_cpp'}
+[0.001682] (-) JobUnselected: {'identifier': 'yolox_ros_py'}
+[0.002144] (unitree_g1_dex3_stack) JobQueued: {'identifier': 'unitree_g1_dex3_stack', 'dependencies': OrderedDict([('bboxes_ex_msgs', '/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs'), ('fcl', '/home/unitree/Desktop/unitree_dex3/install/fcl'), ('trac_ik_lib', '/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib')])}
+[0.002230] (unitree_g1_dex3_stack) JobStarted: {'identifier': 'unitree_g1_dex3_stack'}
+[0.036320] (unitree_g1_dex3_stack) JobProgress: {'identifier': 'unitree_g1_dex3_stack', 'progress': 'cmake'}
+[0.038187] (unitree_g1_dex3_stack) JobProgress: {'identifier': 'unitree_g1_dex3_stack', 'progress': 'build'}
+[0.039410] (unitree_g1_dex3_stack) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack', '--', '-j8', '-l8'], 'cwd': '/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('CONDA_PROMPT_MODIFIER', '(base)'), ('USER', 'unitree'), ('SSH_CLIENT', '192.168.100.27 63999 22'), ('XDG_SESSION_TYPE', 'tty'), ('GIT_ASKPASS', '/home/unitree/.windsurf-server/bin/08b5de9bae1728a5ad46386c9b8903192a125c51/extensions/git/dist/askpass.sh'), ('SHLVL', '0'), ('LD_LIBRARY_PATH', '/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib/lib:/home/unitree/Desktop/unitree_dex3/install/fcl/lib:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs/lib:/home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/lib:/home/unitree/Desktop/unitree_dex3/install/yolox_cpp/lib:/usr/local/cuda-11.4/lib64:/usr/local/lib:/usr/local/cuda-11.4/lib64:/usr/local/lib:/home/unitree/unitree_ros2/cyclonedds_ws/install/lib:/home/unitree/cyclonedds_ws/install/rmw_cyclonedds_cpp/lib:/home/unitree/cyclonedds_ws/install/cyclonedds/lib:/opt/ros/foxy/opt/yaml_cpp_vendor/lib:/opt/ros/foxy/opt/rviz_ogre_vendor/lib:/opt/ros/foxy/lib/aarch64-linux-gnu:/opt/ros/foxy/lib'), ('BROWSER', '/home/unitree/.windsurf-server/bin/08b5de9bae1728a5ad46386c9b8903192a125c51/bin/helpers/browser.sh'), ('MOTD_SHOWN', 'pam'), ('HOME', '/home/unitree'), ('CONDA_SHLVL', '1'), ('CYCLONEDDS_URI', '/home/unitree/cyclonedds_ws/cyclonedds.xml'), ('OLDPWD', '/home/unitree/Desktop/unitree_dex3'), ('TERM_PROGRAM_VERSION', '1.110.1-windsurf'), ('NVM_BIN', '/home/unitree/.nvm/versions/node/v24.12.0/bin'), ('VSCODE_IPC_HOOK_CLI', '/run/user/1000/vscode-ipc-f835af60-c6ac-46d1-b56e-7349d3af5fb9.sock'), ('NVM_INC', '/home/unitree/.nvm/versions/node/v24.12.0/include/node'), ('JETSON_L4T', '35.3.1'), ('ROS_PYTHON_VERSION', '3'), ('JETSON_MODEL', 'NVIDIA Orin NX Developer Kit'), ('PAGER', 'cat'), ('VSCODE_GIT_ASKPASS_MAIN', '/home/unitree/.windsurf-server/bin/08b5de9bae1728a5ad46386c9b8903192a125c51/extensions/git/dist/askpass-main.js'), ('VSCODE_GIT_ASKPASS_NODE', '/home/unitree/.windsurf-server/bin/08b5de9bae1728a5ad46386c9b8903192a125c51/node'), ('VSCODE_PYTHON_AUTOACTIVATE_GUARD', '1'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('_CE_M', ''), ('_CONDA_ROOT', '/home/unitree/miniforge3'), ('NVM_DIR', '/home/unitree/.nvm'), ('COLCON_PREFIX_PATH', '/home/unitree/Desktop/unitree_dex3/install:/home/unitree/unitree_ros2/cyclonedds_ws/install:/home/unitree/cyclonedds_ws/install'), ('ROS_DISTRO', 'foxy'), ('LOGNAME', 'unitree'), ('JETSON_MODULE', 'NVIDIA Jetson Orin NX (16GB ram)'), ('JETSON_SERIAL_NUMBER', ''), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('PKG_CONFIG_PATH', '/home/unitree/Desktop/unitree_dex3/install/fcl/lib/aarch64-linux-gnu/pkgconfig:/home/unitree/Desktop/unitree_dex3/install/fcl/lib/pkgconfig:/home/unitree/unitree_ros2/cyclonedds_ws/install/lib/aarch64-linux-gnu/pkgconfig:/home/unitree/unitree_ros2/cyclonedds_ws/install/lib/pkgconfig:/home/unitree/cyclonedds_ws/install/cyclonedds/lib/aarch64-linux-gnu/pkgconfig:/home/unitree/cyclonedds_ws/install/cyclonedds/lib/pkgconfig'), ('JETSON_CODENAME', 'P3768'), ('XDG_SESSION_CLASS', 'user'), ('TERM', 'xterm-256color'), ('XDG_SESSION_ID', '8'), ('_CE_CONDA', ''), ('ROS_LOCALHOST_ONLY', '0'), ('WINDSURF_CASCADE_TERMINAL_KIND', 'inherit'), ('WINDSURF_CASCADE_TERMINAL', '1'), ('PATH', '/home/unitree/.local/bin:/usr/local/cuda-11.4/bin:/home/unitree/.windsurf-server/bin/08b5de9bae1728a5ad46386c9b8903192a125c51/bin/remote-cli:/home/unitree/.local/bin:/home/unitree/miniforge3/bin:/home/unitree/miniforge3/condabin:/home/unitree/.local/bin:/home/unitree/.nvm/versions/node/v24.12.0/bin:/usr/local/cuda-11.4/bin:/home/unitree/unitree_ros2/cyclonedds_ws/install/bin:/home/unitree/cyclonedds_ws/install/cyclonedds/bin:/opt/ros/foxy/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('LANG', 'en_US.UTF-8'), ('RMW_IMPLEMENTATION', 'rmw_cyclonedds_cpp'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('JETSON_SOC', 'tegra23x'), ('VSCODE_GIT_IPC_HANDLE', '/run/user/1000/vscode-git-37dc1b1adb.sock'), ('TERM_PROGRAM', 'vscode'), ('XML_CATALOG_FILES', 'file:///home/unitree/miniforge3/etc/xml/catalog file:///etc/xml/catalog file:///home/unitree/miniforge3/etc/xml/catalog file:///etc/xml/catalog'), ('AMENT_PREFIX_PATH', '/home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp:/home/unitree/Desktop/unitree_dex3/install/yolox_cpp:/home/unitree/Desktop/unitree_dex3/install/unitree_g1_dex3_stack:/home/unitree/Desktop/unitree_dex3/install/trac_ik:/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs:/home/unitree/unitree_ros2/cyclonedds_ws/install:/home/unitree/cyclonedds_ws/install/rmw_cyclonedds_cpp:/opt/ros/foxy'), ('CONDA_PYTHON_EXE', '/home/unitree/miniforge3/bin/python'), ('SHELL', '/bin/bash'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('CONDA_DEFAULT_ENV', 'base'), ('_CONDA_EXE', '/home/unitree/miniforge3/bin/conda'), ('VSCODE_GIT_ASKPASS_EXTRA_ARGS', ''), ('GIT_PAGER', 'cat'), ('JETSON_CUDA_ARCH_BIN', '8.7'), ('PWD', '/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack'), ('CONDA_EXE', '/home/unitree/miniforge3/bin/conda'), ('SSH_CONNECTION', '192.168.100.27 63999 192.168.100.30 22'), ('NVM_CD_FLAGS', ''), ('XDG_DATA_DIRS', '/usr/local/share:/usr/share:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs/lib/python3.8/site-packages:/home/unitree/unitree_ros2/cyclonedds_ws/build/g1_cam_bridge:/home/unitree/unitree_ros2/cyclonedds_ws/install/lib/python3.8/site-packages:/opt/ros/foxy/lib/python3.8/site-packages'), ('CONDA_PREFIX', '/home/unitree/miniforge3'), ('COLCON', '1'), ('JETSON_JETPACK', '5.1.1'), ('CMAKE_PREFIX_PATH', '/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib:/home/unitree/Desktop/unitree_dex3/install/fcl:/home/unitree/Desktop/unitree_dex3/install/bboxes_ex_msgs:/home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp:/home/unitree/Desktop/unitree_dex3/install/yolox_cpp:/home/unitree/Desktop/unitree_dex3/install/unitree_g1_dex3_stack:/home/unitree/Desktop/unitree_dex3/install/trac_ik:/home/unitree/unitree_ros2/cyclonedds_ws/install:/home/unitree/cyclonedds_ws/install/rmw_cyclonedds_cpp:/home/unitree/cyclonedds_ws/install/cyclonedds:/opt/ros/foxy'), ('JETSON_P_NUMBER', 'p3767-0000')]), 'shell': False}
+[0.099316] (-) TimerEvent: {}
+[0.199760] (-) TimerEvent: {}
+[0.201706] (unitree_g1_dex3_stack) StdoutLine: {'line': b'[ 11%] Built target detection_to_goal_node\n'}
+[0.212506] (unitree_g1_dex3_stack) StdoutLine: {'line': b'[ 22%] Built target joint_trajectory_executor\n'}
+[0.226557] (unitree_g1_dex3_stack) StdoutLine: {'line': b'[ 33%] Built target joint_state_publisher\n'}
+[0.228403] (unitree_g1_dex3_stack) StdoutLine: {'line': b'[ 44%] Built target right_hand_pressure_monitor\n'}
+[0.235065] (unitree_g1_dex3_stack) StdoutLine: {'line': b'[ 66%] Built target visual_detection_yolo_tester\n'}
+[0.235737] (unitree_g1_dex3_stack) StdoutLine: {'line': b'[ 66%] Built target visual_detection_tester\n'}
+[0.239472] (unitree_g1_dex3_stack) StdoutLine: {'line': b'[ 77%] Built target dex3_controller\n'}
+[0.299926] (-) TimerEvent: {}
+[0.316783] (unitree_g1_dex3_stack) StdoutLine: {'line': b'[ 88%] Built target project_to_3d_node\n'}
+[0.366738] (unitree_g1_dex3_stack) StdoutLine: {'line': b'Scanning dependencies of target ik_fcl_ompl_planner\n'}
+[0.400091] (-) TimerEvent: {}
+[0.420756] (unitree_g1_dex3_stack) StdoutLine: {'line': b'[ 94%] Building CXX object CMakeFiles/ik_fcl_ompl_planner.dir/src/ik_fcl_ompl_planner.cpp.o\n'}
+[0.501258] (-) TimerEvent: {}
+[0.601689] (-) TimerEvent: {}
+[0.702111] (-) TimerEvent: {}
+[0.802523] (-) TimerEvent: {}
+[0.902911] (-) TimerEvent: {}
+[1.003331] (-) TimerEvent: {}
+[1.103774] (-) TimerEvent: {}
+[1.204195] (-) TimerEvent: {}
+[1.304623] (-) TimerEvent: {}
+[1.405048] (-) TimerEvent: {}
+[1.505480] (-) TimerEvent: {}
+[1.605917] (-) TimerEvent: {}
+[1.706395] (-) TimerEvent: {}
+[1.806820] (-) TimerEvent: {}
+[1.907239] (-) TimerEvent: {}
+[2.009032] (-) TimerEvent: {}
+[2.110286] (-) TimerEvent: {}
+[2.210699] (-) TimerEvent: {}
+[2.311115] (-) TimerEvent: {}
+[2.411565] (-) TimerEvent: {}
+[2.512015] (-) TimerEvent: {}
+[2.612468] (-) TimerEvent: {}
+[2.712973] (-) TimerEvent: {}
+[2.813369] (-) TimerEvent: {}
+[2.913846] (-) TimerEvent: {}
+[3.017559] (-) TimerEvent: {}
+[3.117989] (-) TimerEvent: {}
+[3.218500] (-) TimerEvent: {}
+[3.318934] (-) TimerEvent: {}
+[3.419359] (-) TimerEvent: {}
+[3.519795] (-) TimerEvent: {}
+[3.620205] (-) TimerEvent: {}
+[3.720601] (-) TimerEvent: {}
+[3.821000] (-) TimerEvent: {}
+[3.921390] (-) TimerEvent: {}
+[4.021813] (-) TimerEvent: {}
+[4.122215] (-) TimerEvent: {}
+[4.222658] (-) TimerEvent: {}
+[4.323108] (-) TimerEvent: {}
+[4.423518] (-) TimerEvent: {}
+[4.523934] (-) TimerEvent: {}
+[4.624343] (-) TimerEvent: {}
+[4.724835] (-) TimerEvent: {}
+[4.825546] (-) TimerEvent: {}
+[4.926045] (-) TimerEvent: {}
+[5.026496] (-) TimerEvent: {}
+[5.126917] (-) TimerEvent: {}
+[5.227330] (-) TimerEvent: {}
+[5.327757] (-) TimerEvent: {}
+[5.428253] (-) TimerEvent: {}
+[5.528736] (-) TimerEvent: {}
+[5.629202] (-) TimerEvent: {}
+[5.729703] (-) TimerEvent: {}
+[5.830186] (-) TimerEvent: {}
+[5.930589] (-) TimerEvent: {}
+[6.031081] (-) TimerEvent: {}
+[6.132976] (-) TimerEvent: {}
+[6.233353] (-) TimerEvent: {}
+[6.333790] (-) TimerEvent: {}
+[6.434304] (-) TimerEvent: {}
+[6.534734] (-) TimerEvent: {}
+[6.635170] (-) TimerEvent: {}
+[6.735630] (-) TimerEvent: {}
+[6.836492] (-) TimerEvent: {}
+[6.936910] (-) TimerEvent: {}
+[7.037384] (-) TimerEvent: {}
+[7.137791] (-) TimerEvent: {}
+[7.238154] (-) TimerEvent: {}
+[7.338541] (-) TimerEvent: {}
+[7.438935] (-) TimerEvent: {}
+[7.539395] (-) TimerEvent: {}
+[7.639828] (-) TimerEvent: {}
+[7.740256] (-) TimerEvent: {}
+[7.840723] (-) TimerEvent: {}
+[7.941129] (-) TimerEvent: {}
+[8.041655] (-) TimerEvent: {}
+[8.142081] (-) TimerEvent: {}
+[8.242690] (-) TimerEvent: {}
+[8.343141] (-) TimerEvent: {}
+[8.443671] (-) TimerEvent: {}
+[8.544168] (-) TimerEvent: {}
+[8.644575] (-) TimerEvent: {}
+[8.744998] (-) TimerEvent: {}
+[8.845452] (-) TimerEvent: {}
+[8.946298] (-) TimerEvent: {}
+[9.047392] (-) TimerEvent: {}
+[9.149125] (-) TimerEvent: {}
+[9.249570] (-) TimerEvent: {}
+[9.350222] (-) TimerEvent: {}
+[9.451130] (-) TimerEvent: {}
+[9.551596] (-) TimerEvent: {}
+[9.652074] (-) TimerEvent: {}
+[9.752601] (-) TimerEvent: {}
+[9.853213] (-) TimerEvent: {}
+[9.955417] (-) TimerEvent: {}
+[10.055871] (-) TimerEvent: {}
+[10.156378] (-) TimerEvent: {}
+[10.256859] (-) TimerEvent: {}
+[10.357343] (-) TimerEvent: {}
+[10.457820] (-) TimerEvent: {}
+[10.558277] (-) TimerEvent: {}
+[10.659154] (-) TimerEvent: {}
+[10.759578] (-) TimerEvent: {}
+[10.860186] (-) TimerEvent: {}
+[10.960685] (-) TimerEvent: {}
+[11.061143] (-) TimerEvent: {}
+[11.161578] (-) TimerEvent: {}
+[11.261977] (-) TimerEvent: {}
+[11.362477] (-) TimerEvent: {}
+[11.462935] (-) TimerEvent: {}
+[11.563326] (-) TimerEvent: {}
+[11.664576] (-) TimerEvent: {}
+[11.764978] (-) TimerEvent: {}
+[11.865368] (-) TimerEvent: {}
+[11.965777] (-) TimerEvent: {}
+[12.066183] (-) TimerEvent: {}
+[12.166601] (-) TimerEvent: {}
+[12.267004] (-) TimerEvent: {}
+[12.367407] (-) TimerEvent: {}
+[12.467802] (-) TimerEvent: {}
+[12.568196] (-) TimerEvent: {}
+[12.668578] (-) TimerEvent: {}
+[12.768963] (-) TimerEvent: {}
+[12.869336] (-) TimerEvent: {}
+[12.969755] (-) TimerEvent: {}
+[13.071182] (-) TimerEvent: {}
+[13.171598] (-) TimerEvent: {}
+[13.272019] (-) TimerEvent: {}
+[13.372436] (-) TimerEvent: {}
+[13.472841] (-) TimerEvent: {}
+[13.573237] (-) TimerEvent: {}
+[13.673657] (-) TimerEvent: {}
+[13.774047] (-) TimerEvent: {}
+[13.874423] (-) TimerEvent: {}
+[13.974791] (-) TimerEvent: {}
+[14.075177] (-) TimerEvent: {}
+[14.176107] (-) TimerEvent: {}
+[14.276524] (-) TimerEvent: {}
+[14.376966] (-) TimerEvent: {}
+[14.477451] (-) TimerEvent: {}
+[14.489661] (unitree_g1_dex3_stack) StderrLine: {'line': b'In file included from /usr/include/aarch64-linux-gnu/c++/9/bits/c++allocator.h:33,\n'}
+[14.490482] (unitree_g1_dex3_stack) StderrLine: {'line': b'                 from /usr/include/c++/9/bits/allocator.h:46,\n'}
+[14.490664] (unitree_g1_dex3_stack) StderrLine: {'line': b'                 from /usr/include/c++/9/memory:63,\n'}
+[14.490795] (unitree_g1_dex3_stack) StderrLine: {'line': b'                 from /opt/ros/foxy/include/rclcpp/rclcpp.hpp:144,\n'}
+[14.490920] (unitree_g1_dex3_stack) StderrLine: {'line': b'                 from /home/unitree/Desktop/unitree_dex3/src/unitree_g1_dex3_stack-main/src/ik_fcl_ompl_planner.cpp:1:\n'}
+[14.491046] (unitree_g1_dex3_stack) StderrLine: {'line': b'/usr/include/c++/9/ext/new_allocator.h: In instantiation of \xe2\x80\x98void __gnu_cxx::new_allocator<_Tp>::construct(_Up*, _Args&& ...) [with _Up = TRAC_IK::TRAC_IK; _Args = {KDL::Chain&, KDL::JntArray&, KDL::JntArray&, double&, double&, TRAC_IK::SolveType&}; _Tp = TRAC_IK::TRAC_IK]\xe2\x80\x99:\n'}
+[14.491184] (unitree_g1_dex3_stack) StderrLine: {'line': b'/usr/include/c++/9/bits/alloc_traits.h:483:4:   required from \xe2\x80\x98static void std::allocator_traits<std::allocator<_Tp1> >::construct(std::allocator_traits<std::allocator<_Tp1> >::allocator_type&, _Up*, _Args&& ...) [with _Up = TRAC_IK::TRAC_IK; _Args = {KDL::Chain&, KDL::JntArray&, KDL::JntArray&, double&, double&, TRAC_IK::SolveType&}; _Tp = TRAC_IK::TRAC_IK; std::allocator_traits<std::allocator<_Tp1> >::allocator_type = std::allocator<TRAC_IK::TRAC_IK>]\xe2\x80\x99\n'}
+[14.491316] (unitree_g1_dex3_stack) StderrLine: {'line': b'/usr/include/c++/9/bits/shared_ptr_base.h:548:39:   required from \xe2\x80\x98std::_Sp_counted_ptr_inplace<_Tp, _Alloc, _Lp>::_Sp_counted_ptr_inplace(_Alloc, _Args&& ...) [with _Args = {KDL::Chain&, KDL::JntArray&, KDL::JntArray&, double&, double&, TRAC_IK::SolveType&}; _Tp = TRAC_IK::TRAC_IK; _Alloc = std::allocator<TRAC_IK::TRAC_IK>; __gnu_cxx::_Lock_policy _Lp = __gnu_cxx::_S_atomic]\xe2\x80\x99\n'}
+[14.491460] (unitree_g1_dex3_stack) StderrLine: {'line': b'/usr/include/c++/9/bits/shared_ptr_base.h:679:16:   required from \xe2\x80\x98std::__shared_count<_Lp>::__shared_count(_Tp*&, std::_Sp_alloc_shared_tag<_Alloc>, _Args&& ...) [with _Tp = TRAC_IK::TRAC_IK; _Alloc = std::allocator<TRAC_IK::TRAC_IK>; _Args = {KDL::Chain&, KDL::JntArray&, KDL::JntArray&, double&, double&, TRAC_IK::SolveType&}; __gnu_cxx::_Lock_policy _Lp = __gnu_cxx::_S_atomic]\xe2\x80\x99\n'}
+[14.491578] (unitree_g1_dex3_stack) StderrLine: {'line': b'/usr/include/c++/9/bits/shared_ptr_base.h:1344:71:   required from \xe2\x80\x98std::__shared_ptr<_Tp, _Lp>::__shared_ptr(std::_Sp_alloc_shared_tag<_Tp>, _Args&& ...) [with _Alloc = std::allocator<TRAC_IK::TRAC_IK>; _Args = {KDL::Chain&, KDL::JntArray&, KDL::JntArray&, double&, double&, TRAC_IK::SolveType&}; _Tp = TRAC_IK::TRAC_IK; __gnu_cxx::_Lock_policy _Lp = __gnu_cxx::_S_atomic]\xe2\x80\x99\n'}
+[14.491712] (unitree_g1_dex3_stack) StderrLine: {'line': b'/usr/include/c++/9/bits/shared_ptr.h:359:59:   required from \xe2\x80\x98std::shared_ptr<_Tp>::shared_ptr(std::_Sp_alloc_shared_tag<_Tp>, _Args&& ...) [with _Alloc = std::allocator<TRAC_IK::TRAC_IK>; _Args = {KDL::Chain&, KDL::JntArray&, KDL::JntArray&, double&, double&, TRAC_IK::SolveType&}; _Tp = TRAC_IK::TRAC_IK]\xe2\x80\x99\n'}
+[14.491850] (unitree_g1_dex3_stack) StderrLine: {'line': b'/usr/include/c++/9/bits/shared_ptr.h:701:14:   required from \xe2\x80\x98std::shared_ptr<_Tp> std::allocate_shared(const _Alloc&, _Args&& ...) [with _Tp = TRAC_IK::TRAC_IK; _Alloc = std::allocator<TRAC_IK::TRAC_IK>; _Args = {KDL::Chain&, KDL::JntArray&, KDL::JntArray&, double&, double&, TRAC_IK::SolveType&}]\xe2\x80\x99\n'}
+[14.491966] (unitree_g1_dex3_stack) StderrLine: {'line': b'/usr/include/c++/9/bits/shared_ptr.h:717:39:   required from \xe2\x80\x98std::shared_ptr<_Tp> std::make_shared(_Args&& ...) [with _Tp = TRAC_IK::TRAC_IK; _Args = {KDL::Chain&, KDL::JntArray&, KDL::JntArray&, double&, double&, TRAC_IK::SolveType&}]\xe2\x80\x99\n'}
+[14.492090] (unitree_g1_dex3_stack) StderrLine: {'line': b'/home/unitree/Desktop/unitree_dex3/src/unitree_g1_dex3_stack-main/src/ik_fcl_ompl_planner.cpp:197:128:   required from here\n'}
+[14.492203] (unitree_g1_dex3_stack) StderrLine: {'line': b'/usr/include/c++/9/ext/new_allocator.h:146:4: error: no matching function for call to \xe2\x80\x98TRAC_IK::TRAC_IK::TRAC_IK(KDL::Chain&, KDL::JntArray&, KDL::JntArray&, double&, double&, TRAC_IK::SolveType&)\xe2\x80\x99\n'}
+[14.492327] (unitree_g1_dex3_stack) StderrLine: {'line': b'  146 |  { ::new((void *)__p) _Up(std::forward<_Args>(__args)...); }\n'}
+[14.492439] (unitree_g1_dex3_stack) StderrLine: {'line': b'      |    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n'}
+[14.492565] (unitree_g1_dex3_stack) StderrLine: {'line': b'In file included from /home/unitree/Desktop/unitree_dex3/src/unitree_g1_dex3_stack-main/src/ik_fcl_ompl_planner.cpp:13:\n'}
+[14.492694] (unitree_g1_dex3_stack) StderrLine: {'line': b'/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib/include/trac_ik/trac_ik.hpp:51:3: note: candidate: \xe2\x80\x98TRAC_IK::TRAC_IK::TRAC_IK(rclcpp::Node::SharedPtr, const string&, const string&, const string&, double, double, TRAC_IK::SolveType)\xe2\x80\x99\n'}
+[14.492806] (unitree_g1_dex3_stack) StderrLine: {'line': b'   51 |   TRAC_IK(rclcpp::Node::SharedPtr nh, const std::string& base_link, const std::string& tip_link, const std::string& URDF_param = "robot_description", double _maxtime = 0.005, double _eps = 1e-5, SolveType _type = Speed);\n'}
+[14.492931] (unitree_g1_dex3_stack) StderrLine: {'line': b'      |   ^~~~~~~\n'}
+[14.493040] (unitree_g1_dex3_stack) StderrLine: {'line': b'/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib/include/trac_ik/trac_ik.hpp:51:35: note:   no known conversion for argument 1 from \xe2\x80\x98KDL::Chain\xe2\x80\x99 to \xe2\x80\x98rclcpp::Node::SharedPtr\xe2\x80\x99 {aka \xe2\x80\x98std::shared_ptr<rclcpp::Node>\xe2\x80\x99}\n'}
+[14.493159] (unitree_g1_dex3_stack) StderrLine: {'line': b'   51 |   TRAC_IK(rclcpp::Node::SharedPtr nh, const std::string& base_link, const std::string& tip_link, const std::string& URDF_param = "robot_description", double _maxtime = 0.005, double _eps = 1e-5, SolveType _type = Speed);\n'}
+[14.493270] (unitree_g1_dex3_stack) StderrLine: {'line': b'      |           ~~~~~~~~~~~~~~~~~~~~~~~~^~\n'}
+[14.493377] (unitree_g1_dex3_stack) StderrLine: {'line': b'In file included from /home/unitree/Desktop/unitree_dex3/src/unitree_g1_dex3_stack-main/src/ik_fcl_ompl_planner.cpp:13:\n'}
+[14.493549] (unitree_g1_dex3_stack) StderrLine: {'line': b'/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib/include/trac_ik/trac_ik.hpp:49:3: note: candidate: \xe2\x80\x98TRAC_IK::TRAC_IK::TRAC_IK(rclcpp::Node::SharedPtr, const KDL::Chain&, const KDL::JntArray&, const KDL::JntArray&, double, double, TRAC_IK::SolveType)\xe2\x80\x99\n'}
+[14.493677] (unitree_g1_dex3_stack) StderrLine: {'line': b'   49 |   TRAC_IK(rclcpp::Node::SharedPtr nh, const KDL::Chain& _chain, const KDL::JntArray& _q_min, const KDL::JntArray& _q_max, double _maxtime = 0.005, double _eps = 1e-5, SolveType _type = Speed);\n'}
+[14.493793] (unitree_g1_dex3_stack) StderrLine: {'line': b'      |   ^~~~~~~\n'}
+[14.493909] (unitree_g1_dex3_stack) StderrLine: {'line': b'/home/unitree/Desktop/unitree_dex3/install/trac_ik_lib/include/trac_ik/trac_ik.hpp:49:35: note:   no known conversion for argument 1 from \xe2\x80\x98KDL::Chain\xe2\x80\x99 to \xe2\x80\x98rclcpp::Node::SharedPtr\xe2\x80\x99 {aka \xe2\x80\x98std::shared_ptr<rclcpp::Node>\xe2\x80\x99}\n'}
+[14.494030] (unitree_g1_dex3_stack) StderrLine: {'line': b'   49 |   TRAC_IK(rclcpp::Node::SharedPtr nh, const KDL::Chain& _chain, const KDL::JntArray& _q_min, const KDL::JntArray& _q_max, double _maxtime = 0.005, double _eps = 1e-5, SolveType _type = Speed);\n'}
+[14.494153] (unitree_g1_dex3_stack) StderrLine: {'line': b'      |           ~~~~~~~~~~~~~~~~~~~~~~~~^~\n'}
+[14.577652] (-) TimerEvent: {}
+[14.678119] (-) TimerEvent: {}
+[14.779310] (-) TimerEvent: {}
+[14.879686] (-) TimerEvent: {}
+[14.980104] (-) TimerEvent: {}
+[15.080513] (-) TimerEvent: {}
+[15.180895] (-) TimerEvent: {}
+[15.281274] (-) TimerEvent: {}
+[15.381690] (-) TimerEvent: {}
+[15.482105] (-) TimerEvent: {}
+[15.582521] (-) TimerEvent: {}
+[15.682948] (-) TimerEvent: {}
+[15.783373] (-) TimerEvent: {}
+[15.883757] (-) TimerEvent: {}
+[15.984158] (-) TimerEvent: {}
+[16.084585] (-) TimerEvent: {}
+[16.185028] (-) TimerEvent: {}
+[16.285466] (-) TimerEvent: {}
+[16.385885] (-) TimerEvent: {}
+[16.486277] (-) TimerEvent: {}
+[16.586710] (-) TimerEvent: {}
+[16.687143] (-) TimerEvent: {}
+[16.787567] (-) TimerEvent: {}
+[16.888151] (-) TimerEvent: {}
+[16.988552] (-) TimerEvent: {}
+[17.088974] (-) TimerEvent: {}
+[17.189428] (-) TimerEvent: {}
+[17.289841] (-) TimerEvent: {}
+[17.390274] (-) TimerEvent: {}
+[17.490749] (-) TimerEvent: {}
+[17.591155] (-) TimerEvent: {}
+[17.691578] (-) TimerEvent: {}
+[17.791994] (-) TimerEvent: {}
+[17.892471] (-) TimerEvent: {}
+[17.992967] (-) TimerEvent: {}
+[18.093437] (-) TimerEvent: {}
+[18.194051] (-) TimerEvent: {}
+[18.295826] (-) TimerEvent: {}
+[18.396265] (-) TimerEvent: {}
+[18.496746] (-) TimerEvent: {}
+[18.597206] (-) TimerEvent: {}
+[18.697736] (-) TimerEvent: {}
+[18.798146] (-) TimerEvent: {}
+[18.898537] (-) TimerEvent: {}
+[18.998944] (-) TimerEvent: {}
+[19.099353] (-) TimerEvent: {}
+[19.199741] (-) TimerEvent: {}
+[19.300116] (-) TimerEvent: {}
+[19.400509] (-) TimerEvent: {}
+[19.500920] (-) TimerEvent: {}
+[19.601416] (-) TimerEvent: {}
+[19.701829] (-) TimerEvent: {}
+[19.802282] (-) TimerEvent: {}
+[19.902838] (-) TimerEvent: {}
+[20.003357] (-) TimerEvent: {}
+[20.103823] (-) TimerEvent: {}
+[20.204251] (-) TimerEvent: {}
+[20.304687] (-) TimerEvent: {}
+[20.405134] (-) TimerEvent: {}
+[20.506316] (-) TimerEvent: {}
+[20.606836] (-) TimerEvent: {}
+[20.707318] (-) TimerEvent: {}
+[20.807789] (-) TimerEvent: {}
+[20.869037] (unitree_g1_dex3_stack) StderrLine: {'line': b'make[2]: *** [CMakeFiles/ik_fcl_ompl_planner.dir/build.make:63: CMakeFiles/ik_fcl_ompl_planner.dir/src/ik_fcl_ompl_planner.cpp.o] Error 1\n'}
+[20.869934] (unitree_g1_dex3_stack) StderrLine: {'line': b'make[1]: *** [CMakeFiles/Makefile2:310: CMakeFiles/ik_fcl_ompl_planner.dir/all] Error 2\n'}
+[20.870395] (unitree_g1_dex3_stack) StderrLine: {'line': b'make: *** [Makefile:141: all] Error 2\n'}
+[20.874782] (unitree_g1_dex3_stack) CommandEnded: {'returncode': 2}
+[20.903482] (unitree_g1_dex3_stack) JobEnded: {'identifier': 'unitree_g1_dex3_stack', 'rc': 2}
+[20.907939] (-) TimerEvent: {}
+[20.914496] (-) EventReactorShutdown: {}

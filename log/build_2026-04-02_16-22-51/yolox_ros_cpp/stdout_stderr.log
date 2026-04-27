@@ -1,0 +1,59 @@
+Scanning dependencies of target yolox_ros_cpp_components
+Scanning dependencies of target yolox_ros_cpp
+[ 50%] Building CXX object CMakeFiles/yolox_ros_cpp.dir/src/yolox_ros_cpp.cpp.o
+[ 50%] Building CXX object CMakeFiles/yolox_ros_cpp_components.dir/src/yolox_ros_cpp.cpp.o
+/home/unitree/Desktop/unitree_dex3/src/YOLOX-ROS/yolox_ros_cpp/yolox_ros_cpp/src/yolox_ros_cpp.cpp: In member function ‘bboxes_ex_msgs::msg::BoundingBoxes yolox_ros_cpp::YoloXNode::objects_to_bboxes(cv::Mat, std::vector<yolox_cpp::Object>, std_msgs::msg::Header)’:
+/home/unitree/Desktop/unitree_dex3/src/YOLOX-ROS/yolox_ros_cpp/yolox_ros_cpp/src/yolox_ros_cpp.cpp:169:77: warning: unused parameter ‘frame’ [-Wunused-parameter]
+  169 |     bboxes_ex_msgs::msg::BoundingBoxes YoloXNode::objects_to_bboxes(cv::Mat frame, std::vector<yolox_cpp::Object> objects, std_msgs::msg::Header header)
+      |                                                                     ~~~~~~~~^~~~~
+/home/unitree/Desktop/unitree_dex3/src/YOLOX-ROS/yolox_ros_cpp/yolox_ros_cpp/src/yolox_ros_cpp.cpp: In member function ‘bboxes_ex_msgs::msg::BoundingBoxes yolox_ros_cpp::YoloXNode::objects_to_bboxes(cv::Mat, std::vector<yolox_cpp::Object>, std_msgs::msg::Header)’:
+/home/unitree/Desktop/unitree_dex3/src/YOLOX-ROS/yolox_ros_cpp/yolox_ros_cpp/src/yolox_ros_cpp.cpp:169:77: warning: unused parameter ‘frame’ [-Wunused-parameter]
+  169 |     bboxes_ex_msgs::msg::BoundingBoxes YoloXNode::objects_to_bboxes(cv::Mat frame, std::vector<yolox_cpp::Object> objects, std_msgs::msg::Header header)
+      |                                                                     ~~~~~~~~^~~~~
+[ 75%] Linking CXX shared library libyolox_ros_cpp_components.so
+[ 75%] Built target yolox_ros_cpp_components
+[100%] Linking CXX executable yolox_ros_cpp
+[100%] Built target yolox_ros_cpp
+-- Install configuration: ""
+-- Installing: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/lib/yolox_ros_cpp/yolox_ros_cpp
+-- Set runtime path of "/home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/lib/yolox_ros_cpp/yolox_ros_cpp" to ""
+-- Installing: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/lib/libyolox_ros_cpp_components.so
+-- Set runtime path of "/home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/lib/libyolox_ros_cpp_components.so" to ""
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/launch
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/launch/yolox_openvino_ncs2.launch.py
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/launch/yolox_openvino.launch.py
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/launch/yolox_tflite.launch.py
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/launch/yolox_onnxruntime.launch.py
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/launch/yolox_tensorrt.launch.py
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/launch/yolox_tensorrt_jetson.launch.py
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/labels
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/labels/coco_names.txt
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tflite
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tflite/download_model.bash
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino/.gitignore
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino/download_openvino_s.bash
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino/README.md
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights/openvino/install.bash
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights/tensorrt/convert.bash
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights/onnx
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights/onnx/download.bash
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/weights/.gitkeep
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/ament_index/resource_index/package_run_dependencies/yolox_ros_cpp
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/ament_index/resource_index/parent_prefix_path/yolox_ros_cpp
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/environment/ament_prefix_path.sh
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/environment/ament_prefix_path.dsv
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/environment/path.sh
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/environment/path.dsv
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/local_setup.bash
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/local_setup.sh
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/local_setup.zsh
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/local_setup.dsv
+-- Installing: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/package.dsv
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/ament_index/resource_index/packages/yolox_ros_cpp
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/ament_index/resource_index/rclcpp_components/yolox_ros_cpp
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/cmake/yolox_ros_cppConfig.cmake
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/cmake/yolox_ros_cppConfig-version.cmake
+-- Up-to-date: /home/unitree/Desktop/unitree_dex3/install/yolox_ros_cpp/share/yolox_ros_cpp/package.xml
