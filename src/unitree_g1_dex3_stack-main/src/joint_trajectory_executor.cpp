@@ -24,9 +24,13 @@
 
 using namespace std::chrono_literals;
 
-// Set by SIGINT/SIGTERM handler so main() can perform a graceful arm-control
-// release (3-second ramp of kNotUsedJoint.q from 1.0 -> 0.0) BEFORE
-// rclcpp::shutdown() invalidates the publisher. See Plan 01-04.
+// Set by SIGINT/SIGTERM handler so (a) main()'s polling loop can exit
+// cleanly even from idle state, and (b) trajectoryCallback's waypoint
+// loop can break out at the next iteration and fall through to the
+// existing end-of-trajectory ramp for a smooth in-flight release. The
+// originally-planned separate 3-second ramp from main() was removed in
+// Plan 01-06 because it stole control authority back from the body
+// controller and jerked the arm to q=0. See Plans 01-04 and 01-06.
 static std::atomic<bool> g_shutdown_requested{false};
 static void executor_signal_handler(int /*sig*/) {
   g_shutdown_requested.store(true);
@@ -114,38 +118,15 @@ public:
   ~JointTrajectoryExecutor() override {
     RCLCPP_INFO(this->get_logger(), "Shutting down Joint Trajectory Executor Node");
 
-    // Last-resort: instant release. Normal SIGINT/SIGTERM path goes through
-    // gracefulRelease() in main() before this destructor runs, so this only
-    // fires when the process exits without our signal handler getting to run
-    // (e.g. SIGKILL, std::terminate from another thread).
+    // Reaffirm body-controller authority on shutdown. In the normal
+    // SIGINT/SIGTERM path, trajectoryCallback's own end-of-trajectory ramp
+    // (or the new break-out path added in Plan 01-06) has already left
+    // kNotUsedJoint.q at 0.0, so this is a redundant-but-harmless final
+    // assertion. On a forced exit (SIGKILL, std::terminate) this destructor
+    // may not run at all; arm_sdk's own timeout takes over in that case.
     unitree_hg::msg::LowCmd final_cmd;
     final_cmd.motor_cmd[JointIndex::kNotUsedJoint].q = 0.0f;
     cmd_pub_->publish(final_cmd);
-  }
-
-  // Smoothly hand arm control back to the robot body controller over 3 s.
-  // Called from main() after the spin loop returns and BEFORE rclcpp::shutdown,
-  // while cmd_pub_ is still valid. The robot body resumes the standing pose
-  // automatically once kNotUsedJoint.q reaches 0.0.
-  void gracefulRelease() {
-    if (!rclcpp::ok()) return;
-    RCLCPP_INFO(this->get_logger(),
-      "Graceful release: smoothly transferring arm control to robot body (3s).");
-    const double duration_s = 3.0;
-    const int steps = 150;
-    auto sleep_ns = std::chrono::nanoseconds(
-      static_cast<int64_t>((duration_s / steps) * 1e9));
-    for (int step = 0; step <= steps && rclcpp::ok(); ++step) {
-      const double t = static_cast<double>(step) / steps;
-      const double value = (1.0 - t) * 1.0;  // linear 1.0 -> 0.0
-      unitree_hg::msg::LowCmd release_cmd;
-      release_cmd.motor_cmd[JointIndex::kNotUsedJoint].q =
-        static_cast<float>(value);
-      cmd_pub_->publish(release_cmd);
-      rclcpp::sleep_for(sleep_ns);
-    }
-    RCLCPP_INFO(this->get_logger(),
-      "Graceful release complete; arm control returned to robot body.");
   }
 
 private:
@@ -196,7 +177,11 @@ private:
 
     auto start_time = this->now();
 
-    for (size_t i = 0; i < msg->points.size(); ++i) {
+    // Plan 01-06: honor SIGINT/SIGTERM mid-trajectory by breaking out of
+    // the waypoint loop at the next iteration. The trailing hand-close +
+    // 1s end-of-trajectory ramp then runs from the current trajectory
+    // point, producing a smooth release without re-grabbing authority.
+    for (size_t i = 0; i < msg->points.size() && !g_shutdown_requested.load(); ++i) {
       const auto& point = msg->points[i];
       unitree_hg::msg::LowCmd cmd_msg;
 
@@ -277,9 +262,11 @@ int main(int argc, char **argv) {
     exec.spin_some(std::chrono::milliseconds(50));
   }
 
-  // SIGINT/SIGTERM received (or rclcpp::ok went false). Smoothly release
-  // arm authority while the publisher is still valid.
-  node->gracefulRelease();
+  // SIGINT/SIGTERM received (or rclcpp::ok went false). The trajectory-end
+  // ramp inside trajectoryCallback (line ~249) is the only graceful release
+  // we need; if a callback was running, its ramp has already executed by
+  // the time we get here. The destructor's instantaneous q=0.0 publish is
+  // a harmless reaffirmation in idle state. See Plan 01-06.
   rclcpp::shutdown();
   return 0;
 }
