@@ -55,9 +55,31 @@ if (!planning_links.empty() &&
 ### Bug 3: D-04 launch file mismatch
 **Location:** `src/unitree_g1_dex3_stack-main/launch/robot.launch.py:48`
 
-**Current:** Default `urdf_name` is `g1_29dof_lock_waist_with_hand_rev_1_0.urdf` (mesh-collision version).
-**Required (D-04):** Default to `g1_29dof_lock_waist_with_hand_rev_1_0_collision_primitives.urdf` so FCL receives box/cylinder primitives instead of full mesh BVH models.
-**Impact:** ~10-100× speedup on FCL pairwise collision checks (each OMPL state validity check loops over ~30 link pairs, called hundreds of times per plan).
+**Current:** Default `urdf_name` is `g1_29dof_lock_waist_with_hand_rev_1_0.urdf`.
+**Required (D-04):** Default to `g1_29dof_lock_waist_with_hand_rev_1_0_collision_primitives.urdf`.
+
+**Actual difference between the two URDFs (verified by parsing both files):**
+
+| Property | `..._rev_1_0.urdf` | `..._collision_primitives.urdf` |
+|----------|---------------------|----------------------------------|
+| Link count | 54 | 54 (identical) |
+| Joint count | 53 | 53 (identical) |
+| `<visual>` geometry | 49 mesh | 49 mesh (identical) |
+| `<collision>` geometry per link | **1 primitive** (axis-aligned bbox) | **3 primitives** (rotated, tighter-fitting boxes) |
+| Total `<collision>` shapes | 52 (37 box + 7 cyl + 8 sphere) | **128** (108 box + 12 cyl + 8 sphere) |
+
+**Both URDFs already use primitives for collision** — neither uses mesh BVH for FCL. The difference is granularity: the original wraps each link in one big axis-aligned box; the primitives variant wraps each link in three smaller, rotated boxes (with non-zero `rpy` on each `<origin>`) that hug the true link geometry more tightly.
+
+Example `right_wrist_yaw_link`:
+- Original: 1 box of 60×54×60 mm, axis-aligned at the link origin.
+- Primitives: 3 rotated boxes (20×50×60 mm, 17×49×54 mm, 9×38×48 mm) at different rpy/xyz, jointly approximating the wrist's actual shape.
+
+38 links (torso, both arms, both legs, all fingers, head, pelvis) get this 1→3 refinement — including every right-arm chain segment and every body link the right arm could collide with.
+
+**Impact (corrected):**
+- **Collision accuracy improves** — single coarse bbox produces many false positives (e.g., the wrist's bbox overlaps the torso's bbox even when the actual wrist is several cm clear). The primitives variant's tighter wrapping reduces those false positives → OMPL finds more feasible paths → higher planning success rate.
+- **FCL performance: minor cost** — each pairwise check is now 3×3 = 9 box-box tests instead of 1×1 = 1. Total `<collision>` count rises from 52 to 128 (~2.5×). This is a small constant factor — both URDFs are dramatically faster than mesh BVH would be (which is what's relevant for the comparison; FCL handles primitives in O(1)).
+- The real motivation behind D-04 is therefore **accuracy/feasibility**, not raw speed. The CONTEXT.md wording "faster FCL collision checks" is approximate — the precise framing is "tighter collision wrapping yields fewer false-positive collisions, which lets OMPL find paths that the coarse bbox would have rejected."
 </bug_root_cause_analysis>
 
 <body_link_transforms_decision>
