@@ -166,7 +166,16 @@ private:
     bool is_left_hand = hand_it->find("left") != std::string::npos;
     RCLCPP_INFO(this->get_logger(), "Executing trajectory for %s hand", is_left_hand ? "left" : "right");
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr hand_cmd_pub = is_left_hand ? left_hand_pub_ : right_hand_pub_;
-    
+
+    // Plan 01-09: snapshot standing pose at callback entry. Arm is guaranteed
+    // to be at standing here (either previous trajectory's ramp settled it
+    // back, or robot just booted with body controller holding standing). This
+    // snapshot is the target the end-of-trajectory ramp will drive toward.
+    std::vector<float> standing_pose;
+    if (!latest_joint_positions_.empty()) {
+      standing_pose = latest_joint_positions_;
+    }
+
     // Start with preparing the hand, open it fully
     std_msgs::msg::Bool hand_cmd;
     hand_cmd.data = false; // Open hand command
@@ -231,10 +240,19 @@ private:
 
     RCLCPP_INFO(this->get_logger(), "Trajectory execution complete, returning to default pose.");
 
+    // Plan 01-09: snapshot the trajectory end-point as the ramp's starting
+    // pose. We interpolate from this fixed start (not the live, drifting
+    // latest_joint_positions_) toward the standing snapshot, so the planner
+    // stiffly tracks a deterministic path back to standing.
+    std::vector<float> ramp_start_positions;
+    if (!latest_joint_positions_.empty()) {
+      ramp_start_positions = latest_joint_positions_;
+    }
+
     // Smoothly interpolate final_cmd.motor_cmd[JointIndex::kNotUsedJoint].q from 1.0 to 0.0
-    // Plan 01-08: 1s -> 3s; kp/kd also fade to 0 over the ramp so the body
-    // controller's standing-pose pull can take effect during the ramp
-    // instead of snapping in at the end.
+    // Plan 01-08: 3 s / 150 step ramp duration preserved. Plan 01-09 reverted
+    // Plan 01-08's kp/kd fade and instead drives the arm along an explicit
+    // q interpolation from the trajectory end-point to the standing snapshot.
     const double interp_duration = 3.0; // seconds
     const int interp_steps = 150;
     auto sleep_ns = std::chrono::nanoseconds(static_cast<int64_t>((interp_duration / interp_steps) * 1e9));
@@ -243,19 +261,24 @@ private:
       double value = (1.0 - t) * 1.0 + t * 0.0; // Linear interpolation
       unitree_hg::msg::LowCmd final_cmd;
       final_cmd.motor_cmd[JointIndex::kNotUsedJoint].q = static_cast<float>(value);
-      // Plan 01-07: hold every joint at its current actual position with the
-      // same kp/kd as the trajectory-following frames, so arm_sdk never sees
-      // the default kp=0+q=0 fields and never jerks toward the q=0 reference.
+      // Plan 01-09: drive the arm explicitly from trajectory end-point to
+      // standing snapshot under stiff servoing (kp/kd back to 60/1.5).
+      // Frame 0 (t=0): q = ramp start = trajectory end-point (matches actual,
+      // no jerk). Frame 150 (t=1): q = standing snapshot (arm is at standing).
+      // Master switch then hands off to body controller with arm already there.
       for (const auto& pair : joint_name_to_index) {
         size_t idx = pair.second;
-        if (latest_joint_positions_.size() > idx) {
+        if (ramp_start_positions.size() > idx && standing_pose.size() > idx) {
+          final_cmd.motor_cmd[idx].q = static_cast<float>(
+            (1.0 - t) * ramp_start_positions[idx] + t * standing_pose[idx]);
+        } else if (latest_joint_positions_.size() > idx) {
           final_cmd.motor_cmd[idx].q = latest_joint_positions_[idx];
         } else {
           final_cmd.motor_cmd[idx].q = 0.0f;
         }
         final_cmd.motor_cmd[idx].dq = 0.f;
-        final_cmd.motor_cmd[idx].kp = static_cast<float>((1.0 - t) * 60.0);
-        final_cmd.motor_cmd[idx].kd = static_cast<float>((1.0 - t) * 1.5);
+        final_cmd.motor_cmd[idx].kp = 60.0f;
+        final_cmd.motor_cmd[idx].kd = 1.5f;
         final_cmd.motor_cmd[idx].tau = 0.f;
       }
       cmd_pub_->publish(final_cmd);
