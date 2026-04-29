@@ -806,9 +806,12 @@ private:
         for (auto it1 = link_collisions.begin(); it1 != link_collisions.end(); ++it1) {
             for (auto it2 = std::next(it1); it2 != link_collisions.end(); ++it2) {
                 // Only check if at least one link is in planning_links
+                // Skip a pair only when NEITHER link is in the right-arm planning chain.
+                // We want to check: arm-vs-arm, arm-vs-body. We don't care about
+                // body-vs-body (those are static, irrelevant to arm motion safety).
                 if (!planning_links.empty() &&
-                    (planning_links.find(it1->first) == planning_links.end() ||
-                     planning_links.find(it2->first) == planning_links.end())) {
+                    planning_links.find(it1->first) == planning_links.end() &&
+                    planning_links.find(it2->first) == planning_links.end()) {
                     continue;
                 }
                 // Skip collision pairs if specified (format: "link1:link2")
