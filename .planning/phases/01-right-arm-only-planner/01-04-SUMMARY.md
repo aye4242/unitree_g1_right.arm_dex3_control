@@ -46,6 +46,8 @@ completed: 2026-04-29
 
 # Phase 01 Plan 04: Graceful Arm Release on Executor Shutdown — Summary
 
+> **⚠️ SUPERSEDED IN PART by Plan 01-06.** The `gracefulRelease()` ramp documented below caused the arm to jerk to its `q = 0` reference pose ("hands forward") on Ctrl+C, because by the time the ramp ran, the trajectoryCallback's own end-of-trajectory ramp had already released authority — `gracefulRelease()`'s first frame (`kNotUsedJoint.q = 1.0`) re-grabbed it. **Plan 01-06 deleted `gracefulRelease()`** and added a `g_shutdown_requested` check to `trajectoryCallback`'s waypoint loop instead, so the existing trajectory-end ramp acts as the single graceful-release path. The signal-handler scaffolding (atomic flag, `uninstall_signal_handlers`, polling loop in `main()`) introduced by Plan 01-04 is preserved; only the separate ramp method was removed. See `@/home/unitree/Desktop/unitree_dex3/.planning/phases/01-right-arm-only-planner/01-06-SUMMARY.md` for the full root-cause analysis and the corrected behavior contract.
+
 **Hot-fix on top of Plan 01-03 to address a safety concern raised mid-verification: when the executor terminal is killed mid-trajectory, the arm should smoothly transfer control back to the robot body over 3 seconds instead of being released instantaneously.**
 
 ## Performance
