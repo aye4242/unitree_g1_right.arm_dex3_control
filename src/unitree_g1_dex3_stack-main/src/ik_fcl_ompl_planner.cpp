@@ -383,6 +383,13 @@ private:
         }
         RCLCPP_INFO(this->get_logger(), "%s", seg_oss.str().c_str());
 
+        if (planning_joints.size() != 7u) {
+            RCLCPP_ERROR(this->get_logger(),
+                "Right-arm planning chain expected 7 joints, got %zu. Aborting goal.",
+                planning_joints.size());
+            return;
+        }
+
         // Snapshot world-frame transforms of all non-planning links from the TF tree.
         // Right-arm chain segments will have their transforms updated per OMPL state
         // inside isInCollision(); everything else (torso, legs, left arm, head, hands)
@@ -668,9 +675,24 @@ private:
                 bounds.setLow(i, lim_it->second.first);
                 bounds.setHigh(i, lim_it->second.second);
             } else {
+                RCLCPP_WARN(this->get_logger(),
+                    "OMPL bounds: joint '%s' has no URDF limit; falling back to [-3.14, 3.14]. "
+                    "This indicates a URDF regression or missing right-arm joint.",
+                    planning_joints[i].c_str());
                 bounds.setLow(i, -3.14);
                 bounds.setHigh(i, 3.14);
             }
+        }
+        {
+            std::ostringstream bounds_oss;
+            bounds_oss << "OMPL bounds set for " << planning_joints.size()
+                       << " right-arm joints:";
+            for (size_t i = 0; i < planning_joints.size(); ++i) {
+                bounds_oss << " [" << planning_joints[i]
+                           << "=" << bounds.low[i]
+                           << "," << bounds.high[i] << "]";
+            }
+            RCLCPP_INFO(this->get_logger(), "%s", bounds_oss.str().c_str());
         }
         space->setBounds(bounds);
         auto ss = std::make_shared<og::SimpleSetup>(space);
