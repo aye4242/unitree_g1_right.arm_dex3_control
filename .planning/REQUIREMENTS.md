@@ -9,7 +9,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Motion Planning
 
-- [ ] **PLAN-01**: Planner only plans for right arm chain (torso_link → right_wrist_yaw_link), left arm logic removed or disabled
+- [x] **PLAN-01**: Planner only plans for right arm chain (torso_link → right_wrist_yaw_link), left arm logic removed or disabled
 - [ ] **PLAN-02**: Self-collision checking verifies right arm links against ALL other body links (torso, legs, left arm), not just arm-internal pairs
 - [ ] **PLAN-03**: OMPL path simplification applied after planning to remove unnecessary waypoints
 - [ ] **PLAN-04**: Joint limits from URDF enforced as OMPL state space bounds for all right arm joints
@@ -63,7 +63,7 @@ Deferred to future release. Tracked but not in current roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PLAN-01 | Phase 1 | Pending |
+| PLAN-01 | Phase 1 | Complete |
 | PLAN-02 | Phase 1 | Pending |
 | PLAN-04 | Phase 1 | Pending |
 | PLAN-03 | Phase 2 | Pending |
