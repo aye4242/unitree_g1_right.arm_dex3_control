@@ -45,7 +45,7 @@ def launch_setup(context, *args, **kwargs):
 def generate_launch_description():
     urdf_name_arg = DeclareLaunchArgument(
         'urdf_name',
-        default_value='g1_29dof_lock_waist_with_hand_rev_1_0.urdf',
+        default_value='g1_29dof_lock_waist_with_hand_rev_1_0_collision_primitives.urdf',
         description='URDF filename to load from robots/g1_description/'
     )
     urdf_path_arg = DeclareLaunchArgument(
