@@ -108,7 +108,6 @@ public:
             rclcpp::shutdown();
             return;
         }
-        printKDLChainInfo(kdl_chain_right, "right", this->get_logger());
 
         // Parse joint limits from URDF for OMPL bounds
         for (const auto& joint_pair : urdf_model.joints_) {
@@ -135,21 +134,6 @@ public:
                 ++idx;
             }
         }
-
-        // Debug: Print right arm KDL chain joint names and limits
-        std::ostringstream right_chain_oss;
-        right_chain_oss << "Right arm KDL chain joints and limits:";
-        idx = 0;
-        for (unsigned int i = 0; i < kdl_chain_right.getNrOfSegments(); ++i) {
-            const auto& joint = kdl_chain_right.getSegment(i).getJoint();
-            if (joint.getType() != KDL::Joint::None) {
-                right_chain_oss << "\n  " << joint.getName() << ": [" << right_lower(idx) << ", " << right_upper(idx) << "]";
-                ++idx;
-            } else {
-                right_chain_oss << "\n  " << joint.getName() << ": [None]";
-            }
-        }
-        RCLCPP_INFO(this->get_logger(), "%s", right_chain_oss.str().c_str());
 
         // Use longer timeout and error tolerance for TRAC-IK
         double ik_timeout = 1.0; // seconds
@@ -181,44 +165,6 @@ public:
         }
         RCLCPP_INFO(this->get_logger(), "Planner type: %s", planner_type_.c_str());
         RCLCPP_INFO(this->get_logger(), "Right arm: base_link = %s, tip_link = %s", base_link_.c_str(), right_tip_.c_str());
-        RCLCPP_INFO(this->get_logger(), "Right arm KDL chain segments: %d", kdl_chain_right.getNrOfSegments());
-        RCLCPP_INFO(this->get_logger(), "Right arm KDL chain joints: %d", kdl_chain_right.getNrOfJoints());
-
-        // --- DEBUG: Print all URDF link names ---
-        std::ostringstream urdf_links_oss;
-        urdf_links_oss << "URDF links (" << urdf_model.links_.size() << "): ";
-        for (const auto& link_pair : urdf_model.links_) {
-            urdf_links_oss << link_pair.first << ", ";
-        }
-        RCLCPP_INFO(this->get_logger(), "%s", urdf_links_oss.str().c_str());
-
-        // --- DEBUG: Print KDL chain link and joint sequence for right arm ---
-        std::ostringstream kdl_right_oss;
-        kdl_right_oss << "Right arm KDL chain: ";
-        for (unsigned int i = 0; i < kdl_chain_right.getNrOfSegments(); ++i) {
-            const auto& seg = kdl_chain_right.getSegment(i);
-            kdl_right_oss << "[" << seg.getName() << ": ";
-            const auto& joint = seg.getJoint();
-            switch (joint.getType()) {
-                case KDL::Joint::None: kdl_right_oss << "None"; break;
-                case KDL::Joint::RotAxis: kdl_right_oss << "RotAxis"; break;
-                case KDL::Joint::TransAxis: kdl_right_oss << "TransAxis"; break;
-                case KDL::Joint::RotX: kdl_right_oss << "RotX"; break;
-                case KDL::Joint::RotY: kdl_right_oss << "RotY"; break;
-                case KDL::Joint::RotZ: kdl_right_oss << "RotZ"; break;
-                case KDL::Joint::TransX: kdl_right_oss << "TransX"; break;
-                case KDL::Joint::TransY: kdl_right_oss << "TransY"; break;
-                case KDL::Joint::TransZ: kdl_right_oss << "TransZ"; break;
-                default: kdl_right_oss << "Unknown"; break;
-            }
-            kdl_right_oss << ", joint='" << joint.getName() << "'], ";
-        }
-        RCLCPP_INFO(this->get_logger(), "%s", kdl_right_oss.str().c_str());
-
-        // Debug: Print joint limits
-        for (const auto& lim : joint_limits_) {
-            RCLCPP_INFO(this->get_logger(), "Joint %s limits: [%.3f, %.3f]", lim.first.c_str(), lim.second.first, lim.second.second);
-        }
     }
 
 private:
@@ -370,18 +316,14 @@ private:
         const KDL::Chain& chain = kdl_chain_right;
         std::vector<std::string> planning_joints;
         std::set<std::string> planning_links; // <-- collect relevant links
-        std::ostringstream seg_oss;
-        seg_oss << "Planning chain segments: ";
         for (unsigned int i = 0; i < chain.getNrOfSegments(); ++i) {
             const auto& seg = chain.getSegment(i);
             planning_links.insert(seg.getName());
-            seg_oss << seg.getName() << ", ";
             const auto& joint = seg.getJoint();
             if (joint.getType() != KDL::Joint::None) {
                 planning_joints.push_back(joint.getName());
             }
         }
-        RCLCPP_INFO(this->get_logger(), "%s", seg_oss.str().c_str());
 
         if (planning_joints.size() != 7u) {
             RCLCPP_ERROR(this->get_logger(),
@@ -424,37 +366,32 @@ private:
                 tf_lookup_failures);
         }
 
-        // --- Joint order check: compare planning_joints to expected URDF joint order ---
-        std::ostringstream expected_oss, actual_oss, warn_oss;
-        expected_oss << "URDF joint_names_: ";
-        for (const auto& j : joint_names_) expected_oss << j << ", ";
-        actual_oss << "KDL planning_joints: ";
-        for (const auto& j : planning_joints) actual_oss << j << ", ";
-        RCLCPP_INFO(this->get_logger(), "%s", expected_oss.str().c_str());
-        RCLCPP_INFO(this->get_logger(), "%s", actual_oss.str().c_str());
-        // Check for missing or out-of-order joints
+        // Joint-order sanity check: planning_joints must appear in joint_names_
+        // in non-decreasing order. On mismatch, emit a single ERROR; do not abort.
         bool order_ok = true;
         size_t last_found = 0;
+        std::ostringstream order_warn_oss;
         for (size_t i = 0; i < planning_joints.size(); ++i) {
-            auto it = std::find(joint_names_.begin(), joint_names_.end(), planning_joints[i]);
+            auto it = std::find(joint_names_.begin(), joint_names_.end(),
+                                planning_joints[i]);
             if (it == joint_names_.end()) {
-                warn_oss << "[WARN] Planning joint '" << planning_joints[i] << "' not found in URDF joint_names_. ";
+                order_warn_oss << "joint '" << planning_joints[i]
+                               << "' missing from /joint_states; ";
                 order_ok = false;
             } else {
                 size_t idx = std::distance(joint_names_.begin(), it);
                 if (idx < last_found) {
-                    warn_oss << "[WARN] Planning joint '" << planning_joints[i] << "' is out of order (index " << idx << "). ";
+                    order_warn_oss << "joint '" << planning_joints[i]
+                                   << "' out of order at idx " << idx << "; ";
                     order_ok = false;
                 }
                 last_found = idx;
             }
         }
-        if (order_ok) {
-            RCLCPP_INFO(this->get_logger(), "KDL planning_joints match URDF joint_names_ order.");
-        } else {
-            RCLCPP_ERROR(this->get_logger(), "KDL planning_joints do NOT match URDF joint_names_ order: %s", warn_oss.str().c_str());
-            //rclcpp::shutdown();
-            //return;
+        if (!order_ok) {
+            RCLCPP_ERROR(this->get_logger(),
+                "Joint-order mismatch between KDL chain and /joint_states: %s",
+                order_warn_oss.str().c_str());
         }
 
         std::vector<double> planning_positions;
@@ -467,14 +404,6 @@ private:
                 planning_positions.push_back(0.0); // fallback if not found
             }
         }
-        // Debug: Print start state joint names and values
-        std::ostringstream oss;
-        oss << "Start state: ";
-        for (size_t i = 0; i < planning_joints.size(); ++i) {
-            oss << planning_joints[i] << "=" << planning_positions[i] << ", ";
-        }
-        RCLCPP_INFO(this->get_logger(), "%s", oss.str().c_str());
-
         KDL::Frame target_frame(KDL::Rotation::Quaternion(
                                     pose_in_base.pose.orientation.x,
                                     pose_in_base.pose.orientation.y,
@@ -485,50 +414,13 @@ private:
                                     pose_in_base.pose.position.y,
                                     pose_in_base.pose.position.z));
 
-        // Debug target frame
-        double rx, ry, rz;
-        target_frame.M.GetRPY(rx, ry, rz);
-        RCLCPP_INFO(this->get_logger(), "Target frame details:");
-        RCLCPP_INFO(this->get_logger(), "  Position: [%.3f, %.3f, %.3f]", 
-            target_frame.p.x(), target_frame.p.y(), target_frame.p.z());
-        RCLCPP_INFO(this->get_logger(), "  RPY: [%.3f, %.3f, %.3f]", rx, ry, rz);
-        
-        // Print planning joint names and order
-        std::ostringstream joint_oss;
-        joint_oss << "Planning joints (order): ";
-        for (const auto& j : planning_joints) joint_oss << j << ", ";
-        RCLCPP_INFO(this->get_logger(), "%s", joint_oss.str().c_str());
-        // Print base and tip link names
-        RCLCPP_INFO(this->get_logger(), "KDL/TRAC-IK base link: %s, tip link: %s", base_link_.c_str(), right_tip_.c_str());
-        // Print joint limits
-        for (const auto& j : planning_joints) {
-            auto lim_it = joint_limits_.find(j);
-            if (lim_it != joint_limits_.end()) {
-                RCLCPP_INFO(this->get_logger(), "Joint %s limits: [%.3f, %.3f]", j.c_str(), lim_it->second.first, lim_it->second.second);
-            } else {
-                RCLCPP_WARN(this->get_logger(), "Joint %s has no limits, using [-3.14, 3.14]", j.c_str());
-            }
-        }
         // Try IK with current state as seed
         KDL::JntArray seed(planning_joints.size());
         for (size_t i = 0; i < planning_joints.size(); ++i) seed(i) = planning_positions[i];
         auto& solver = ik_right;
         KDL::JntArray goal(planning_joints.size());
         int ik_result = solver->CartToJnt(seed, target_frame, goal);
-        
-        // Print detailed information about seed and solution
-        std::ostringstream seed_oss, goal_oss;
-        seed_oss << "IK seed state: [ ";
-        goal_oss << "IK solution:   [ ";
-        for (size_t i = 0; i < planning_joints.size(); ++i) {
-            seed_oss << std::fixed << std::setprecision(6) << seed(i);
-            goal_oss << std::fixed << std::setprecision(6) << goal(i);
-            if (i + 1 < planning_joints.size()) {
-                seed_oss << ", ";
-                goal_oss << ", ";
-            }
-        }
-        
+
         // Check specific return codes
         const char* result_str;
         switch (ik_result) {
@@ -537,12 +429,8 @@ private:
             default: result_str = ik_result > 0 ? "Success" : "Unknown error";
         }
         RCLCPP_INFO(this->get_logger(), "TRAC-IK result: %s (code: %d)", result_str, ik_result);
-        
+
         bool ik_success = (ik_result > 0);
-        seed_oss << " ]";
-        goal_oss << " ]";
-        RCLCPP_INFO(this->get_logger(), "%s", seed_oss.str().c_str());
-        RCLCPP_INFO(this->get_logger(), "%s", goal_oss.str().c_str());
 
         if (!ik_success) {
             RCLCPP_WARN(this->get_logger(), "IK failed with current state as seed. Trying neutral seed.");
@@ -556,36 +444,10 @@ private:
                 return;
             }
         }
-        // Print input goal pose
-        RCLCPP_INFO(this->get_logger(), "Input goal pose (in '%s'): position [%.3f, %.3f, %.3f], orientation [%.3f, %.3f, %.3f, %.3f]", 
-            base_link_.c_str(),
-            pose_in_base.pose.position.x, pose_in_base.pose.position.y, pose_in_base.pose.position.z, 
-            pose_in_base.pose.orientation.x, pose_in_base.pose.orientation.y, pose_in_base.pose.orientation.z, pose_in_base.pose.orientation.w);
-        // Compute and print current end-effector pose (FK)
-        KDL::JntArray current_jnt(planning_joints.size());
-        for (size_t i = 0; i < planning_joints.size(); ++i) current_jnt(i) = planning_positions[i];
-        KDL::Frame current_ee;
-        auto& fk_solver = fk_right_solver;
-        if (fk_solver->JntToCart(current_jnt, current_ee) >= 0) {
-            double x = current_ee.p.x(), y = current_ee.p.y(), z = current_ee.p.z();
-            double qx, qy, qz, qw;
-            current_ee.M.GetQuaternion(qx, qy, qz, qw);
-            RCLCPP_INFO(this->get_logger(), "Current EE pose: position [%.3f, %.3f, %.3f], orientation [%.3f, %.3f, %.3f, %.3f]", x, y, z, qx, qy, qz, qw);
-        } else {
-            RCLCPP_WARN(this->get_logger(), "FK failed for current joint state");
-        }
         if (!solver->CartToJnt(seed, target_frame, goal)) {
             RCLCPP_WARN(this->get_logger(), "IK failed for goal pose");
             return;
         }
-        // Print computed IK solution for goal pose
-        std::ostringstream ikoss;
-        ikoss << "IK solution for goal pose: ";
-        for (size_t i = 0; i < planning_joints.size(); ++i) {
-            ikoss << planning_joints[i] << "=" << goal(i);
-            if (i + 1 < planning_joints.size()) ikoss << ", ";
-        }
-        RCLCPP_INFO(this->get_logger(), "%s", ikoss.str().c_str());
 
         // If IK result is too close to the seed, try random seeds up to N times
         double ik_max_diff = 0.0;
@@ -604,7 +466,7 @@ private:
         double best_diff = ik_max_diff;
         
         while (best_diff < solution_threshold && random_tries < max_random_tries) {
-            RCLCPP_INFO(this->get_logger(), 
+            RCLCPP_DEBUG(this->get_logger(), 
                 "IK solution is too close to seed (max diff %.6f). Trying random seed (%d/%d)", 
                 best_diff, random_tries+1, max_random_tries);
                 
@@ -639,7 +501,7 @@ private:
                         if (i + 1 < planning_joints.size()) sol_oss << ", ";
                     }
                     sol_oss << " ]";
-                    RCLCPP_INFO(this->get_logger(), "%s", sol_oss.str().c_str());
+                    RCLCPP_DEBUG(this->get_logger(), "%s", sol_oss.str().c_str());
                 }
             }
             random_tries++;
@@ -652,19 +514,6 @@ private:
         
         // Use the best solution found
         goal = best_solution;
-
-        // Compute and print current end-effector pose (FK)
-        KDL::JntArray current_jnt_final(planning_joints.size());
-        for (size_t i = 0; i < planning_joints.size(); ++i) current_jnt_final(i) = goal(i);
-        KDL::Frame final_ee;
-        if (fk_solver->JntToCart(current_jnt_final, final_ee) >= 0) {
-            double x = final_ee.p.x(), y = final_ee.p.y(), z = final_ee.p.z();
-            double qx, qy, qz, qw;
-            final_ee.M.GetQuaternion(qx, qy, qz, qw);
-            RCLCPP_INFO(this->get_logger(), "Final EE pose: position [%.3f, %.3f, %.3f], orientation [%.3f, %.3f, %.3f, %.3f]", x, y, z, qx, qy, qz, qw);
-        } else {
-            RCLCPP_WARN(this->get_logger(), "FK failed for final joint state");
-        }
 
         // OMPL bounds: use URDF joint limits if available, else fallback to [-3.14, 3.14]
         auto space = std::make_shared<ob::RealVectorStateSpace>(planning_joints.size());
@@ -717,19 +566,17 @@ private:
         for (size_t i = 0; i < planning_joints.size(); ++i) goal_state[i] = goal(i);
         ss->setStartAndGoalStates(start, goal_state);
 
-        // --- Debug: Check start and goal state validity before planning ---
         {
-            bool start_valid = ss->getStateValidityChecker()->isValid(start.get());
-            bool goal_valid = ss->getStateValidityChecker()->isValid(goal_state.get());
-            std::ostringstream soss, goss;
-            soss << "Start state validity: " << (start_valid ? "VALID" : "INVALID") << ". Values: ";
-            goss << "Goal state validity: " << (goal_valid ? "VALID" : "INVALID") << ". Values: ";
-            for (size_t i = 0; i < planning_joints.size(); ++i) {
-                soss << planning_joints[i] << "=" << start[i] << ", ";
-                goss << planning_joints[i] << "=" << goal_state[i] << ", ";
+            const bool start_valid =
+                ss->getStateValidityChecker()->isValid(start.get());
+            const bool goal_valid =
+                ss->getStateValidityChecker()->isValid(goal_state.get());
+            if (!start_valid || !goal_valid) {
+                RCLCPP_WARN(this->get_logger(),
+                    "OMPL state validity: start=%s goal=%s",
+                    start_valid ? "VALID" : "INVALID",
+                    goal_valid ? "VALID" : "INVALID");
             }
-            RCLCPP_WARN(this->get_logger(), "%s", soss.str().c_str());
-            RCLCPP_WARN(this->get_logger(), "%s", goss.str().c_str());
         }
 
         //ss->getSpaceInformation()->setStateValidityCheckingResolution(0.01);
@@ -761,23 +608,11 @@ private:
                     return;
                 }
             }
-            // --- Debug: Check if final state matches goal ---
-            if (!traj_msg.points.empty()) {
-                const auto& final_pt = traj_msg.points.back();
-                double max_diff = 0.0;
-                for (size_t i = 0; i < planning_joints.size(); ++i) {
-                    double diff = std::abs(final_pt.positions[i] - goal(i));
-                    if (diff > max_diff) max_diff = diff;
-                }
-                RCLCPP_WARN(this->get_logger(), "Final trajectory state vs goal: max joint diff = %.6f", max_diff);
-                if (max_diff < 1e-3) {
-                    RCLCPP_INFO(this->get_logger(), "Trajectory achieves the goal (within tolerance)");
-                } else {
-                    RCLCPP_WARN(this->get_logger(), "Trajectory does NOT reach the goal (max diff > 1e-3)");
-                }
-            }
             traj_msg.header.stamp = this->now();
             traj_pub_->publish(traj_msg);
+            RCLCPP_INFO(this->get_logger(),
+                "Plan published: %zu waypoints over %zu right-arm joints",
+                traj_msg.points.size(), traj_msg.joint_names.size());
         } else {
             RCLCPP_WARN(this->get_logger(), "OMPL failed to find a path for goal pose");
         }
@@ -812,22 +647,10 @@ private:
                 Eigen::Isometry3d final_tf = world_tf * lc.local_transform;
                 fcl::Transform3d tf(final_tf.matrix());
                 lc.object->setTransform(tf);
-                // Debug: Print translation and rotation for each collision object
-                //RCLCPP_INFO(this->get_logger(), "Collision object %s translation: [%.3f, %.3f, %.3f]", link_name.c_str(), trans.x(), trans.y(), trans.z());
-                //RCLCPP_INFO(this->get_logger(), "Collision object %s rotation matrix: [%.3f %.3f %.3f; %.3f %.3f %.3f; %.3f %.3f %.3f]", link_name.c_str(),
-                //    rot(0,0), rot(0,1), rot(0,2), rot(1,0), rot(1,1), rot(1,2), rot(2,0), rot(2,1), rot(2,2));
-                // Print bounding box (AABB) in world coordinates
-                //fcl::AABBd aabb = lc.object->getAABB();
-                //RCLCPP_INFO(this->get_logger(), "Collision object %s AABB: min[%.3f, %.3f, %.3f] max[%.3f, %.3f, %.3f]", link_name.c_str(),
-                //    aabb.min_.x(), aabb.min_.y(), aabb.min_.z(), aabb.max_.x(), aabb.max_.y(), aabb.max_.z());
-            } else {
-                // If not updated, print a warning
-                //RCLCPP_WARN(this->get_logger(), "Collision object %s not updated with a transform (may be at origin)", link_name.c_str());
             }
         }
         for (auto it1 = link_collisions.begin(); it1 != link_collisions.end(); ++it1) {
             for (auto it2 = std::next(it1); it2 != link_collisions.end(); ++it2) {
-                // Only check if at least one link is in planning_links
                 // Skip a pair only when NEITHER link is in the right-arm planning chain.
                 // We want to check: arm-vs-arm, arm-vs-body. We don't care about
                 // body-vs-body (those are static, irrelevant to arm motion safety).
@@ -855,29 +678,6 @@ private:
         return false;
     }
 
-    // Utility: Print KDL chain structure for diagnostics
-    void printKDLChainInfo(const KDL::Chain& chain, const std::string& chain_name, rclcpp::Logger logger) {
-        std::ostringstream oss;
-        oss << "KDL Chain [" << chain_name << "] structure:";
-        for (unsigned int i = 0; i < chain.getNrOfSegments(); ++i) {
-            const auto& seg = chain.getSegment(i);
-            const auto& joint = seg.getJoint();
-            oss << "\n  Segment " << i << ": name='" << seg.getName() << "', joint='" << joint.getName() << "', type=";
-            switch (joint.getType()) {
-                case KDL::Joint::None: oss << "None"; break;
-                case KDL::Joint::RotAxis: oss << "RotAxis"; break;
-                case KDL::Joint::RotX: oss << "RotX"; break;
-                case KDL::Joint::RotY: oss << "RotY"; break;
-                case KDL::Joint::RotZ: oss << "RotZ"; break;
-                case KDL::Joint::TransAxis: oss << "TransAxis"; break;
-                case KDL::Joint::TransX: oss << "TransX"; break;
-                case KDL::Joint::TransY: oss << "TransY"; break;
-                case KDL::Joint::TransZ: oss << "TransZ"; break;
-                default: oss << "Unknown";
-            }
-        }
-        RCLCPP_INFO(logger, "%s", oss.str().c_str());
-    }
 };
 
 int main(int argc, char** argv)
