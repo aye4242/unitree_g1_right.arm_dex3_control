@@ -1,36 +1,45 @@
-# Stack Research: Safe Right-Arm Reaching for Unitree G1
+# Stack Research: v1.1 Additions
 
-## Current Stack (Already In Place)
+## New Dependencies
 
-| Component | Library | Version/Status | Notes |
-|-----------|---------|----------------|-------|
-| Motion Planning | OMPL (RRTConnect) | Compiled, working | Sampling-based planner |
-| Collision Checking | FCL | Vendored, compiled | Supports box, cylinder, sphere, mesh geometries |
-| Inverse Kinematics | TRAC-IK | Vendored, compiled | Distance solve mode, 1.0s timeout |
-| Forward Kinematics | KDL | Via kdl_parser | Chain from URDF |
-| Perception | Ultralytics YOLO + PCL | Working | 2D→3D projection via depth images |
-| TF | tf2_ros | Working | Camera-to-robot transform calibrated |
-| Robot Interface | unitree_hg | Working | LowCmd/LowState messages |
+| Library | Version | Purpose | Integration Point |
+|---------|---------|---------|-------------------|
+| `pupil-apriltags` | `==1.0.4.post11` | AprilTag 36h11 detection + pose estimation. Bundles apriltag3 C library, no external deps. | Subscribes to D435i color image + camera_info; publishes tag pose as PoseStamped |
+| `scipy` | `>=1.10.0` | `Rotation` for rotation math, `Slerp` for orientation interpolation | Used in detection node (pose_R → quat) and adaptive orientation computation |
+| `numpy` | `>=1.24.0` | Array operations for tag pose processing | Already present as OpenCV/PyKDL dep, pin minimum |
 
-## Recommendations
+## Configuration Files Needed
 
-### Keep As-Is
-- **OMPL + FCL + TRAC-IK**: This is the standard stack for ROS 2 arm planning without MoveIt. The existing implementation already handles the core pipeline. No need to switch.
-- **RRTConnect planner**: Good default for 7-DOF arm planning. Fast and bidirectional.
+1. **AprilTag parameters YAML** (`config/apriltag_params.yaml`):
+   ```yaml
+   apriltag_detector:
+     ros__parameters:
+       tag_family: "tag36h11"
+       tag_size: 0.05          # meters - physical tag size
+       target_offset_x: 0.0    # configurable offset from tag to object
+       target_offset_y: 0.0
+       target_offset_z: 0.0
+   ```
 
-### Add/Improve
-- **OMPL path simplification**: Current code calls `path.interpolate()` but does NOT call `path.simplify()` or use `PathSimplifier`. Adding simplification removes unnecessary waypoints and shortens paths.
-- **Trajectory smoothing**: Current output is raw OMPL waypoints with fixed time steps. No velocity/acceleration profiling. Should add time parameterization for smooth execution.
-- **Collision checking resolution**: `setStateValidityCheckingResolution()` is commented out. Should be enabled (0.01-0.05) to catch collisions between waypoints.
-- **Environment collision objects**: Current `buildCollisionObjects()` only loads URDF collision geometries (self-collision). No mechanism to add table or other environment obstacles.
+2. **TCP offset parameter** in planner:
+   ```yaml
+   tcp_offset_x: 0.175  # meters, +X from right_wrist_yaw_link
+   ```
 
-### Do NOT Use
-- **MoveIt 2**: Overkill for this use case. The existing direct OMPL+FCL integration is simpler and already working. MoveIt would require significant setup (SRDF, move_group, etc.) with no clear benefit.
-- **VAMP**: Requires specific setup and is not yet mainstream for ROS 2 Foxy-era stacks.
+## What NOT to Add
 
-## Confidence
+| Library/Package | Reason |
+|-----------------|--------|
+| `apriltag_ros` / `apriltag_ros2` | Heavyweight ROS wrapper; pupil-apriltags called directly is simpler |
+| `pyapriltags` | Less maintained fork of dt-apriltags |
+| `dt-apriltags` | Predecessor to pupil-apriltags, no longer updated |
+| `transforms3d` | scipy.spatial.transform.Rotation covers all needs |
+| `pytracik` (pip) | Project already builds trac_ik from source as ROS 2 C++ package |
+| Additional URDF TCP link | Not needed — offset applied as inverse transform on IK goal |
 
-- **High**: Keep OMPL+FCL+TRAC-IK stack — proven and already compiled
-- **High**: Add path simplification — standard OMPL feature, minimal code change
-- **Medium**: Trajectory smoothing approach — several options (cubic spline, trapezoidal velocity profile, TOPP-RA), needs evaluation
-- **High**: Add environment obstacles — straightforward FCL addition
+## Integration Notes
+
+- Detection node: standalone Python ROS 2 node using cv_bridge + pupil-apriltags
+- TCP offset: apply inverse offset in C++ planner (~3 lines change), no new library
+- Adaptive orientation: scipy Rotation in Python goal composer node
+- Install: `pip install "pupil-apriltags==1.0.4.post11" "scipy>=1.10.0"`

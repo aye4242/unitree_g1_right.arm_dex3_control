@@ -2,55 +2,63 @@
 
 ## What This Is
 
-A safe, stable right-arm reaching system for the Unitree G1 humanoid robot. The robot stands in place (official running mode maintains balance), detects objects via the existing YOLO + RealSense perception pipeline, transforms coordinates from camera frame to robot frame, and uses OMPL + FCL + TRAC-IK to plan and execute a collision-free trajectory for the right arm only to reach the target position. No dexterous hand control — the task is complete when the right arm end-effector arrives at the target.
+A safe, stable right-arm reaching system for the Unitree G1 humanoid robot. The robot stands in place (official running mode maintains balance), detects AprilTag 36h11 markers via the head-mounted RealSense D435i, computes target position with configurable offset, and uses OMPL + FCL + TRAC-IK to plan and execute a collision-free trajectory for the right arm TCP (wrist + 0.175m offset) to reach the target. No dexterous hand control — the task is complete when the TCP arrives at the target.
 
 ## Core Value
 
-The right arm moves safely to the target position without colliding with the robot's own body or the environment, and without exceeding joint limits.
+The right arm TCP moves safely to the target position without colliding with the robot's own body or the environment, and without exceeding joint limits.
+
+## Current Milestone: v1.1 AprilTag 定位 + TCP 修正
+
+**Goal:** 用 AprilTag 36h11 替代 YOLO 检测，修正 TCP offset 和末端位姿策略，使到达成功率大幅提升。
+
+**Target features:**
+- 移除 YOLO 检测代码（已验证不可行）
+- AprilTag 36h11 检测 + 可配置相对偏移定位物品
+- TCP offset (0.175m) 集成到 planner IK 目标
+- 自适应末端位姿（根据目标位置自动选择可行 orientation）
 
 ## Requirements
 
 ### Validated
 
-- ✓ YOLO object detection on RGB images — existing (`ultralytics_detector.py`)
-- ✓ 2D-to-3D projection from bounding boxes + depth images — existing (`project_to_3d_node`)
+- ✓ Right-arm-only OMPL+FCL+TRAC-IK motion planning — v1.0 Phase 1
+- ✓ Self-collision detection (right arm vs all body links) — v1.0 Phase 1
+- ✓ OMPL path simplification — v1.0 Phase 2
+- ✓ Velocity-based trajectory smoothing + validation — v1.0 Phase 3
+- ✓ Right-arm-only executor coexisting with running mode — v1.0 Phase 4
+- ✓ End-to-end integration with single launch command — v1.0 Phase 5
 - ✓ Camera-to-robot TF relationship — already calibrated
 - ✓ URDF models for G1 + DEX3 hands — existing in `robots/`
-- ✓ OMPL + FCL + TRAC-IK planner compiled — existing (`ik_fcl_ompl_planner`)
-- ✓ Joint state publishing from robot — existing (`joint_state_publisher`)
-- ✓ Robot state publisher with URDF — existing (`robot.launch.py`)
+- ✓ Joint state publishing from robot — existing
 
 ### Active
 
-- [ ] Right-arm-only motion planning (planner configured for right arm chain only)
-- [ ] Self-collision detection (right arm vs torso, legs, left arm)
-- [ ] Environment collision avoidance (table and other obstacles)
-- [ ] Joint limit protection (position and velocity limits enforced in planner and executor)
-- [ ] Smooth trajectory execution (interpolated, no sudden large motions)
-- [ ] Coordinate transform pipeline: camera 3D detection → robot base frame → planner goal pose
-- [ ] Right-arm-only trajectory executor (sends commands only for right arm joints, leaves rest to running mode)
-- [ ] End-to-end integration: perception → coordinate transform → planning → execution
-- [ ] Safe startup and error handling (graceful behavior when services/topics unavailable)
+- [ ] 移除 YOLO 检测代码（已验证不可行）
+- [ ] AprilTag 36h11 检测 + 可配置相对偏移定位物品
+- [ ] TCP offset (0.175m) 集成到 planner IK 目标
+- [ ] 自适应末端位姿（根据目标位置自动选择可行 orientation）
 
 ### Out of Scope
 
 - Left arm control — not needed for this milestone
 - DEX3 hand control — task is reach only, no grasping
 - Walking/locomotion — robot stands in place, official running mode handles balance
-- YOLO model training — using existing best.pt model
-- Camera calibration — already done
 - Simulation (Gazebo) — testing on physical robot only
+- YOLO 检测 — 已验证不可行，彻底移除
 
 ## Context
 
 - Running on Unitree G1 onboard computer (Ubuntu Linux, `/home/unitree/`)
 - Existing ROS 2 workspace with all dependencies built (`colcon build`)
-- Perception pipeline fully functional (YOLO + RealSense + 3D projection)
-- Planner node (`ik_fcl_ompl_planner`) already compiled but currently supports both arms — needs to be focused on right arm only
-- Trajectory executor (`joint_trajectory_executor`) currently sends commands to both arms and hands — needs to be restricted to right arm joints only
+- v1.0 pipeline fully functional: planner + executor + launch files
+- YOLO 检测经测试不可行，需彻底移除相关代码
+- 头部 RealSense D435i 相机继续使用
+- TCP offset = 0.175m 沿 right_wrist_yaw_link 局部 X 轴（参见 `tcp_torso_pose.py`）
+- Planner 当前 IK 目标是 right_wrist_yaw_link，未考虑 TCP offset
+- 固定末端位姿导致 IK/OMPL 失败率高，需自适应策略
 - Official Unitree running mode controls legs, waist, and overall balance via `/arm_sdk` topic
-- Robot communicates via `unitree_hg` custom messages
-- Conda environment `grab` required for Python perception node
+- Conda environment `grab` required for Python perception nodes
 
 ## Constraints
 
@@ -64,11 +72,14 @@ The right arm moves safely to the target position without colliding with the rob
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Right arm only, no hand | Simplify scope; reach task doesn't need grasping | — Pending |
-| Reuse existing perception pipeline | Already working; focus effort on planning and control | — Pending |
-| FCL for collision checking | Already integrated and compiled in workspace | — Pending |
-| OMPL RRTConnect for planning | Already implemented in `ik_fcl_ompl_planner` | — Pending |
-| Official running mode for balance | Avoids implementing full-body control; proven stable | — Pending |
+| Right arm only, no hand | Simplify scope; reach task doesn't need grasping | ✓ Good |
+| Reuse existing perception pipeline | Already working; focus effort on planning and control | ⚠️ Revisit — YOLO 不可行 |
+| FCL for collision checking | Already integrated and compiled in workspace | ✓ Good |
+| OMPL RRTConnect for planning | Already implemented in `ik_fcl_ompl_planner` | ✓ Good |
+| Official running mode for balance | Avoids implementing full-body control; proven stable | ✓ Good |
+| 移除 YOLO，改用 AprilTag 36h11 | YOLO 检测经测试不可行；AprilTag 轻量可靠 | — Pending |
+| TCP offset 集成到 planner | 当前 IK 目标不含 TCP offset，导致实际到达位置偏差 | — Pending |
+| 自适应末端位姿 | 固定位姿导致 IK/OMPL 失败率高 | — Pending |
 
 ## Evolution
 
@@ -88,4 +99,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2025-04-27 after initialization*
+*Last updated: 2026-05-15 after milestone v1.1 start*

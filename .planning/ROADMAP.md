@@ -1,100 +1,74 @@
 # Roadmap: Unitree G1 Right-Arm Safe Reach
 
-**Created:** 2025-04-27
-**Milestone:** v1.0 — Safe right-arm reaching
-**Phases:** 5
-**Requirements:** 9
+**Created:** 2026-05-15
+**Milestone:** v1.1 — AprilTag 定位 + TCP 修正
+**Phases:** 4
+**Requirements:** 10
 
-## Phase 1: Right-Arm-Only Planner
+## Phase 6: YOLO 清理 + TCP Offset 集成
 
-**Goal:** Modify `ik_fcl_ompl_planner` to only plan for the right arm, with correct self-collision checking.
+**Goal:** 移除不可行的 YOLO 代码，将 TCP offset 集成到 planner IK 链末端。
 
-**Requirements:** PLAN-01, PLAN-02, PLAN-04
-
-**UI hint**: no
+**Requirements:** CLEAN-01, TCP-01, TCP-02
 
 **Success Criteria:**
-1. Planner always uses right arm KDL chain regardless of goal position
-2. Left arm chain/IK/FK code removed or disabled
-3. `isInCollision()` checks right arm links against ALL other body links (torso, legs, left arm)
-4. OMPL bounds correctly set from URDF joint limits for all 7 right arm joints
-5. Planner compiles and launches successfully
+1. YOLO 相关文件（ultralytics_detector.py、project_to_3d_node 等）已删除并提交
+2. 原 reach.launch.py 中 YOLO 相关节点已移除
+3. Planner IK 链末端延伸到 TCP 点（wrist_yaw_link + 0.175m X 轴）
+4. TCP offset 通过 ROS 参数配置，不硬编码
+5. 现有 planner 功能不受影响（手动指定目标仍可规划）
 
 **Depends on:** —
 
 ---
 
-## Phase 2: Path Simplification & Quality
+## Phase 7: AprilTag 检测节点
 
-**Goal:** Add OMPL path simplification and improve trajectory output quality.
+**Goal:** 实现 AprilTag 36h11 检测，发布 tag 位姿并转换到 torso_link 帧。
 
-**Requirements:** PLAN-03
-
-**UI hint**: no
+**Requirements:** TAG-01, TAG-02, TAG-03, TAG-04
 
 **Success Criteria:**
-1. OMPL `PathSimplifier` or `simplify()` called after solving, before trajectory conversion
-2. `setStateValidityCheckingResolution()` enabled (0.01-0.05) for collision checking between waypoints
-3. Simplified paths have fewer waypoints than raw paths (verified by logging)
-4. All simplified paths still collision-free (verified by state validity check)
+1. pupil-apriltags 检测节点从 D435i color stream 检测 tag36h11
+2. 检测到 tag 后发布 6-DOF 位姿（PoseStamped）
+3. 可配置 tag→物品 XYZ 偏移通过 YAML 文件设置
+4. 位姿通过 TF 从 camera_color_optical_frame 变换到 torso_link
+5. 低质量检测被过滤（decision_margin 阈值）
+6. 节点可独立启动测试，不依赖 planner
 
-**Depends on:** Phase 1
+**Depends on:** Phase 6（YOLO 已清理，避免冲突）
 
 ---
 
-## Phase 3: Trajectory Smoothing & Validation
+## Phase 8: 自适应末端位姿
 
-**Goal:** Replace fixed time steps with velocity-based time parameterization and add pre-execution validation.
+**Goal:** 根据目标位置自动计算可行的末端 orientation，提高 IK/OMPL 成功率。
 
-**Requirements:** EXEC-01, EXEC-02
-
-**UI hint**: no
+**Requirements:** ORI-01
 
 **Success Criteria:**
-1. Trajectory time stamps computed from URDF joint velocity limits (not fixed 50ms)
-2. Maximum joint velocity between consecutive waypoints does not exceed URDF limit
-3. All trajectory joint positions verified within URDF limits before execution
-4. Trajectories with limit violations are rejected with clear error log
-5. Resulting motion is observably smoother than fixed-time-step version
+1. 根据目标位置相对右肩的方向自动计算 orientation
+2. 计算出的 orientation 使手臂自然指向目标（非固定死姿态）
+3. 对比固定姿态，IK 成功率明显提升
+4. 在工作空间边界和肩部正上方等困难区域仍能找到可行姿态
 
-**Depends on:** Phase 2
+**Depends on:** Phase 6（TCP offset 已集成，orientation 计算基于 TCP）
 
 ---
 
-## Phase 4: Right-Arm-Only Executor
+## Phase 9: 端到端集成
 
-**Goal:** Modify `joint_trajectory_executor` to only send right arm joint commands, coexisting with running mode.
+**Goal:** 将 AprilTag 检测 + TCP 修正 + 自适应位姿整合为完整流水线。
 
-**Requirements:** INTG-02
-
-**UI hint**: no
+**Requirements:** INTG-01, INTG-02
 
 **Success Criteria:**
-1. `LowCmd` only populates motor commands for right arm joint indices (kRightShoulderPitch through kRightWristYaw)
-2. All non-right-arm joint command entries left at zero/untouched
-3. Hand open/close commands removed (no DEX3 control)
-4. Running mode maintains balance while right arm moves
-5. No observable interference between arm motion and body stability
+1. apriltag_reach.launch.py 单命令启动完整流水线
+2. 全流程验证：AprilTag 检测 → 偏移计算 → TF 变换 → 自适应 orientation → planner → executor
+3. TCP 实际到达位置与目标位置误差在可接受范围内
+4. 在物理机器人上演示成功
 
-**Depends on:** Phase 3
-
----
-
-## Phase 5: End-to-End Integration
-
-**Goal:** Wire the complete pipeline together and provide launch files for the full system.
-
-**Requirements:** INTG-01, INTG-03
-
-**UI hint**: no
-
-**Success Criteria:**
-1. Single launch command starts perception + planning + execution pipeline
-2. YOLO detects object → 3D position computed → TF transform to torso_link → planner receives goal → right arm moves to target
-3. Full pipeline demonstrated on physical robot
-4. README or documentation updated with usage instructions
-
-**Depends on:** Phase 4
+**Depends on:** Phase 7, Phase 8
 
 ---
 
@@ -102,20 +76,21 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PLAN-01 | Phase 1 | Pending |
-| PLAN-02 | Phase 1 | Pending |
-| PLAN-04 | Phase 1 | Pending |
-| PLAN-03 | Phase 2 | Pending |
-| EXEC-01 | Phase 3 | Pending |
-| EXEC-02 | Phase 3 | Pending |
-| INTG-02 | Phase 4 | Pending |
-| INTG-01 | Phase 5 | Pending |
-| INTG-03 | Phase 5 | Pending |
+| CLEAN-01 | Phase 6 | Pending |
+| TCP-01 | Phase 6 | Pending |
+| TCP-02 | Phase 6 | Pending |
+| TAG-01 | Phase 7 | Pending |
+| TAG-02 | Phase 7 | Pending |
+| TAG-03 | Phase 7 | Pending |
+| TAG-04 | Phase 7 | Pending |
+| ORI-01 | Phase 8 | Pending |
+| INTG-01 | Phase 9 | Pending |
+| INTG-02 | Phase 9 | Pending |
 
-**v1 requirements:** 9 total
-**Mapped to phases:** 9
+**v1.1 requirements:** 10 total
+**Mapped to phases:** 10
 **Unmapped:** 0 ✓
 
 ---
-*Roadmap created: 2025-04-27*
-*Last updated: 2025-04-27 after initial creation*
+*Roadmap created: 2026-05-15*
+*Last updated: 2026-05-15 after initial creation*

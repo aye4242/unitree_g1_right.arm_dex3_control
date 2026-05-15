@@ -1,62 +1,62 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: Executing Phase 01
-last_updated: "2026-04-30T03:28:15.521Z"
+milestone: v1.1
+milestone_name: AprilTag 定位 + TCP 修正
+status: planning
+last_updated: "2026-05-15T09:46:50.991Z"
+last_activity: 2026-05-15 — Roadmap created
 progress:
-  total_phases: 5
+  total_phases: 4
   completed_phases: 0
-  total_plans: 3
-  completed_plans: 2
-  percent: 67
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2025-04-27)
+See: .planning/PROJECT.md (updated 2026-05-15)
 
-**Core value:** The right arm moves safely to the target position without colliding with the robot's own body or the environment, and without exceeding joint limits.
-**Current focus:** Phase 01 — right-arm-only-planner
+**Core value:** The right arm TCP moves safely to the target position without colliding with the robot's own body or the environment, and without exceeding joint limits.
+**Current focus:** Phase 6 — YOLO 清理 + TCP Offset 集成
+
+## Current Position
+
+Phase: 6 — YOLO 清理 + TCP Offset 集成
+Plan: —
+Status: Ready to plan
+Last activity: 2026-05-15 — Roadmap created
 
 ## Current Milestone
 
-**v1.0 — Safe right-arm reaching**
+**v1.1 — AprilTag 定位 + TCP 修正**
 
 | Phase | Name | Status | Requirements |
 |-------|------|--------|--------------|
-| 1 | Right-Arm-Only Planner | ○ Pending | PLAN-01, PLAN-02, PLAN-04 |
-| 2 | Path Simplification & Quality | ○ Pending | PLAN-03 |
-| 3 | Trajectory Smoothing & Validation | ○ Pending | EXEC-01, EXEC-02 |
-| 4 | Right-Arm-Only Executor | ○ Pending | INTG-02 |
-| 5 | End-to-End Integration | ○ Pending | INTG-01, INTG-03 |
+| 6 | YOLO 清理 + TCP Offset 集成 | ○ Pending | CLEAN-01, TCP-01, TCP-02 |
+| 7 | AprilTag 检测节点 | ○ Pending | TAG-01~04 |
+| 8 | 自适应末端位姿 | ○ Pending | ORI-01 |
+| 9 | 端到端集成 | ○ Pending | INTG-01~02 |
 
 Progress: ░░░░░░░░░░ 0%
 
 ## Active Context
 
-- Existing OMPL+FCL+TRAC-IK planner compiled and installed
-- Perception pipeline (YOLO + RealSense + 3D projection) working
-- Camera-to-robot TF calibrated
-- Key bug: `isInCollision()` only checks pairs where BOTH links are in planning chain
-- Key issue: trajectory executor sends commands for ALL joints, not just right arm
+- v1.0 milestone complete — full right-arm reaching pipeline working
+- YOLO 检测经测试不可行，需移除
+- 新检测方案：AprilTag 36h11 + 可配置偏移
+- TCP offset (0.175m) 需集成到 planner IK 目标
+- 固定末端位姿导致 IK/OMPL 失败率高，需自适应策略
 
 ## Decisions Log
 
 | Decision | Phase | Rationale |
 |----------|-------|-----------|
-| Keep OMPL+FCL+TRAC-IK | Init | Already working, simpler than MoveIt |
-| No MoveIt 2 | Init | Direct integration sufficient |
-| Static environment only | Init | No dynamic obstacles for v1 |
-| Collision primitives URDF recommended | Init | Faster FCL checks than mesh URDF |
-
-### Quick Tasks Completed
-
-| # | Description | Date | Commit | Directory |
-|---|-------------|------|--------|-----------|
-| 260430-fxj | tcp-torso-link TCP位姿脚本 | 2026-04-30 | bfaabc8 | [260430-fxj-tcp-torso-link](./quick/260430-fxj-tcp-torso-link/) |
+| 移除 YOLO，改用 AprilTag 36h11 | Init | YOLO 检测经测试不可行；AprilTag 轻量可靠 |
+| TCP offset 集成到 planner | Init | 当前 IK 目标不含 TCP offset |
+| 自适应末端位姿 | Init | 固定位姿导致 IK/OMPL 失败率高 |
 
 ---
-Last activity: 2026-04-30 - Completed quick task 260430-fxj: tcp-torso-link TCP位姿脚本
+Last activity: 2026-05-15
