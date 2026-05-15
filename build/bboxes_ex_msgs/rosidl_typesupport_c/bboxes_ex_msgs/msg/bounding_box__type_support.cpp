@@ -4,8 +4,8 @@
 
 #include "cstddef"
 #include "rosidl_runtime_c/message_type_support_struct.h"
-#include "bboxes_ex_msgs/msg/rosidl_typesupport_c__visibility_control.h"
 #include "bboxes_ex_msgs/msg/detail/bounding_box__struct.h"
+#include "bboxes_ex_msgs/msg/detail/bounding_box__type_support.h"
 #include "rosidl_typesupport_c/identifier.h"
 #include "rosidl_typesupport_c/message_type_support_dispatch.h"
 #include "rosidl_typesupport_c/type_support_map.h"
@@ -85,7 +85,6 @@ extern "C"
 {
 #endif
 
-ROSIDL_TYPESUPPORT_C_EXPORT_bboxes_ex_msgs
 const rosidl_message_type_support_t *
 ROSIDL_TYPESUPPORT_INTERFACE__MESSAGE_SYMBOL_NAME(rosidl_typesupport_c, bboxes_ex_msgs, msg, BoundingBox)() {
   return &::bboxes_ex_msgs::msg::rosidl_typesupport_c::BoundingBox_message_type_support_handle;

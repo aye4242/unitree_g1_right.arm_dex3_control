@@ -5,13 +5,15 @@
 #ifndef BBOXES_EX_MSGS__MSG__DETAIL__BOUNDING_BOX__STRUCT_HPP_
 #define BBOXES_EX_MSGS__MSG__DETAIL__BOUNDING_BOX__STRUCT_HPP_
 
-#include <rosidl_runtime_cpp/bounded_vector.hpp>
-#include <rosidl_runtime_cpp/message_initialization.hpp>
 #include <algorithm>
 #include <array>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "rosidl_runtime_cpp/bounded_vector.hpp"
+#include "rosidl_runtime_cpp/message_initialization.hpp"
 
 
 #ifndef _WIN32
@@ -43,11 +45,13 @@ struct BoundingBox_
       this->xmax = 0l;
       this->ymax = 0l;
       this->class_id = "";
+      this->text = "";
     }
   }
 
   explicit BoundingBox_(const ContainerAllocator & _alloc, rosidl_runtime_cpp::MessageInitialization _init = rosidl_runtime_cpp::MessageInitialization::ALL)
-  : class_id(_alloc)
+  : class_id(_alloc),
+    text(_alloc)
   {
     if (rosidl_runtime_cpp::MessageInitialization::ALL == _init ||
       rosidl_runtime_cpp::MessageInitialization::ZERO == _init)
@@ -58,6 +62,7 @@ struct BoundingBox_
       this->xmax = 0l;
       this->ymax = 0l;
       this->class_id = "";
+      this->text = "";
     }
   }
 
@@ -78,8 +83,11 @@ struct BoundingBox_
     int32_t;
   _ymax_type ymax;
   using _class_id_type =
-    std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other>;
+    std::basic_string<char, std::char_traits<char>, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<char>>;
   _class_id_type class_id;
+  using _text_type =
+    std::basic_string<char, std::char_traits<char>, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<char>>;
+  _text_type text;
 
   // setters for named parameter idiom
   Type & set__probability(
@@ -113,9 +121,15 @@ struct BoundingBox_
     return *this;
   }
   Type & set__class_id(
-    const std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other> & _arg)
+    const std::basic_string<char, std::char_traits<char>, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<char>> & _arg)
   {
     this->class_id = _arg;
+    return *this;
+  }
+  Type & set__text(
+    const std::basic_string<char, std::char_traits<char>, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<char>> & _arg)
+  {
+    this->text = _arg;
     return *this;
   }
 
@@ -177,6 +191,9 @@ struct BoundingBox_
       return false;
     }
     if (this->class_id != other.class_id) {
+      return false;
+    }
+    if (this->text != other.text) {
       return false;
     }
     return true;

@@ -1255,6 +1255,13 @@
       <origin xyz="0 0 0" rpy="0 0 0" />
     </collision>
   </link>
+  <!-- TCP (Tool Center Point) virtual link: 0.175m along wrist_yaw X axis -->
+  <joint name="right_tcp_joint" type="fixed">
+    <origin xyz="0.175 0 0" rpy="0 0 0" />
+    <parent link="right_wrist_yaw_link" />
+    <child link="right_tcp_link" />
+  </joint>
+  <link name="right_tcp_link" />
   <joint name="right_hand_palm_joint" type="fixed">
     <origin xyz="0.0415 -0.003 0" rpy="0 0 0" />
     <parent link="right_wrist_yaw_link" />

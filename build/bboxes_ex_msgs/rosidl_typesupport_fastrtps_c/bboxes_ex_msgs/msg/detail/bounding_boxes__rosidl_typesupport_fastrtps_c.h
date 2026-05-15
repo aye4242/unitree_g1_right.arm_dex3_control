@@ -23,6 +23,7 @@ size_t get_serialized_size_bboxes_ex_msgs__msg__BoundingBoxes(
 ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_bboxes_ex_msgs
 size_t max_serialized_size_bboxes_ex_msgs__msg__BoundingBoxes(
   bool & full_bounded,
+  bool & is_plain,
   size_t current_alignment);
 
 ROSIDL_TYPESUPPORT_FASTRTPS_C_PUBLIC_bboxes_ex_msgs

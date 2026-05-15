@@ -5,10 +5,11 @@
 #ifndef BBOXES_EX_MSGS__MSG__DETAIL__BOUNDING_BOX__BUILDER_HPP_
 #define BBOXES_EX_MSGS__MSG__DETAIL__BOUNDING_BOX__BUILDER_HPP_
 
-#include "bboxes_ex_msgs/msg/detail/bounding_box__struct.hpp"
-#include <rosidl_runtime_cpp/message_initialization.hpp>
 #include <algorithm>
 #include <utility>
+
+#include "bboxes_ex_msgs/msg/detail/bounding_box__struct.hpp"
+#include "rosidl_runtime_cpp/message_initialization.hpp"
 
 
 namespace bboxes_ex_msgs
@@ -20,16 +21,32 @@ namespace msg
 namespace builder
 {
 
+class Init_BoundingBox_text
+{
+public:
+  explicit Init_BoundingBox_text(::bboxes_ex_msgs::msg::BoundingBox & msg)
+  : msg_(msg)
+  {}
+  ::bboxes_ex_msgs::msg::BoundingBox text(::bboxes_ex_msgs::msg::BoundingBox::_text_type arg)
+  {
+    msg_.text = std::move(arg);
+    return std::move(msg_);
+  }
+
+private:
+  ::bboxes_ex_msgs::msg::BoundingBox msg_;
+};
+
 class Init_BoundingBox_class_id
 {
 public:
   explicit Init_BoundingBox_class_id(::bboxes_ex_msgs::msg::BoundingBox & msg)
   : msg_(msg)
   {}
-  ::bboxes_ex_msgs::msg::BoundingBox class_id(::bboxes_ex_msgs::msg::BoundingBox::_class_id_type arg)
+  Init_BoundingBox_text class_id(::bboxes_ex_msgs::msg::BoundingBox::_class_id_type arg)
   {
     msg_.class_id = std::move(arg);
-    return std::move(msg_);
+    return Init_BoundingBox_text(msg_);
   }
 
 private:

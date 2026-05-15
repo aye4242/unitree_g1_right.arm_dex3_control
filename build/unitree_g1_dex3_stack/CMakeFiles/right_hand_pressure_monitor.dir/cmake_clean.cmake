@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/right_hand_pressure_monitor.dir/src/right_hand_pressure_monitor.cpp.o"
+  "CMakeFiles/right_hand_pressure_monitor.dir/src/right_hand_pressure_monitor.cpp.o.d"
   "right_hand_pressure_monitor"
   "right_hand_pressure_monitor.pdb"
 )

@@ -5,10 +5,11 @@
 #ifndef BBOXES_EX_MSGS__MSG__DETAIL__BOUNDING_BOXES__BUILDER_HPP_
 #define BBOXES_EX_MSGS__MSG__DETAIL__BOUNDING_BOXES__BUILDER_HPP_
 
-#include "bboxes_ex_msgs/msg/detail/bounding_boxes__struct.hpp"
-#include <rosidl_runtime_cpp/message_initialization.hpp>
 #include <algorithm>
 #include <utility>
+
+#include "bboxes_ex_msgs/msg/detail/bounding_boxes__struct.hpp"
+#include "rosidl_runtime_cpp/message_initialization.hpp"
 
 
 namespace bboxes_ex_msgs

@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/project_to_3d_node.dir/src/project_to_3d_node.cpp.o"
+  "CMakeFiles/project_to_3d_node.dir/src/project_to_3d_node.cpp.o.d"
   "project_to_3d_node"
   "project_to_3d_node.pdb"
 )

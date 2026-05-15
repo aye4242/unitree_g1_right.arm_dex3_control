@@ -237,22 +237,27 @@ bboxes_ex_msgs__msg__BoundingBoxes__Sequence__copy(
   if (output->capacity < input->size) {
     const size_t allocation_size =
       input->size * sizeof(bboxes_ex_msgs__msg__BoundingBoxes);
+    rcutils_allocator_t allocator = rcutils_get_default_allocator();
     bboxes_ex_msgs__msg__BoundingBoxes * data =
-      (bboxes_ex_msgs__msg__BoundingBoxes *)realloc(output->data, allocation_size);
+      (bboxes_ex_msgs__msg__BoundingBoxes *)allocator.reallocate(
+      output->data, allocation_size, allocator.state);
     if (!data) {
       return false;
     }
+    // If reallocation succeeded, memory may or may not have been moved
+    // to fulfill the allocation request, invalidating output->data.
+    output->data = data;
     for (size_t i = output->capacity; i < input->size; ++i) {
-      if (!bboxes_ex_msgs__msg__BoundingBoxes__init(&data[i])) {
-        /* free currently allocated and return false */
+      if (!bboxes_ex_msgs__msg__BoundingBoxes__init(&output->data[i])) {
+        // If initialization of any new item fails, roll back
+        // all previously initialized items. Existing items
+        // in output are to be left unmodified.
         for (; i-- > output->capacity; ) {
-          bboxes_ex_msgs__msg__BoundingBoxes__fini(&data[i]);
+          bboxes_ex_msgs__msg__BoundingBoxes__fini(&output->data[i]);
         }
-        free(data);
         return false;
       }
     }
-    output->data = data;
     output->capacity = input->size;
   }
   output->size = input->size;

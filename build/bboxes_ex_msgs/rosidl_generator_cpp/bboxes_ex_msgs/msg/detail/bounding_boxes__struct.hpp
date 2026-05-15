@@ -5,13 +5,15 @@
 #ifndef BBOXES_EX_MSGS__MSG__DETAIL__BOUNDING_BOXES__STRUCT_HPP_
 #define BBOXES_EX_MSGS__MSG__DETAIL__BOUNDING_BOXES__STRUCT_HPP_
 
-#include <rosidl_runtime_cpp/bounded_vector.hpp>
-#include <rosidl_runtime_cpp/message_initialization.hpp>
 #include <algorithm>
 #include <array>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "rosidl_runtime_cpp/bounded_vector.hpp"
+#include "rosidl_runtime_cpp/message_initialization.hpp"
 
 
 // Include directives for member types
@@ -55,7 +57,7 @@ struct BoundingBoxes_
     std_msgs::msg::Header_<ContainerAllocator>;
   _header_type header;
   using _bounding_boxes_type =
-    std::vector<bboxes_ex_msgs::msg::BoundingBox_<ContainerAllocator>, typename ContainerAllocator::template rebind<bboxes_ex_msgs::msg::BoundingBox_<ContainerAllocator>>::other>;
+    std::vector<bboxes_ex_msgs::msg::BoundingBox_<ContainerAllocator>, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<bboxes_ex_msgs::msg::BoundingBox_<ContainerAllocator>>>;
   _bounding_boxes_type bounding_boxes;
 
   // setters for named parameter idiom
@@ -66,7 +68,7 @@ struct BoundingBoxes_
     return *this;
   }
   Type & set__bounding_boxes(
-    const std::vector<bboxes_ex_msgs::msg::BoundingBox_<ContainerAllocator>, typename ContainerAllocator::template rebind<bboxes_ex_msgs::msg::BoundingBox_<ContainerAllocator>>::other> & _arg)
+    const std::vector<bboxes_ex_msgs::msg::BoundingBox_<ContainerAllocator>, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<bboxes_ex_msgs::msg::BoundingBox_<ContainerAllocator>>> & _arg)
   {
     this->bounding_boxes = _arg;
     return *this;

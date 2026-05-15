@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/joint_state_publisher.dir/src/joint_state_publisher.cpp.o"
+  "CMakeFiles/joint_state_publisher.dir/src/joint_state_publisher.cpp.o.d"
   "joint_state_publisher"
   "joint_state_publisher.pdb"
 )

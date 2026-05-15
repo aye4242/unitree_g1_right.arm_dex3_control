@@ -8,6 +8,7 @@ set(CMAKE_IMPORT_FILE_VERSION 1)
 # Import target "bboxes_ex_msgs::bboxes_ex_msgs__rosidl_typesupport_c" for configuration ""
 set_property(TARGET bboxes_ex_msgs::bboxes_ex_msgs__rosidl_typesupport_c APPEND PROPERTY IMPORTED_CONFIGURATIONS NOCONFIG)
 set_target_properties(bboxes_ex_msgs::bboxes_ex_msgs__rosidl_typesupport_c PROPERTIES
+  IMPORTED_LINK_DEPENDENT_LIBRARIES_NOCONFIG "rosidl_runtime_c::rosidl_runtime_c;rosidl_typesupport_c::rosidl_typesupport_c"
   IMPORTED_LOCATION_NOCONFIG "${_IMPORT_PREFIX}/lib/libbboxes_ex_msgs__rosidl_typesupport_c.so"
   IMPORTED_SONAME_NOCONFIG "libbboxes_ex_msgs__rosidl_typesupport_c.so"
   )

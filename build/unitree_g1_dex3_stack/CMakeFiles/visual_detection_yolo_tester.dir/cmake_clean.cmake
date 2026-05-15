@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/visual_detection_yolo_tester.dir/src/visual_detection_yolo_tester.cpp.o"
+  "CMakeFiles/visual_detection_yolo_tester.dir/src/visual_detection_yolo_tester.cpp.o.d"
   "visual_detection_yolo_tester"
   "visual_detection_yolo_tester.pdb"
 )

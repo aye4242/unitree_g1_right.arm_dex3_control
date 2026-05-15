@@ -19,9 +19,10 @@ extern "C"
 
 // Include directives for member types
 // Member 'class_id'
+// Member 'text'
 #include "rosidl_runtime_c/string.h"
 
-// Struct defined in msg/BoundingBox in the package bboxes_ex_msgs.
+/// Struct defined in msg/BoundingBox in the package bboxes_ex_msgs.
 typedef struct bboxes_ex_msgs__msg__BoundingBox
 {
   float probability;
@@ -30,6 +31,7 @@ typedef struct bboxes_ex_msgs__msg__BoundingBox
   int32_t xmax;
   int32_t ymax;
   rosidl_runtime_c__String class_id;
+  rosidl_runtime_c__String text;
 } bboxes_ex_msgs__msg__BoundingBox;
 
 // Struct for a sequence of bboxes_ex_msgs__msg__BoundingBox.

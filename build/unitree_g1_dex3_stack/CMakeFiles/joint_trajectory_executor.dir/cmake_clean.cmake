@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/joint_trajectory_executor.dir/src/joint_trajectory_executor.cpp.o"
+  "CMakeFiles/joint_trajectory_executor.dir/src/joint_trajectory_executor.cpp.o.d"
   "joint_trajectory_executor"
   "joint_trajectory_executor.pdb"
 )

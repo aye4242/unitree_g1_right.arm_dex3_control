@@ -4,7 +4,7 @@ using dynamic forward kinematics via PyKDL + URDF.
 
 Subscribes to /joint_states, builds a KDL kinematic chain from torso_link
 to right_wrist_yaw_link, runs FK with current joint angles, applies a +X
-TCP offset (configurable, default 0.145 m), and outputs xyz (m) + rpy (rad)
+TCP offset (configurable, default 0.175 m), and outputs xyz (m) + rpy (rad)
 at a configurable rate.
 """
 
@@ -26,7 +26,7 @@ class TcpTorsoPoseNode(Node):
 
         # ---------- parameters ----------
         self.declare_parameter('urdf_path', '')
-        self.declare_parameter('tcp_offset_x', 0.145)
+        self.declare_parameter('tcp_offset_x', 0.175)
         self.declare_parameter('base_link', 'torso_link')
         self.declare_parameter('tip_link', 'right_wrist_yaw_link')
         self.declare_parameter('publish_rate', 10.0)

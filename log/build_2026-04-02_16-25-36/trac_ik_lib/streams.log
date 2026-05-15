@@ -1,2 +1,0 @@
-[0.072s] Invoking command in '/home/unitree/Desktop/unitree_dex3/build/trac_ik_lib': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/foxy CONDA_PROMPT_MODIFIER=(grab) /usr/bin/cmake --build /home/unitree/Desktop/unitree_dex3/build/trac_ik_lib -- -j8 -l8
-[0.250s] [100%] Built target trac_ik

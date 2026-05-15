@@ -37,6 +37,11 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
   set(CMAKE_CROSSCOMPILING "FALSE")
 endif()
 
+# Set default install directory permissions.
+if(NOT DEFINED CMAKE_OBJDUMP)
+  set(CMAKE_OBJDUMP "/usr/bin/objdump")
+endif()
+
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xDevelopmentx" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/fcl" TYPE FILE FILES
     "/home/unitree/Desktop/unitree_dex3/build/fcl/fcl-config.cmake"
@@ -56,6 +61,7 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/home/unitree/Desktop/unitree_dex3/build/fcl/src/cmake_install.cmake")
   include("/home/unitree/Desktop/unitree_dex3/build/fcl/include/fcl/cmake_install.cmake")
+  include("/home/unitree/Desktop/unitree_dex3/build/fcl/test/cmake_install.cmake")
 
 endif()
 

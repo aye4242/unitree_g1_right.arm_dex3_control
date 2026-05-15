@@ -11,10 +11,13 @@
 
 #include <std_msgs/msg/bool.hpp>
 
+#include <array>
 #include <vector>
 #include <chrono>
 #include <map>
+#include <sstream>
 #include <string>
+#include <string_view>
 #include <urdf/model.h>
 
 #include <atomic>
@@ -43,6 +46,40 @@ struct JointLimits {
   double velocity;
   double effort;
 };
+
+namespace {
+
+// Plan 04-01: consumed by Plan 04-02 validation and Plan 04-03 publish-loop reasoning; indices and names must stay in sync.
+static constexpr std::array<JointIndex, 7> kRightArmJointIndices = {
+  kRightShoulderPitch,
+  kRightShoulderRoll,
+  kRightShoulderYaw,
+  kRightElbow,
+  kRightWristRoll,
+  kRightWristPitch,
+  kRightWristYaw,
+};
+
+static constexpr std::array<std::string_view, 7> kRightArmJointNames = {
+  "right_shoulder_pitch_joint",
+  "right_shoulder_roll_joint",
+  "right_shoulder_yaw_joint",
+  "right_elbow_joint",
+  "right_wrist_roll_joint",
+  "right_wrist_pitch_joint",
+  "right_wrist_yaw_joint",
+};
+
+inline bool isRightArmJoint(std::string_view name) {
+  for (const auto& right_arm_name : kRightArmJointNames) {
+    if (name == right_arm_name) {
+      return true;
+    }
+  }
+  return false;
+}
+
+}  // namespace
 
 class JointTrajectoryExecutor : public rclcpp::Node {
 public:
@@ -155,6 +192,59 @@ private:
       RCLCPP_ERROR(this->get_logger(), "Received empty joint names in trajectory message");
       return;
     }
+
+    // Plan 04-02 D-03 stage 1: foreign-joint WARN + strip.
+    std::vector<size_t> right_arm_columns_in_msg;
+    right_arm_columns_in_msg.reserve(kRightArmJointNames.size());
+    std::vector<std::string> filtered_joint_names;
+    filtered_joint_names.reserve(kRightArmJointNames.size());
+    std::vector<std::string> foreign_names;
+    for (size_t k = 0; k < msg->joint_names.size(); ++k) {
+      const auto& joint_name = msg->joint_names[k];
+      if (isRightArmJoint(joint_name)) {
+        right_arm_columns_in_msg.push_back(k);
+        filtered_joint_names.push_back(joint_name);
+      } else {
+        foreign_names.push_back(joint_name);
+      }
+    }
+    if (!foreign_names.empty()) {
+      std::ostringstream foreign_oss;
+      for (size_t k = 0; k < foreign_names.size(); ++k) {
+        if (k > 0) foreign_oss << ", ";
+        foreign_oss << foreign_names[k];
+      }
+      RCLCPP_WARN(this->get_logger(),
+        "Trajectory contains %zu foreign (non-right-arm) joint(s): %s — stripping these columns and proceeding with the right-arm subset.",
+        foreign_names.size(), foreign_oss.str().c_str());
+    }
+
+    // Plan 04-02 D-03 stage 2: completeness ERROR.
+    std::vector<std::string> missing;
+    for (const auto& right_arm_name : kRightArmJointNames) {
+      bool found = false;
+      for (const auto& filtered_name : filtered_joint_names) {
+        if (filtered_name == right_arm_name) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        missing.emplace_back(right_arm_name);
+      }
+    }
+    if (!missing.empty()) {
+      std::ostringstream missing_oss;
+      for (size_t k = 0; k < missing.size(); ++k) {
+        if (k > 0) missing_oss << ", ";
+        missing_oss << missing[k];
+      }
+      RCLCPP_ERROR(this->get_logger(),
+        "Trajectory missing %zu right-arm joint(s): %s — rejecting trajectory; no LowCmd published.",
+        missing.size(), missing_oss.str().c_str());
+      return;
+    }
+
     auto hand_it = std::find_if(msg->joint_names.begin(), msg->joint_names.end(),
       [](const std::string& name) {
         return name.find("left") != std::string::npos || name.find("right") != std::string::npos;
@@ -179,7 +269,7 @@ private:
     // Start with preparing the hand, open it fully
     std_msgs::msg::Bool hand_cmd;
     hand_cmd.data = false; // Open hand command
-    hand_cmd_pub->publish(hand_cmd); // Open hand command
+    // Plan 04-01 (D-01 minimal removal): hand-open publish deleted; sleep_for(1s) below stays as an inert settling delay.
     // Wait for the hand to open
     rclcpp::sleep_for(1s);  // Wait for the hand to open
     RCLCPP_INFO(this->get_logger(), "Hand opened fully, starting trajectory execution");
@@ -196,6 +286,7 @@ private:
 
       cmd_msg.motor_cmd[JointIndex::kNotUsedJoint].q = 0.5f; // Full transition speed for trajectory following
       // Fill all joints with latest state first
+      // Plan 04-03 D-06 Option A: all 28 body joints locked with kp=60; non-right-arm joints held at latest_joint_positions_. Trajectory column override below drives right-arm q. Matches free_arm_demo.py coexistence pattern.
       for (const auto& pair : joint_name_to_index) {
         size_t idx = pair.second;
         // Plan 01-10: enable PD control mode (was implicitly mode=0 before,
@@ -211,8 +302,9 @@ private:
         cmd_msg.motor_cmd[idx].kd = 1.5f;
         cmd_msg.motor_cmd[idx].tau = 0.f;
       }
-      // Overwrite with trajectory values for joints present in this point
-      for (size_t j = 0; j < point.positions.size(); ++j) {
+      // Plan 04-02 D-05: walk only the right-arm columns from the original msg; map lookups are guarded by stage 2 above.
+      for (size_t k = 0; k < right_arm_columns_in_msg.size(); ++k) {
+        const size_t j = right_arm_columns_in_msg[k];
         auto target_joint_name = msg->joint_names[j];
         auto target_index = joint_name_to_index.at(target_joint_name);
         auto target_position = point.positions[j];
@@ -267,7 +359,7 @@ private:
     // that keeps publishing master=0.5 + q=latest + mode=1 + kp/kd at 250 Hz.
     // Hand close runs in parallel (separate publisher) starting at frame 0.
     hand_cmd.data = true;
-    hand_cmd_pub->publish(hand_cmd);
+    // Plan 04-01 (D-01 minimal removal): hand-close publish deleted; the true assignment above is kept for future DEX3 re-enable.
 
     {
       const int hold_steps = 250;                            // 1.0 s @ 250 Hz
@@ -275,6 +367,7 @@ private:
       for (int s = 0; s < hold_steps; ++s) {
         unitree_hg::msg::LowCmd hold_cmd;
         hold_cmd.motor_cmd[JointIndex::kNotUsedJoint].q = 0.5f; // full planner authority
+        // Plan 04-03 D-06 Option A: all 28 body joints locked with kp=60 at trajectory end-point.
         for (const auto& pair : joint_name_to_index) {
           size_t idx = pair.second;
           hold_cmd.motor_cmd[idx].mode = 1;
@@ -317,6 +410,7 @@ private:
       // Frame 0 (t=0): q = ramp start = trajectory end-point (matches actual,
       // no jerk). Frame 150 (t=1): q = standing snapshot (arm is at standing).
       // Master switch then hands off to body controller with arm already there.
+      // Plan 04-03 D-06 Option A: all 28 body joints locked with kp=60; q interpolates to standing_pose over 3 s.
       for (const auto& pair : joint_name_to_index) {
         size_t idx = pair.second;
         // Plan 01-10: enable PD control mode here too, so the q-interpolation

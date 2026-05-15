@@ -1,8 +1,0 @@
-/home/unitree/Desktop/unitree_dex3/src/YOLOX-ROS/yolox_ros_cpp/yolox_ros_cpp/src/yolox_ros_cpp.cpp: In member function ‘bboxes_ex_msgs::msg::BoundingBoxes yolox_ros_cpp::YoloXNode::objects_to_bboxes(cv::Mat, std::vector<yolox_cpp::Object>, std_msgs::msg::Header)’:
-/home/unitree/Desktop/unitree_dex3/src/YOLOX-ROS/yolox_ros_cpp/yolox_ros_cpp/src/yolox_ros_cpp.cpp:169:77: warning: unused parameter ‘frame’ [-Wunused-parameter]
-  169 |     bboxes_ex_msgs::msg::BoundingBoxes YoloXNode::objects_to_bboxes(cv::Mat frame, std::vector<yolox_cpp::Object> objects, std_msgs::msg::Header header)
-      |                                                                     ~~~~~~~~^~~~~
-/home/unitree/Desktop/unitree_dex3/src/YOLOX-ROS/yolox_ros_cpp/yolox_ros_cpp/src/yolox_ros_cpp.cpp: In member function ‘bboxes_ex_msgs::msg::BoundingBoxes yolox_ros_cpp::YoloXNode::objects_to_bboxes(cv::Mat, std::vector<yolox_cpp::Object>, std_msgs::msg::Header)’:
-/home/unitree/Desktop/unitree_dex3/src/YOLOX-ROS/yolox_ros_cpp/yolox_ros_cpp/src/yolox_ros_cpp.cpp:169:77: warning: unused parameter ‘frame’ [-Wunused-parameter]
-  169 |     bboxes_ex_msgs::msg::BoundingBoxes YoloXNode::objects_to_bboxes(cv::Mat frame, std::vector<yolox_cpp::Object> objects, std_msgs::msg::Header header)
-      |                                                                     ~~~~~~~~^~~~~

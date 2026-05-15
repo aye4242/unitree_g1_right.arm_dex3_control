@@ -5,6 +5,10 @@
 
 # Import statements for member types
 
+import builtins  # noqa: E402, I100
+
+import math  # noqa: E402, I100
+
 import rosidl_parser.definition  # noqa: E402, I100
 
 
@@ -59,6 +63,7 @@ class BoundingBox(metaclass=Metaclass_BoundingBox):
         '_xmax',
         '_ymax',
         '_class_id',
+        '_text',
     ]
 
     _fields_and_field_types = {
@@ -68,6 +73,7 @@ class BoundingBox(metaclass=Metaclass_BoundingBox):
         'xmax': 'int32',
         'ymax': 'int32',
         'class_id': 'string',
+        'text': 'string',
     }
 
     SLOT_TYPES = (
@@ -76,6 +82,7 @@ class BoundingBox(metaclass=Metaclass_BoundingBox):
         rosidl_parser.definition.BasicType('int32'),  # noqa: E501
         rosidl_parser.definition.BasicType('int32'),  # noqa: E501
         rosidl_parser.definition.BasicType('int32'),  # noqa: E501
+        rosidl_parser.definition.UnboundedString(),  # noqa: E501
         rosidl_parser.definition.UnboundedString(),  # noqa: E501
     )
 
@@ -89,6 +96,7 @@ class BoundingBox(metaclass=Metaclass_BoundingBox):
         self.xmax = kwargs.get('xmax', int())
         self.ymax = kwargs.get('ymax', int())
         self.class_id = kwargs.get('class_id', str())
+        self.text = kwargs.get('text', str())
 
     def __repr__(self):
         typename = self.__class__.__module__.split('.')
@@ -131,6 +139,8 @@ class BoundingBox(metaclass=Metaclass_BoundingBox):
             return False
         if self.class_id != other.class_id:
             return False
+        if self.text != other.text:
+            return False
         return True
 
     @classmethod
@@ -138,7 +148,7 @@ class BoundingBox(metaclass=Metaclass_BoundingBox):
         from copy import copy
         return copy(cls._fields_and_field_types)
 
-    @property
+    @builtins.property
     def probability(self):
         """Message field 'probability'."""
         return self._probability
@@ -149,9 +159,11 @@ class BoundingBox(metaclass=Metaclass_BoundingBox):
             assert \
                 isinstance(value, float), \
                 "The 'probability' field must be of type 'float'"
+            assert not (value < -3.402823466e+38 or value > 3.402823466e+38) or math.isinf(value), \
+                "The 'probability' field must be a float in [-3.402823466e+38, 3.402823466e+38]"
         self._probability = value
 
-    @property
+    @builtins.property
     def xmin(self):
         """Message field 'xmin'."""
         return self._xmin
@@ -166,7 +178,7 @@ class BoundingBox(metaclass=Metaclass_BoundingBox):
                 "The 'xmin' field must be an integer in [-2147483648, 2147483647]"
         self._xmin = value
 
-    @property
+    @builtins.property
     def ymin(self):
         """Message field 'ymin'."""
         return self._ymin
@@ -181,7 +193,7 @@ class BoundingBox(metaclass=Metaclass_BoundingBox):
                 "The 'ymin' field must be an integer in [-2147483648, 2147483647]"
         self._ymin = value
 
-    @property
+    @builtins.property
     def xmax(self):
         """Message field 'xmax'."""
         return self._xmax
@@ -196,7 +208,7 @@ class BoundingBox(metaclass=Metaclass_BoundingBox):
                 "The 'xmax' field must be an integer in [-2147483648, 2147483647]"
         self._xmax = value
 
-    @property
+    @builtins.property
     def ymax(self):
         """Message field 'ymax'."""
         return self._ymax
@@ -211,7 +223,7 @@ class BoundingBox(metaclass=Metaclass_BoundingBox):
                 "The 'ymax' field must be an integer in [-2147483648, 2147483647]"
         self._ymax = value
 
-    @property
+    @builtins.property
     def class_id(self):
         """Message field 'class_id'."""
         return self._class_id
@@ -223,3 +235,16 @@ class BoundingBox(metaclass=Metaclass_BoundingBox):
                 isinstance(value, str), \
                 "The 'class_id' field must be of type 'str'"
         self._class_id = value
+
+    @builtins.property
+    def text(self):
+        """Message field 'text'."""
+        return self._text
+
+    @text.setter
+    def text(self, value):
+        if __debug__:
+            assert \
+                isinstance(value, str), \
+                "The 'text' field must be of type 'str'"
+        self._text = value

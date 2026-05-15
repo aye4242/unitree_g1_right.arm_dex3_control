@@ -37,7 +37,7 @@ void BoundingBox_fini_function(void * message_memory)
   typed_message->~BoundingBox();
 }
 
-static const ::rosidl_typesupport_introspection_cpp::MessageMember BoundingBox_message_member_array[6] = {
+static const ::rosidl_typesupport_introspection_cpp::MessageMember BoundingBox_message_member_array[7] = {
   {
     "probability",  // name
     ::rosidl_typesupport_introspection_cpp::ROS_TYPE_FLOAT,  // type
@@ -51,6 +51,8 @@ static const ::rosidl_typesupport_introspection_cpp::MessageMember BoundingBox_m
     nullptr,  // size() function pointer
     nullptr,  // get_const(index) function pointer
     nullptr,  // get(index) function pointer
+    nullptr,  // fetch(index, &value) function pointer
+    nullptr,  // assign(index, value) function pointer
     nullptr  // resize(index) function pointer
   },
   {
@@ -66,6 +68,8 @@ static const ::rosidl_typesupport_introspection_cpp::MessageMember BoundingBox_m
     nullptr,  // size() function pointer
     nullptr,  // get_const(index) function pointer
     nullptr,  // get(index) function pointer
+    nullptr,  // fetch(index, &value) function pointer
+    nullptr,  // assign(index, value) function pointer
     nullptr  // resize(index) function pointer
   },
   {
@@ -81,6 +85,8 @@ static const ::rosidl_typesupport_introspection_cpp::MessageMember BoundingBox_m
     nullptr,  // size() function pointer
     nullptr,  // get_const(index) function pointer
     nullptr,  // get(index) function pointer
+    nullptr,  // fetch(index, &value) function pointer
+    nullptr,  // assign(index, value) function pointer
     nullptr  // resize(index) function pointer
   },
   {
@@ -96,6 +102,8 @@ static const ::rosidl_typesupport_introspection_cpp::MessageMember BoundingBox_m
     nullptr,  // size() function pointer
     nullptr,  // get_const(index) function pointer
     nullptr,  // get(index) function pointer
+    nullptr,  // fetch(index, &value) function pointer
+    nullptr,  // assign(index, value) function pointer
     nullptr  // resize(index) function pointer
   },
   {
@@ -111,6 +119,8 @@ static const ::rosidl_typesupport_introspection_cpp::MessageMember BoundingBox_m
     nullptr,  // size() function pointer
     nullptr,  // get_const(index) function pointer
     nullptr,  // get(index) function pointer
+    nullptr,  // fetch(index, &value) function pointer
+    nullptr,  // assign(index, value) function pointer
     nullptr  // resize(index) function pointer
   },
   {
@@ -126,6 +136,25 @@ static const ::rosidl_typesupport_introspection_cpp::MessageMember BoundingBox_m
     nullptr,  // size() function pointer
     nullptr,  // get_const(index) function pointer
     nullptr,  // get(index) function pointer
+    nullptr,  // fetch(index, &value) function pointer
+    nullptr,  // assign(index, value) function pointer
+    nullptr  // resize(index) function pointer
+  },
+  {
+    "text",  // name
+    ::rosidl_typesupport_introspection_cpp::ROS_TYPE_STRING,  // type
+    0,  // upper bound of string
+    nullptr,  // members of sub message
+    false,  // is array
+    0,  // array size
+    false,  // is upper bound
+    offsetof(bboxes_ex_msgs::msg::BoundingBox, text),  // bytes offset in struct
+    nullptr,  // default value
+    nullptr,  // size() function pointer
+    nullptr,  // get_const(index) function pointer
+    nullptr,  // get(index) function pointer
+    nullptr,  // fetch(index, &value) function pointer
+    nullptr,  // assign(index, value) function pointer
     nullptr  // resize(index) function pointer
   }
 };
@@ -133,7 +162,7 @@ static const ::rosidl_typesupport_introspection_cpp::MessageMember BoundingBox_m
 static const ::rosidl_typesupport_introspection_cpp::MessageMembers BoundingBox_message_members = {
   "bboxes_ex_msgs::msg",  // message namespace
   "BoundingBox",  // message name
-  6,  // number of fields
+  7,  // number of fields
   sizeof(bboxes_ex_msgs::msg::BoundingBox),
   BoundingBox_message_member_array,  // message members
   BoundingBox_init_function,  // function to initialize message memory (memory has to be allocated)

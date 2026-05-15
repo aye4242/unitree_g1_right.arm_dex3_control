@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
   "CMakeFiles/bboxes_ex_msgs__rosidl_typesupport_c.dir/rosidl_typesupport_c/bboxes_ex_msgs/msg/bounding_box__type_support.cpp.o"
+  "CMakeFiles/bboxes_ex_msgs__rosidl_typesupport_c.dir/rosidl_typesupport_c/bboxes_ex_msgs/msg/bounding_box__type_support.cpp.o.d"
   "CMakeFiles/bboxes_ex_msgs__rosidl_typesupport_c.dir/rosidl_typesupport_c/bboxes_ex_msgs/msg/bounding_boxes__type_support.cpp.o"
+  "CMakeFiles/bboxes_ex_msgs__rosidl_typesupport_c.dir/rosidl_typesupport_c/bboxes_ex_msgs/msg/bounding_boxes__type_support.cpp.o.d"
   "libbboxes_ex_msgs__rosidl_typesupport_c.pdb"
   "libbboxes_ex_msgs__rosidl_typesupport_c.so"
   "rosidl_typesupport_c/bboxes_ex_msgs/msg/bounding_box__type_support.cpp"

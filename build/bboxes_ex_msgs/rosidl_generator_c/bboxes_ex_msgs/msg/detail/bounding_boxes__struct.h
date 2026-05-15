@@ -23,7 +23,7 @@ extern "C"
 // Member 'bounding_boxes'
 #include "bboxes_ex_msgs/msg/detail/bounding_box__struct.h"
 
-// Struct defined in msg/BoundingBoxes in the package bboxes_ex_msgs.
+/// Struct defined in msg/BoundingBoxes in the package bboxes_ex_msgs.
 typedef struct bboxes_ex_msgs__msg__BoundingBoxes
 {
   std_msgs__msg__Header header;

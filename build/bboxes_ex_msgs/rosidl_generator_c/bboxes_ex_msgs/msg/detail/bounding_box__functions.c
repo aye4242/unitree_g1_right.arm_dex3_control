@@ -13,6 +13,7 @@
 
 // Include directives for member types
 // Member `class_id`
+// Member `text`
 #include "rosidl_runtime_c/string_functions.h"
 
 bool
@@ -28,6 +29,11 @@ bboxes_ex_msgs__msg__BoundingBox__init(bboxes_ex_msgs__msg__BoundingBox * msg)
   // ymax
   // class_id
   if (!rosidl_runtime_c__String__init(&msg->class_id)) {
+    bboxes_ex_msgs__msg__BoundingBox__fini(msg);
+    return false;
+  }
+  // text
+  if (!rosidl_runtime_c__String__init(&msg->text)) {
     bboxes_ex_msgs__msg__BoundingBox__fini(msg);
     return false;
   }
@@ -47,6 +53,8 @@ bboxes_ex_msgs__msg__BoundingBox__fini(bboxes_ex_msgs__msg__BoundingBox * msg)
   // ymax
   // class_id
   rosidl_runtime_c__String__fini(&msg->class_id);
+  // text
+  rosidl_runtime_c__String__fini(&msg->text);
 }
 
 bool
@@ -81,6 +89,12 @@ bboxes_ex_msgs__msg__BoundingBox__are_equal(const bboxes_ex_msgs__msg__BoundingB
   {
     return false;
   }
+  // text
+  if (!rosidl_runtime_c__String__are_equal(
+      &(lhs->text), &(rhs->text)))
+  {
+    return false;
+  }
   return true;
 }
 
@@ -105,6 +119,12 @@ bboxes_ex_msgs__msg__BoundingBox__copy(
   // class_id
   if (!rosidl_runtime_c__String__copy(
       &(input->class_id), &(output->class_id)))
+  {
+    return false;
+  }
+  // text
+  if (!rosidl_runtime_c__String__copy(
+      &(input->text), &(output->text)))
   {
     return false;
   }
@@ -256,22 +276,27 @@ bboxes_ex_msgs__msg__BoundingBox__Sequence__copy(
   if (output->capacity < input->size) {
     const size_t allocation_size =
       input->size * sizeof(bboxes_ex_msgs__msg__BoundingBox);
+    rcutils_allocator_t allocator = rcutils_get_default_allocator();
     bboxes_ex_msgs__msg__BoundingBox * data =
-      (bboxes_ex_msgs__msg__BoundingBox *)realloc(output->data, allocation_size);
+      (bboxes_ex_msgs__msg__BoundingBox *)allocator.reallocate(
+      output->data, allocation_size, allocator.state);
     if (!data) {
       return false;
     }
+    // If reallocation succeeded, memory may or may not have been moved
+    // to fulfill the allocation request, invalidating output->data.
+    output->data = data;
     for (size_t i = output->capacity; i < input->size; ++i) {
-      if (!bboxes_ex_msgs__msg__BoundingBox__init(&data[i])) {
-        /* free currently allocated and return false */
+      if (!bboxes_ex_msgs__msg__BoundingBox__init(&output->data[i])) {
+        // If initialization of any new item fails, roll back
+        // all previously initialized items. Existing items
+        // in output are to be left unmodified.
         for (; i-- > output->capacity; ) {
-          bboxes_ex_msgs__msg__BoundingBox__fini(&data[i]);
+          bboxes_ex_msgs__msg__BoundingBox__fini(&output->data[i]);
         }
-        free(data);
         return false;
       }
     }
-    output->data = data;
     output->capacity = input->size;
   }
   output->size = input->size;

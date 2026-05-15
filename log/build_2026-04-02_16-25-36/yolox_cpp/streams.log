@@ -1,2 +1,0 @@
-[0.076s] Invoking command in '/home/unitree/Desktop/unitree_dex3/build/yolox_cpp': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/foxy CONDA_PROMPT_MODIFIER=(grab) /usr/bin/cmake --build /home/unitree/Desktop/unitree_dex3/build/yolox_cpp -- -j8 -l8
-[0.210s] [100%] Built target yolox_cpp

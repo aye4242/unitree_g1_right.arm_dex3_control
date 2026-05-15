@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/dex3_controller.dir/src/dex3_controller.cpp.o"
+  "CMakeFiles/dex3_controller.dir/src/dex3_controller.cpp.o.d"
   "dex3_controller"
   "dex3_controller.pdb"
 )

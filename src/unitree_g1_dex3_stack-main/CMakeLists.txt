@@ -30,14 +30,10 @@ find_package(kdl_parser REQUIRED)
 find_package(vision_msgs REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(bboxes_ex_msgs REQUIRED)
-find_package(image_transport REQUIRED)
 find_package(message_filters REQUIRED)
-find_package(pcl_conversions REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
-find_package(PCL REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 
 if(BUILD_IK_FCL_OMPL_PLANNER)
@@ -51,7 +47,6 @@ endif()
 include_directories(
   include
   ${OpenCV_INCLUDE_DIRS}
-  ${PCL_INCLUDE_DIRS}
 )
 
 if(BUILD_IK_FCL_OMPL_PLANNER)
@@ -64,11 +59,8 @@ endif()
 add_executable(joint_state_publisher src/joint_state_publisher.cpp)
 add_executable(dex3_controller src/dex3_controller.cpp)
 add_executable(joint_trajectory_executor src/joint_trajectory_executor.cpp)
-add_executable(project_to_3d_node src/project_to_3d_node.cpp)
-add_executable(detection_to_goal_node src/detection_to_goal_node.cpp)
 add_executable(right_hand_pressure_monitor src/right_hand_pressure_monitor.cpp)
 add_executable(visual_detection_tester src/visual_detection_tester.cpp)
-add_executable(visual_detection_yolo_tester src/visual_detection_yolo_tester.cpp)
 
 if(BUILD_IK_FCL_OMPL_PLANNER)
   add_executable(ik_fcl_ompl_planner src/ik_fcl_ompl_planner.cpp)
@@ -83,22 +75,12 @@ ament_target_dependencies(dex3_controller
 ament_target_dependencies(joint_trajectory_executor
   rclcpp unitree_hg sensor_msgs geometry_msgs std_msgs trajectory_msgs urdf
 )
-ament_target_dependencies(project_to_3d_node
-  rclcpp vision_msgs bboxes_ex_msgs sensor_msgs geometry_msgs std_msgs cv_bridge image_transport message_filters pcl_conversions tf2 tf2_ros
-)
-ament_target_dependencies(detection_to_goal_node
-  rclcpp vision_msgs bboxes_ex_msgs sensor_msgs geometry_msgs std_msgs
-)
 ament_target_dependencies(right_hand_pressure_monitor
   rclcpp unitree_hg
 )
 ament_target_dependencies(visual_detection_tester
   rclcpp sensor_msgs geometry_msgs cv_bridge message_filters tf2 tf2_ros tf2_geometry_msgs
 )
-ament_target_dependencies(visual_detection_yolo_tester
-  rclcpp vision_msgs geometry_msgs tf2 tf2_ros tf2_geometry_msgs
-)
-
 if(BUILD_IK_FCL_OMPL_PLANNER)
   ament_target_dependencies(ik_fcl_ompl_planner
     rclcpp sensor_msgs geometry_msgs std_msgs trajectory_msgs urdf kdl_parser trac_ik_lib geometric_shapes resource_retriever vision_msgs ament_index_cpp tf2 tf2_ros tf2_geometry_msgs
@@ -111,11 +93,6 @@ if(BUILD_IK_FCL_OMPL_PLANNER)
   )
 endif()
 
-target_link_libraries(project_to_3d_node
-  ${OpenCV_LIBRARIES}
-  ${PCL_LIBRARIES}
-)
-
 target_link_libraries(visual_detection_tester
   ${OpenCV_LIBRARIES}
 )
@@ -124,11 +101,8 @@ install(TARGETS
   joint_state_publisher
   dex3_controller
   joint_trajectory_executor
-  project_to_3d_node
-  detection_to_goal_node
   right_hand_pressure_monitor
   visual_detection_tester
-  visual_detection_yolo_tester
   DESTINATION lib/${PROJECT_NAME}
 )
 
@@ -140,8 +114,8 @@ if(BUILD_IK_FCL_OMPL_PLANNER)
 endif()
 
 install(PROGRAMS
-  scripts/ultralytics_detector.py
   scripts/tcp_torso_pose.py
+  scripts/keyboard_trigger_node.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

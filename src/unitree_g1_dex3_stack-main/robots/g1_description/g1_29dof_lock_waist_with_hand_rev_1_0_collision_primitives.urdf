@@ -1059,6 +1059,13 @@
       </material>
     </visual>
     <collision><origin xyz="0.0118 -0.0002 -0.0205" rpy="1.5916 1.4917 1.5700" /><geometry><box size="0.0202 0.0498 0.0596" /></geometry></collision><collision><origin xyz="0.0343 -0.0032 0.0055" rpy="-1.5826 0.0758 3.0923" /><geometry><box size="0.0170 0.0494 0.0540" /></geometry></collision><collision><origin xyz="0.0062 0.0004 0.0254" rpy="1.7491 -1.5552 1.4159" /><geometry><box size="0.0093 0.0384 0.0483" /></geometry></collision></link>
+  <!-- TCP (Tool Center Point) virtual link: 0.175m along wrist_yaw X axis -->
+  <joint name="right_tcp_joint" type="fixed">
+    <origin xyz="0.175 0 0" rpy="0 0 0" />
+    <parent link="right_wrist_yaw_link" />
+    <child link="right_tcp_link" />
+  </joint>
+  <link name="right_tcp_link" />
   <joint name="right_hand_palm_joint" type="fixed">
     <origin xyz="0.0415 -0.003 0" rpy="0 0 0" />
     <parent link="right_wrist_yaw_link" />

@@ -1,6 +1,6 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch.actions import DeclareLaunchArgument, OpaqueFunction
+from launch.actions import DeclareLaunchArgument, OpaqueFunction, SetEnvironmentVariable
 from launch.substitutions import LaunchConfiguration
 from ament_index_python.packages import get_package_share_directory
 import os
@@ -54,6 +54,11 @@ def generate_launch_description():
         description='Full path to URDF file (overrides urdf_name if set)'
     )
     return LaunchDescription([
+        SetEnvironmentVariable('RMW_IMPLEMENTATION', 'rmw_cyclonedds_cpp'),
+        SetEnvironmentVariable('CYCLONEDDS_URI',
+            '<CycloneDDS><Domain><General><Interfaces>'
+            '<NetworkInterface name="enP8p1s0" priority="default" multicast="default" />'
+            '</Interfaces></General></Domain></CycloneDDS>'),
         urdf_name_arg,
         urdf_path_arg,
         OpaqueFunction(function=launch_setup)

@@ -37,6 +37,11 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
   set(CMAKE_CROSSCOMPILING "FALSE")
 endif()
 
+# Set default install directory permissions.
+if(NOT DEFINED CMAKE_OBJDUMP)
+  set(CMAKE_OBJDUMP "/usr/bin/objdump")
+endif()
+
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xRuntimex" OR NOT CMAKE_INSTALL_COMPONENT)
   foreach(file
       "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/libfcl.so.0.7.0"
@@ -46,7 +51,7 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xRuntimex" OR NOT CMAKE_INSTALL_COMP
        NOT IS_SYMLINK "${file}")
       file(RPATH_CHECK
            FILE "${file}"
-           RPATH "/home/unitree/Desktop/unitree_dex3/install/fcl/lib:/opt/ros/foxy/lib")
+           RPATH "/home/unitree/Desktop/unitree_dex3/install/fcl/lib:/opt/ros/humble/lib/aarch64-linux-gnu")
     endif()
   endforeach()
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE SHARED_LIBRARY FILES
@@ -61,8 +66,8 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xRuntimex" OR NOT CMAKE_INSTALL_COMP
        NOT IS_SYMLINK "${file}")
       file(RPATH_CHANGE
            FILE "${file}"
-           OLD_RPATH "/opt/ros/foxy/lib:::::::::::::::::::::::::::::::::::::::::::::::::::"
-           NEW_RPATH "/home/unitree/Desktop/unitree_dex3/install/fcl/lib:/opt/ros/foxy/lib")
+           OLD_RPATH "/opt/ros/humble/lib/aarch64-linux-gnu:::::::::::::::::::::::::::::::::::::::::::::::::::"
+           NEW_RPATH "/home/unitree/Desktop/unitree_dex3/install/fcl/lib:/opt/ros/humble/lib/aarch64-linux-gnu")
       if(CMAKE_INSTALL_DO_STRIP)
         execute_process(COMMAND "/usr/bin/strip" "${file}")
       endif()
@@ -75,15 +80,15 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xDevelopmentx" OR NOT CMAKE_INSTALL_
      NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/libfcl.so")
     file(RPATH_CHECK
          FILE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/libfcl.so"
-         RPATH "/home/unitree/Desktop/unitree_dex3/install/fcl/lib:/opt/ros/foxy/lib")
+         RPATH "/home/unitree/Desktop/unitree_dex3/install/fcl/lib:/opt/ros/humble/lib/aarch64-linux-gnu")
   endif()
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE SHARED_LIBRARY FILES "/home/unitree/Desktop/unitree_dex3/build/fcl/lib/libfcl.so")
   if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/libfcl.so" AND
      NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/libfcl.so")
     file(RPATH_CHANGE
          FILE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/libfcl.so"
-         OLD_RPATH "/opt/ros/foxy/lib:::::::::::::::::::::::::::::::::::::::::::::::::::"
-         NEW_RPATH "/home/unitree/Desktop/unitree_dex3/install/fcl/lib:/opt/ros/foxy/lib")
+         OLD_RPATH "/opt/ros/humble/lib/aarch64-linux-gnu:::::::::::::::::::::::::::::::::::::::::::::::::::"
+         NEW_RPATH "/home/unitree/Desktop/unitree_dex3/install/fcl/lib:/opt/ros/humble/lib/aarch64-linux-gnu")
     if(CMAKE_INSTALL_DO_STRIP)
       execute_process(COMMAND "/usr/bin/strip" "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/libfcl.so")
     endif()

@@ -27,7 +27,7 @@ extern "C"
 {
 #endif
 
-void BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_init_function(
+void bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_init_function(
   void * message_memory, enum rosidl_runtime_c__message_initialization _init)
 {
   // TODO(karsten1987): initializers are not yet implemented for typesupport c
@@ -36,12 +36,12 @@ void BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_init_funct
   bboxes_ex_msgs__msg__BoundingBoxes__init(message_memory);
 }
 
-void BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_fini_function(void * message_memory)
+void bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_fini_function(void * message_memory)
 {
   bboxes_ex_msgs__msg__BoundingBoxes__fini(message_memory);
 }
 
-size_t BoundingBoxes__rosidl_typesupport_introspection_c__size_function__BoundingBox__bounding_boxes(
+size_t bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__size_function__BoundingBoxes__bounding_boxes(
   const void * untyped_member)
 {
   const bboxes_ex_msgs__msg__BoundingBox__Sequence * member =
@@ -49,7 +49,7 @@ size_t BoundingBoxes__rosidl_typesupport_introspection_c__size_function__Boundin
   return member->size;
 }
 
-const void * BoundingBoxes__rosidl_typesupport_introspection_c__get_const_function__BoundingBox__bounding_boxes(
+const void * bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__get_const_function__BoundingBoxes__bounding_boxes(
   const void * untyped_member, size_t index)
 {
   const bboxes_ex_msgs__msg__BoundingBox__Sequence * member =
@@ -57,7 +57,7 @@ const void * BoundingBoxes__rosidl_typesupport_introspection_c__get_const_functi
   return &member->data[index];
 }
 
-void * BoundingBoxes__rosidl_typesupport_introspection_c__get_function__BoundingBox__bounding_boxes(
+void * bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__get_function__BoundingBoxes__bounding_boxes(
   void * untyped_member, size_t index)
 {
   bboxes_ex_msgs__msg__BoundingBox__Sequence * member =
@@ -65,7 +65,29 @@ void * BoundingBoxes__rosidl_typesupport_introspection_c__get_function__Bounding
   return &member->data[index];
 }
 
-bool BoundingBoxes__rosidl_typesupport_introspection_c__resize_function__BoundingBox__bounding_boxes(
+void bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__fetch_function__BoundingBoxes__bounding_boxes(
+  const void * untyped_member, size_t index, void * untyped_value)
+{
+  const bboxes_ex_msgs__msg__BoundingBox * item =
+    ((const bboxes_ex_msgs__msg__BoundingBox *)
+    bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__get_const_function__BoundingBoxes__bounding_boxes(untyped_member, index));
+  bboxes_ex_msgs__msg__BoundingBox * value =
+    (bboxes_ex_msgs__msg__BoundingBox *)(untyped_value);
+  *value = *item;
+}
+
+void bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__assign_function__BoundingBoxes__bounding_boxes(
+  void * untyped_member, size_t index, const void * untyped_value)
+{
+  bboxes_ex_msgs__msg__BoundingBox * item =
+    ((bboxes_ex_msgs__msg__BoundingBox *)
+    bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__get_function__BoundingBoxes__bounding_boxes(untyped_member, index));
+  const bboxes_ex_msgs__msg__BoundingBox * value =
+    (const bboxes_ex_msgs__msg__BoundingBox *)(untyped_value);
+  *item = *value;
+}
+
+bool bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__resize_function__BoundingBoxes__bounding_boxes(
   void * untyped_member, size_t size)
 {
   bboxes_ex_msgs__msg__BoundingBox__Sequence * member =
@@ -74,7 +96,7 @@ bool BoundingBoxes__rosidl_typesupport_introspection_c__resize_function__Boundin
   return bboxes_ex_msgs__msg__BoundingBox__Sequence__init(member, size);
 }
 
-static rosidl_typesupport_introspection_c__MessageMember BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_message_member_array[2] = {
+static rosidl_typesupport_introspection_c__MessageMember bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_message_member_array[2] = {
   {
     "header",  // name
     rosidl_typesupport_introspection_c__ROS_TYPE_MESSAGE,  // type
@@ -88,6 +110,8 @@ static rosidl_typesupport_introspection_c__MessageMember BoundingBoxes__rosidl_t
     NULL,  // size() function pointer
     NULL,  // get_const(index) function pointer
     NULL,  // get(index) function pointer
+    NULL,  // fetch(index, &value) function pointer
+    NULL,  // assign(index, value) function pointer
     NULL  // resize(index) function pointer
   },
   {
@@ -100,43 +124,45 @@ static rosidl_typesupport_introspection_c__MessageMember BoundingBoxes__rosidl_t
     false,  // is upper bound
     offsetof(bboxes_ex_msgs__msg__BoundingBoxes, bounding_boxes),  // bytes offset in struct
     NULL,  // default value
-    BoundingBoxes__rosidl_typesupport_introspection_c__size_function__BoundingBox__bounding_boxes,  // size() function pointer
-    BoundingBoxes__rosidl_typesupport_introspection_c__get_const_function__BoundingBox__bounding_boxes,  // get_const(index) function pointer
-    BoundingBoxes__rosidl_typesupport_introspection_c__get_function__BoundingBox__bounding_boxes,  // get(index) function pointer
-    BoundingBoxes__rosidl_typesupport_introspection_c__resize_function__BoundingBox__bounding_boxes  // resize(index) function pointer
+    bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__size_function__BoundingBoxes__bounding_boxes,  // size() function pointer
+    bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__get_const_function__BoundingBoxes__bounding_boxes,  // get_const(index) function pointer
+    bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__get_function__BoundingBoxes__bounding_boxes,  // get(index) function pointer
+    bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__fetch_function__BoundingBoxes__bounding_boxes,  // fetch(index, &value) function pointer
+    bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__assign_function__BoundingBoxes__bounding_boxes,  // assign(index, value) function pointer
+    bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__resize_function__BoundingBoxes__bounding_boxes  // resize(index) function pointer
   }
 };
 
-static const rosidl_typesupport_introspection_c__MessageMembers BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_message_members = {
+static const rosidl_typesupport_introspection_c__MessageMembers bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_message_members = {
   "bboxes_ex_msgs__msg",  // message namespace
   "BoundingBoxes",  // message name
   2,  // number of fields
   sizeof(bboxes_ex_msgs__msg__BoundingBoxes),
-  BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_message_member_array,  // message members
-  BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_init_function,  // function to initialize message memory (memory has to be allocated)
-  BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_fini_function  // function to terminate message instance (will not free memory)
+  bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_message_member_array,  // message members
+  bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_init_function,  // function to initialize message memory (memory has to be allocated)
+  bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_fini_function  // function to terminate message instance (will not free memory)
 };
 
 // this is not const since it must be initialized on first access
 // since C does not allow non-integral compile-time constants
-static rosidl_message_type_support_t BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_message_type_support_handle = {
+static rosidl_message_type_support_t bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_message_type_support_handle = {
   0,
-  &BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_message_members,
+  &bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_message_members,
   get_message_typesupport_handle_function,
 };
 
 ROSIDL_TYPESUPPORT_INTROSPECTION_C_EXPORT_bboxes_ex_msgs
 const rosidl_message_type_support_t *
 ROSIDL_TYPESUPPORT_INTERFACE__MESSAGE_SYMBOL_NAME(rosidl_typesupport_introspection_c, bboxes_ex_msgs, msg, BoundingBoxes)() {
-  BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_message_member_array[0].members_ =
+  bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_message_member_array[0].members_ =
     ROSIDL_TYPESUPPORT_INTERFACE__MESSAGE_SYMBOL_NAME(rosidl_typesupport_introspection_c, std_msgs, msg, Header)();
-  BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_message_member_array[1].members_ =
+  bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_message_member_array[1].members_ =
     ROSIDL_TYPESUPPORT_INTERFACE__MESSAGE_SYMBOL_NAME(rosidl_typesupport_introspection_c, bboxes_ex_msgs, msg, BoundingBox)();
-  if (!BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_message_type_support_handle.typesupport_identifier) {
-    BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_message_type_support_handle.typesupport_identifier =
+  if (!bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_message_type_support_handle.typesupport_identifier) {
+    bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_message_type_support_handle.typesupport_identifier =
       rosidl_typesupport_introspection_c__identifier;
   }
-  return &BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_message_type_support_handle;
+  return &bboxes_ex_msgs__msg__BoundingBoxes__rosidl_typesupport_introspection_c__BoundingBoxes_message_type_support_handle;
 }
 #ifdef __cplusplus
 }

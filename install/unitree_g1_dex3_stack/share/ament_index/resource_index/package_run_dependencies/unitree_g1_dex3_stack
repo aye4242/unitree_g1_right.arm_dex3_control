@@ -1,1 +1,1 @@
-/home/unitree/Desktop/unitree_dex3/build/unitree_g1_dex3_stack/ament_cmake_index/share/ament_index/resource_index/package_run_dependencies/unitree_g1_dex3_stack
+rclcpp;sensor_msgs;geometry_msgs;std_msgs;trajectory_msgs;unitree_hg;urdf;kdl_parser;trac_ik_lib;ompl;fcl;geometric_shapes;resource_retriever;OpenCV;vision_msgs;cv_bridge;message_filters;tf2;tf2_ros;tf2_geometry_msgs;ament_index_cpp

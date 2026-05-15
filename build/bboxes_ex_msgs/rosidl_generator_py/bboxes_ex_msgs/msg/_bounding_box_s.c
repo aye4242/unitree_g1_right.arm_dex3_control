@@ -113,6 +113,21 @@ bool bboxes_ex_msgs__msg__bounding_box__convert_from_py(PyObject * _pymsg, void 
     Py_DECREF(encoded_field);
     Py_DECREF(field);
   }
+  {  // text
+    PyObject * field = PyObject_GetAttrString(_pymsg, "text");
+    if (!field) {
+      return false;
+    }
+    assert(PyUnicode_Check(field));
+    PyObject * encoded_field = PyUnicode_AsUTF8String(field);
+    if (!encoded_field) {
+      Py_DECREF(field);
+      return false;
+    }
+    rosidl_runtime_c__String__assign(&ros_message->text, PyBytes_AS_STRING(encoded_field));
+    Py_DECREF(encoded_field);
+    Py_DECREF(field);
+  }
 
   return true;
 }
@@ -201,6 +216,23 @@ PyObject * bboxes_ex_msgs__msg__bounding_box__convert_to_py(void * raw_ros_messa
     }
     {
       int rc = PyObject_SetAttrString(_pymessage, "class_id", field);
+      Py_DECREF(field);
+      if (rc) {
+        return NULL;
+      }
+    }
+  }
+  {  // text
+    PyObject * field = NULL;
+    field = PyUnicode_DecodeUTF8(
+      ros_message->text.data,
+      strlen(ros_message->text.data),
+      "replace");
+    if (!field) {
+      return NULL;
+    }
+    {
+      int rc = PyObject_SetAttrString(_pymessage, "text", field);
       Py_DECREF(field);
       if (rc) {
         return NULL;

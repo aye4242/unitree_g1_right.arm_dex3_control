@@ -17,6 +17,8 @@ module bboxes_ex_msgs {
       int32 ymax;
 
       string class_id;
+
+      string text;
     };
   };
 };

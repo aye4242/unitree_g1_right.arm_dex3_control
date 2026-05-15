@@ -17,11 +17,12 @@
 #include <ompl/base/ProblemDefinition.h>
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/geometric/planners/rrt/RRTConnect.h>
+#include <ompl/geometric/PathSimplifier.h>
 #include <std_msgs/msg/string.hpp>
 #include <geometric_shapes/shape_operations.h>
 #include <geometric_shapes/shapes.h>
 #include <fcl/geometry/bvh/BVH_model.h>
-#include <resource_retriever/retriever.h>
+#include <resource_retriever/retriever.hpp>
 
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <tf2/exceptions.h>
@@ -30,9 +31,13 @@
 #include <tf2_ros/transform_listener.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <map>
+#include <set>
 #include <vector>
 #include <string>
 #include <memory>
+#include <chrono>
+#include <cmath>
+#include <algorithm>
 
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
@@ -53,13 +58,18 @@ public:
     void init()
     {
         // Parameterization
-        this->declare_parameter("trajectory_time_step", 0.05);
+        this->declare_parameter("velocity_scale", 0.05);
+        this->declare_parameter("min_time_step", 0.02);
         this->declare_parameter("planning_timeout", 1.0);
         this->declare_parameter("base_link", "torso_link");
-        this->declare_parameter("right_tip", "right_wrist_yaw_link");
+        this->declare_parameter("right_tip", "right_tcp_link");
         this->declare_parameter("goal_pose_topic", "/goal_pose");
         this->declare_parameter("planner_type", "RRTConnect");
         this->declare_parameter("collision_skip_pairs", std::vector<std::string>{});
+        this->declare_parameter("simplify_method", std::string("simple"));
+        this->declare_parameter("simplify_timeout", 0.5);
+        this->declare_parameter("simplify_max_steps", 100);
+        this->declare_parameter("simplify_max_empty_steps", 50);
 
         // Fetch robot_description from global parameter server
         std::string urdf_xml;
@@ -90,13 +100,18 @@ public:
             return;
         }
 
-        this->get_parameter("trajectory_time_step", time_step_);
+        this->get_parameter("velocity_scale", velocity_scale_);
+        this->get_parameter("min_time_step", min_time_step_);
         this->get_parameter("planning_timeout", planning_timeout_);
         this->get_parameter("base_link", base_link_);
         this->get_parameter("right_tip", right_tip_);
         this->get_parameter("goal_pose_topic", goal_pose_topic_);
         this->get_parameter("planner_type", planner_type_);
         this->get_parameter("collision_skip_pairs", collision_skip_pairs_);
+        this->get_parameter("simplify_method", simplify_method_);
+        this->get_parameter("simplify_timeout", simplify_timeout_);
+        this->get_parameter("simplify_max_steps", simplify_max_steps_);
+        this->get_parameter("simplify_max_empty_steps", simplify_max_empty_steps_);
 
         if (!urdf_model.initString(urdf_xml)) {
             RCLCPP_FATAL(this->get_logger(), "Failed to parse URDF");
@@ -115,12 +130,35 @@ public:
             return;
         }
 
+        // TCP offset override: allow runtime adjustment of the last fixed segment
+        this->declare_parameter("tcp_offset_x", 0.175);
+        double tcp_offset_x = this->get_parameter("tcp_offset_x").as_double();
+        {
+            unsigned int n_seg = kdl_chain_right.getNrOfSegments();
+            if (n_seg > 0 && kdl_chain_right.getSegment(n_seg - 1).getJoint().getType() == KDL::Joint::None) {
+                KDL::Chain new_chain;
+                for (unsigned int i = 0; i < n_seg - 1; ++i) {
+                    new_chain.addSegment(kdl_chain_right.getSegment(i));
+                }
+                new_chain.addSegment(KDL::Segment(
+                    kdl_chain_right.getSegment(n_seg - 1).getName(),
+                    KDL::Joint(KDL::Joint::None),
+                    KDL::Frame(KDL::Vector(tcp_offset_x, 0.0, 0.0))
+                ));
+                kdl_chain_right = new_chain;
+                RCLCPP_INFO(this->get_logger(), "TCP offset overridden to %.4f m", tcp_offset_x);
+            }
+        }
+
         // Parse joint limits from URDF for OMPL bounds
         for (const auto& joint_pair : urdf_model.joints_) {
             const auto& joint = joint_pair.second;
             if (joint->type != urdf::Joint::REVOLUTE && joint->type != urdf::Joint::PRISMATIC && joint->type != urdf::Joint::FIXED) continue;
             if (!joint->limits) continue;
             joint_limits_[joint->name] = std::make_pair(joint->limits->lower, joint->limits->upper);
+            if (joint->type != urdf::Joint::FIXED && joint->limits->velocity > 0.0) {
+                velocity_limits_[joint->name] = joint->limits->velocity;
+            }
         }
 
         // Build joint limits array for right arm
@@ -166,6 +204,12 @@ public:
 
         fk_right_solver = std::make_shared<KDL::ChainFkSolverPos_recursive>(kdl_chain_right);
 
+        // Collect link names from the planning chain to filter collision objects
+        chain_link_names_.insert(base_link_);
+        for (unsigned int i = 0; i < kdl_chain_right.getNrOfSegments(); ++i) {
+            chain_link_names_.insert(kdl_chain_right.getSegment(i).getName());
+        }
+
         buildCollisionObjects();
 
         goal_pose_sub_ = this->create_subscription<geometry_msgs::msg::PoseStamped>(
@@ -177,13 +221,15 @@ public:
         RCLCPP_INFO(this->get_logger(), "IKFCLPlannerNode initialized with %zu joints", joint_limits_.size());
         RCLCPP_INFO(this->get_logger(), "Using base link: %s, right tip: %s",
                     base_link_.c_str(), right_tip_.c_str());
-        RCLCPP_INFO(this->get_logger(), "Planning timeout: %.2f seconds, time step: %.2f seconds",
-                    planning_timeout_, time_step_);
+        RCLCPP_INFO(this->get_logger(), "Planning timeout: %.2f seconds, velocity_scale: %.2f, min_time_step: %.2f",
+                    planning_timeout_, velocity_scale_, min_time_step_);
         RCLCPP_INFO(this->get_logger(), "Collision skip pairs: %zu", collision_skip_pairs_.size());
         for (const auto& pair : collision_skip_pairs_) {
             RCLCPP_INFO(this->get_logger(), "Skipping collision check for pair: %s", pair.c_str());
         }
         RCLCPP_INFO(this->get_logger(), "Planner type: %s", planner_type_.c_str());
+        RCLCPP_INFO(this->get_logger(), "Simplification: method=%s, timeout=%.2f seconds, max_steps=%d, max_empty_steps=%d",
+                    simplify_method_.c_str(), simplify_timeout_, simplify_max_steps_, simplify_max_empty_steps_);
         RCLCPP_INFO(this->get_logger(), "Right arm: base_link = %s, tip_link = %s", base_link_.c_str(), right_tip_.c_str());
     }
 
@@ -207,12 +253,15 @@ private:
     };
 
     std::map<std::string, LinkCollision> link_collisions;
+    std::set<std::string> chain_link_names_;
 
     // Add joint_limits_ as a member variable
     std::map<std::string, std::pair<double, double>> joint_limits_;
+    std::map<std::string, double> velocity_limits_;
 
     // Parameters
-    double time_step_ = 0.05;
+    double velocity_scale_ = 0.05;
+    double min_time_step_ = 0.02;
     double planning_timeout_ = 1.0;
     std::string base_link_ = "pelvis";
     std::string right_tip_ = "right_hand_palm_link";
@@ -220,6 +269,10 @@ private:
     std::string planner_type_ = "RRTConnect";
     std::vector<std::string> collision_skip_pairs_;
     std::string log_level_ = "info";
+    std::string simplify_method_ = "simple";
+    double simplify_timeout_ = 0.5;
+    int simplify_max_steps_ = 100;
+    int simplify_max_empty_steps_ = 50;
 
     tf2_ros::Buffer tf_buffer_;
     tf2_ros::TransformListener tf_listener_;
@@ -229,6 +282,7 @@ private:
         for (const auto& link_pair : urdf_model.links_) {
             auto link = link_pair.second;
             if (!link->collision || !link->collision->geometry) continue;
+            if (chain_link_names_.find(link->name) == chain_link_names_.end()) continue;
 
             std::shared_ptr<fcl::CollisionGeometryd> geom;
             if (link->collision->geometry->type == urdf::Geometry::BOX) {
@@ -575,7 +629,7 @@ private:
             }
         }
 
-        //ss->getSpaceInformation()->setStateValidityCheckingResolution(0.01);
+        ss->getSpaceInformation()->setStateValidityCheckingResolution(0.01);
         
         if (planner_type_ == "RRTConnect") {
             ss->setPlanner(std::make_shared<og::RRTConnect>(ss->getSpaceInformation()));
@@ -585,19 +639,121 @@ private:
         }
         if (ss->solve(planning_timeout_)) {
             auto path = ss->getSolutionPath();
+            const std::size_t n_before = path.getStateCount();
+            if (simplify_method_ == "simple") {
+                ss->simplifySolution(simplify_timeout_);
+                path = ss->getSolutionPath();
+            } else if (simplify_method_ == "manual") {
+                og::PathSimplifier ps(ss->getSpaceInformation());
+                auto simplify_start = std::chrono::steady_clock::now();
+                ps.partialShortcutPath(path, static_cast<unsigned int>(simplify_max_steps_), static_cast<unsigned int>(simplify_max_empty_steps_));
+                ps.reduceVertices(path);
+                double elapsed = std::chrono::duration<double>(std::chrono::steady_clock::now() - simplify_start).count();
+                if (elapsed > simplify_timeout_) {
+                    RCLCPP_WARN(this->get_logger(), "Manual path simplification exceeded simplify_timeout %.2f seconds (elapsed %.2f seconds)",
+                                simplify_timeout_, elapsed);
+                }
+            } else {
+                RCLCPP_WARN(this->get_logger(), "Unknown simplify_method '%s'; skipping path simplification", simplify_method_.c_str());
+            }
+            const std::size_t n_after = path.getStateCount();
+            RCLCPP_INFO(this->get_logger(), "Simplified: %zu → %zu waypoints (-%zu%%)",
+                        n_before, n_after, n_before > 0 ? (n_before - n_after) * 100 / n_before : 0);
             path.interpolate();
             const auto& states = path.getStates();
             trajectory_msgs::msg::JointTrajectory traj_msg;
             traj_msg.joint_names = planning_joints;
+            double cumulative_time = 0.0;
             for (size_t idx = 0; idx < states.size(); ++idx) {
                 const auto& state = states[idx];
                 trajectory_msgs::msg::JointTrajectoryPoint point;
                 for (size_t i = 0; i < planning_joints.size(); ++i) {
                     point.positions.push_back(state->as<ob::RealVectorStateSpace::StateType>()->values[i]);
                 }
-                point.time_from_start = rclcpp::Duration::from_seconds(time_step_ * (idx + 1));
+                double dt = min_time_step_;
+                if (idx > 0) {
+                    const auto& prev = states[idx - 1];
+                    double max_dt = 0.0;
+                    for (size_t i = 0; i < planning_joints.size(); ++i) {
+                        double dq = std::abs(state->as<ob::RealVectorStateSpace::StateType>()->values[i] -
+                                             prev->as<ob::RealVectorStateSpace::StateType>()->values[i]);
+                        auto vel_it = velocity_limits_.find(planning_joints[i]);
+                        double vel_limit = (vel_it != velocity_limits_.end()) ? vel_it->second : 10.0;
+                        double seg_dt = dq / (vel_limit * velocity_scale_);
+                        if (seg_dt > max_dt) max_dt = seg_dt;
+                    }
+                    dt = std::max(max_dt, min_time_step_);
+                }
+                cumulative_time += dt;
+                point.time_from_start = rclcpp::Duration::from_seconds(cumulative_time);
                 traj_msg.points.push_back(point);
             }
+            RCLCPP_INFO(this->get_logger(), "Trajectory: %zu waypoints, %.3f seconds total duration",
+                        traj_msg.points.size(), cumulative_time);
+            // Pre-publish trajectory validation with auto-fix
+            bool position_fixed = false;
+            bool velocity_fixed = false;
+            for (auto& pt : traj_msg.points) {
+                for (size_t i = 0; i < planning_joints.size(); ++i) {
+                    auto lim_it = joint_limits_.find(planning_joints[i]);
+                    if (lim_it == joint_limits_.end()) continue;
+                    double lower = lim_it->second.first;
+                    double upper = lim_it->second.second;
+                    if (pt.positions[i] < lower || pt.positions[i] > upper) {
+                        RCLCPP_WARN(this->get_logger(), "Auto-fix: clamped joint %s position %.4f to [%.4f, %.4f]",
+                                    planning_joints[i].c_str(), pt.positions[i], lower, upper);
+                        pt.positions[i] = std::max(lower, std::min(upper, pt.positions[i]));
+                        position_fixed = true;
+                    }
+                }
+            }
+            for (size_t idx = 1; idx < traj_msg.points.size(); ++idx) {
+                double t_prev = rclcpp::Duration(traj_msg.points[idx - 1].time_from_start).seconds();
+                double t_curr = rclcpp::Duration(traj_msg.points[idx].time_from_start).seconds();
+                double dt = t_curr - t_prev;
+                if (dt <= 0.0) dt = min_time_step_;
+                double max_required_dt = 0.0;
+                for (size_t i = 0; i < planning_joints.size(); ++i) {
+                    double dq = std::abs(traj_msg.points[idx].positions[i] - traj_msg.points[idx - 1].positions[i]);
+                    auto vel_it = velocity_limits_.find(planning_joints[i]);
+                    double vel_limit = (vel_it != velocity_limits_.end()) ? vel_it->second : 10.0;
+                    double required_dt = dq / (vel_limit * velocity_scale_);
+                    if (required_dt > max_required_dt) max_required_dt = required_dt;
+                }
+                max_required_dt = std::max(max_required_dt, min_time_step_);
+                if (max_required_dt > dt + 1e-9) {
+                    RCLCPP_WARN(this->get_logger(), "Auto-fix: stretched dt at waypoint %zu for velocity limit", idx);
+                    double delta = max_required_dt - dt;
+                    for (size_t j = idx; j < traj_msg.points.size(); ++j) {
+                        double t = rclcpp::Duration(traj_msg.points[j].time_from_start).seconds();
+                        traj_msg.points[j].time_from_start = rclcpp::Duration::from_seconds(t + delta);
+                    }
+                    velocity_fixed = true;
+                }
+            }
+            bool re_valid = true;
+            for (size_t idx = 1; idx < traj_msg.points.size(); ++idx) {
+                double t_prev = rclcpp::Duration(traj_msg.points[idx - 1].time_from_start).seconds();
+                double t_curr = rclcpp::Duration(traj_msg.points[idx].time_from_start).seconds();
+                double dt = t_curr - t_prev;
+                if (dt <= 0.0) dt = min_time_step_;
+                for (size_t i = 0; i < planning_joints.size(); ++i) {
+                    double dq = std::abs(traj_msg.points[idx].positions[i] - traj_msg.points[idx - 1].positions[i]);
+                    auto vel_it = velocity_limits_.find(planning_joints[i]);
+                    double vel_limit = (vel_it != velocity_limits_.end()) ? vel_it->second : 10.0;
+                    if (dq / dt > vel_limit * velocity_scale_ + 1e-6) {
+                        re_valid = false;
+                        break;
+                    }
+                }
+                if (!re_valid) break;
+            }
+            if (!re_valid) {
+                RCLCPP_ERROR(this->get_logger(), "Trajectory validation failed after auto-fix, rejecting");
+                return;
+            }
+            bool any_fixed = position_fixed || velocity_fixed;
+            RCLCPP_INFO(this->get_logger(), "Trajectory validation passed%s", any_fixed ? " (with auto-fix)" : "");
             for (const auto& pt : traj_msg.points) {
                 if (pt.positions.size() != traj_msg.joint_names.size()) {
                     RCLCPP_ERROR(this->get_logger(), "Trajectory point size mismatch: %zu vs %zu", pt.positions.size(), traj_msg.joint_names.size());
