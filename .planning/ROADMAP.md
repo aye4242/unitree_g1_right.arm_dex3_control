@@ -5,18 +5,19 @@
 **Phases:** 4
 **Requirements:** 10
 
-## Phase 6: YOLO 清理 + TCP Offset 集成
+## Phase 6: YOLO 清理 + TCP Offset 集成 ✅
 
+**Status:** Complete (2026-05-18)
 **Goal:** 移除不可行的 YOLO 代码，将 TCP offset 集成到 planner IK 链末端。
 
-**Requirements:** CLEAN-01, TCP-01, TCP-02
+**Requirements:** CLEAN-01 ✓, TCP-01 ✓, TCP-02 ✓
 
 **Success Criteria:**
-1. YOLO 相关文件（ultralytics_detector.py、project_to_3d_node 等）已删除并提交
-2. 原 reach.launch.py 中 YOLO 相关节点已移除
-3. Planner IK 链末端延伸到 TCP 点（wrist_yaw_link + 0.175m X 轴）
-4. TCP offset 通过 ROS 参数配置，不硬编码
-5. 现有 planner 功能不受影响（手动指定目标仍可规划）
+1. ✓ YOLO 相关文件（ultralytics_detector.py、project_to_3d_node 等）已删除并提交
+2. ✓ 原 reach.launch.py 中 YOLO 相关节点已移除
+3. ✓ Planner IK 链末端延伸到 TCP 点（wrist_yaw_link + 0.175m X 轴）
+4. ✓ TCP offset 通过 ROS 参数配置，不硬编码
+5. ✓ 现有 planner 功能不受影响（手动指定目标仍可规划）
 
 **Depends on:** —
 
@@ -76,9 +77,9 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CLEAN-01 | Phase 6 | Pending |
-| TCP-01 | Phase 6 | Pending |
-| TCP-02 | Phase 6 | Pending |
+| CLEAN-01 | Phase 6 | Complete |
+| TCP-01 | Phase 6 | Complete |
+| TCP-02 | Phase 6 | Complete |
 | TAG-01 | Phase 7 | Pending |
 | TAG-02 | Phase 7 | Pending |
 | TAG-03 | Phase 7 | Pending |
@@ -93,4 +94,4 @@
 
 ---
 *Roadmap created: 2026-05-15*
-*Last updated: 2026-05-15 after initial creation*
+*Last updated: 2026-05-18 — Phase 6 complete (CLEAN-01, TCP-01, TCP-02)*

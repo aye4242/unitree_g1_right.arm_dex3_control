@@ -9,7 +9,7 @@ Requirements for milestone v1.1. Each maps to roadmap phases.
 
 ### 清理（Cleanup）
 
-- [ ] **CLEAN-01**: 移除 YOLO 检测相关代码（ultralytics_detector.py、project_to_3d_node 等），从 launch 和依赖中彻底删除
+- [x] **CLEAN-01**: 移除 YOLO 检测相关代码（ultralytics_detector.py、project_to_3d_node 等），从 launch 和依赖中彻底删除
 
 ### AprilTag 检测（Detection）
 
@@ -20,8 +20,8 @@ Requirements for milestone v1.1. Each maps to roadmap phases.
 
 ### TCP 修正（TCP Correction）
 
-- [ ] **TCP-01**: 将 0.175m TCP offset 加入运动学链末端，IK/OMPL 直接以 TCP 为目标点求解
-- [ ] **TCP-02**: TCP offset 可配置（ROS 参数），不硬编码
+- [x] **TCP-01**: 将 0.175m TCP offset 加入运动学链末端，IK/OMPL 直接以 TCP 为目标点求解
+- [x] **TCP-02**: TCP offset 可配置（ROS 参数），不硬编码
 
 ### 自适应位姿（Adaptive Orientation）
 
@@ -61,9 +61,9 @@ Requirements for milestone v1.1. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CLEAN-01 | Phase 6 | Pending |
-| TCP-01 | Phase 6 | Pending |
-| TCP-02 | Phase 6 | Pending |
+| CLEAN-01 | Phase 6 | Complete |
+| TCP-01 | Phase 6 | Complete |
+| TCP-02 | Phase 6 | Complete |
 | TAG-01 | Phase 7 | Pending |
 | TAG-02 | Phase 7 | Pending |
 | TAG-03 | Phase 7 | Pending |
