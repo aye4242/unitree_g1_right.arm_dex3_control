@@ -61,9 +61,11 @@
 
 ## Phase 9: 端到端集成
 
+**Status:** Planning ready
 **Goal:** 将 AprilTag 检测 + TCP 修正 + 自适应位姿整合为完整流水线。
 
 **Requirements:** INTG-01, INTG-02
+**Plans:** 4 plans
 
 **Success Criteria:**
 1. apriltag_reach.launch.py 单命令启动完整流水线
@@ -72,6 +74,12 @@
 4. 在物理机器人上演示成功
 
 **Depends on:** Phase 7, Phase 8
+
+**Plans:**
+- [ ] 09-01-PLAN.md — AprilTag goal bridge node (apriltag_goal_bridge.py, D-01..D-14)
+- [ ] 09-02-PLAN.md — End-to-end launch file (apriltag_reach.launch.py, D-15..D-20)
+- [ ] 09-03-PLAN.md — UAT harness with FK measurement (apriltag_reach_uat.py, D-21..D-25)
+- [ ] 09-04-PLAN.md — CMakeLists, README docs, delete keyboard_trigger_node.py
 
 ---
 
@@ -96,4 +104,4 @@
 
 ---
 *Roadmap created: 2026-05-15*
-*Last updated: 2026-05-19 — Phase 8 complete (ORI-01); UAT measured 5/8 vs 4/8 baseline, criterion #3 reframed as partial*
+*Last updated: 2026-05-19 — Phase 9 planning complete (4 plans created)*
