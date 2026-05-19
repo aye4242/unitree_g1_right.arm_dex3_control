@@ -42,7 +42,7 @@ Requirements for milestone v1.1. Each maps to roadmap phases.
 
 ### 位姿增强
 
-- **ORI-02**: IK 失败时多候选姿态 fallback
+- **ORI-02**: IK 失败时多候选姿态 fallback — 详见 `.planning/todos/pending/ORI-02-multi-candidate-orientation.md`（汇集 Phase 8 UAT 失败现象 + 触发条件 + scope 边界）
 - **ORI-03**: 基于 tag 法线推导接近方向（垂直于表面）
 
 ## Out of Scope
