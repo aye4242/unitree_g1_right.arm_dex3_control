@@ -15,6 +15,7 @@ def launch_setup(context, *args, **kwargs):
     right_tip = str(LaunchConfiguration('right_tip').perform(context))
     tcp_offset_x = float(LaunchConfiguration('tcp_offset_x').perform(context))
     planner_type = str(LaunchConfiguration('planner_type').perform(context))
+    adaptive_orientation_enabled = LaunchConfiguration('adaptive_orientation_enabled').perform(context).lower() == 'true'
 
     parameters = {
         'trajectory_time_step': trajectory_time_step,
@@ -23,6 +24,7 @@ def launch_setup(context, *args, **kwargs):
         'right_tip': right_tip,
         'tcp_offset_x': tcp_offset_x,
         'planner_type': planner_type,
+        'adaptive_orientation_enabled': adaptive_orientation_enabled,
     }
     if collision_skip_pairs:
         parameters['collision_skip_pairs'] = collision_skip_pairs
@@ -50,6 +52,7 @@ def generate_launch_description():
         DeclareLaunchArgument('right_tip', default_value='right_tcp_link'),
         DeclareLaunchArgument('tcp_offset_x', default_value='0.175'),
         DeclareLaunchArgument('planner_type', default_value='RRTConnect'),
+        DeclareLaunchArgument('adaptive_orientation_enabled', default_value='true'),
         DeclareLaunchArgument('collision_skip_pairs', default_value='right_hand_thumb_0_link:right_wrist_yaw_link'),
     ]
     return LaunchDescription(args + [OpaqueFunction(function=launch_setup)])
