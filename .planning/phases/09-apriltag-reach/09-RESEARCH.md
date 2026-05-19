@@ -913,22 +913,22 @@ if __name__ == '__main__':
 | A5 | `emulate_tty=True` + `os.open('/dev/tty', ...)` works for keyboard reading in `ros2 launch` | Common Pitfalls | MEDIUM — This exact pattern works in `keyboard_trigger_node.py` and `apriltag_detector_node.py`. If broken, G keypresses would be silently ignored. Testing on hardware is the only way to confirm. |
 | A6 | `/joint_trajectory_targets` is a reliable completion signal | Architecture Patterns | MEDIUM — Planner publishes one trajectory per goal. If planner publishes multiple trajectories for a single goal (e.g., path smoothing splits), bridge must track which trajectories belong to which trigger. D-25 delegates to agent's discretion; trajectory `points[-1].time_from_start` is the most robust heuristic. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should the bridge node use trajectory `time_from_start` or subscribe to executor feedback for completion detection?**
    - What we know: D-25 delegates this to discretion. Option (a) subscribe to `/joint_trajectory_targets` and compute duration from `points[-1].time_from_start` plus safety margin (e.g., +1.0 s). Option (b) detect joint velocity zero via `/joint_states` for all right-arm joints.
    - What's unclear: Whether planner publishes exactly one trajectory per `/goal_pose` or may publish multiple (e.g., retry with different seed). If multiple, trajectory-only completion is still fine — the first trajectory's duration is an upper bound.
-   - Recommendation: Use (a) for primary, (b) as fallback. The bridge subscribes to `/joint_trajectory_targets`; when a trajectory arrives, set a timer for `points[-1].time_from_start + 1.0s`, then clear `waiting_for_completion`. If a second trajectory arrives before the timer fires, reset the timer.
+   - RESOLVED: Use (a) for primary, (b) as fallback. The bridge subscribes to `/joint_trajectory_targets`; when a trajectory arrives, set a timer for `points[-1].time_from_start + 1.0s`, then clear `waiting_for_completion`. If a second trajectory arrives before the timer fires, reset the timer.
 
 2. **What are the exact 4 target coordinates for UAT?**
    - What we know: Must satisfy `distance to shoulder ≤ 0.55 m` AND `right side (+Y_torso half-space)`.
    - What's unclear: Which specific Phase 8 targets satisfy both. From Phase 8 data: `center` (0.40, -0.20) at shoulder distance ~0.437 m [PASS both modes]; `right-side` (0.40, -0.40) at ~0.486 m [PASS adaptive]; `low` (0.40, -0.20, -0.10) at ~0.449 m [PASS adaptive]; `diag` (0.45, -0.30, 0.05) at ~0.537 m [PASS both]. `high` (0.40, -0.20, 0.15) at ~0.464 m but may have issues. `center-near` at (0.30, -0.20, 0.00) has shoulder distance ~0.348 m — within 0.55 m but adaptive had collision issues. Recommend: `center`, `right-side`, `low`, `diag` — all adaptive=true PASS targets from Phase 8 within reach radius.
-   - Recommendation: Use the four targets listed above: center, right-side, low, diag. All PASS under adaptive=true in Phase 8, all within 0.55 m reach radius, all in right-side workspace. (Per D-21, exact coordinates are agent's discretion.)
+   - RESOLVED: Use the four targets listed above: center, right-side, low, diag. All PASS under adaptive=true in Phase 8, all within 0.55 m reach radius, all in right-side workspace. (Per D-21, exact coordinates are agent's discretion.)
 
 3. **How does the UAT harness know when the trajectory has completed?**
    - What we know: D-22 says "executor 报告轨迹完成后" and D-25 delegates the signal source to agent's discretion.
    - What's unclear: The executor does not publish a "trajectory complete" topic. The simplest approach is for the harness to subscribe to `/joint_trajectory_targets`, use the trajectory `points[-1].time_from_start` as the expected duration, add a safety margin (e.g., +2.0 s), and assume completion after that time has elapsed.
-   - Recommendation: Harness subscribes to `/joint_trajectory_targets`. On receiving a trajectory, records the `points[-1].time_from_start` duration. After `duration + 2.0s` passes, reads the latest `/joint_states` for FK computation. This is a timeout-based approach that works without executor modification.
+   - RESOLVED: Harness subscribes to `/joint_trajectory_targets`. On receiving a trajectory, records the `points[-1].time_from_start` duration. After `duration + 2.0s` passes, reads the latest `/joint_states` for FK computation. This is a timeout-based approach that works without executor modification.
 
 ## Environment Availability
 
