@@ -17,7 +17,89 @@ from sensor_msgs.msg import JointState
 import PyKDL
 
 from urdf_parser_py.urdf import URDF
-from kdl_parser_py.urdf import treeFromUrdfModel
+
+
+# ---------------------------------------------------------------------------
+# Inlined replacement for kdl_parser_py.urdf.treeFromUrdfModel
+#
+# Background: ros-humble does not ship kdl_parser_py as an apt package, and
+# the upstream source on the `humble` branch still contains the Python 2
+# token `kdl.Joint.None` which is a syntax error on Python 3. Rather than
+# vendor a patched copy of the whole package, we inline only what we need.
+#
+# This is a direct port of kdl_parser_py.urdf.treeFromUrdfModel using the
+# Py3-compatible `PyKDL.Joint.Fixed` attribute available in python3-pykdl
+# (orocos-kdl 1.5.x).
+# ---------------------------------------------------------------------------
+def _kdl_pose(pose):
+    rpy = pose.rpy if pose and pose.rpy and len(pose.rpy) == 3 else [0.0, 0.0, 0.0]
+    xyz = pose.xyz if pose and pose.xyz and len(pose.xyz) == 3 else [0.0, 0.0, 0.0]
+    return PyKDL.Frame(PyKDL.Rotation.RPY(*rpy), PyKDL.Vector(*xyz))
+
+
+def _kdl_inertia(i):
+    origin = _kdl_pose(i.origin)
+    inertia = i.inertia
+    return origin.M * PyKDL.RigidBodyInertia(
+        i.mass, origin.p,
+        PyKDL.RotationalInertia(inertia.ixx, inertia.iyy, inertia.izz,
+                                inertia.ixy, inertia.ixz, inertia.iyz))
+
+
+def _kdl_joint(jnt):
+    F = _kdl_pose(jnt.origin)
+    if jnt.type in ('revolute', 'continuous'):
+        return PyKDL.Joint(jnt.name, F.p, F.M * PyKDL.Vector(*jnt.axis),
+                           PyKDL.Joint.RotAxis)
+    if jnt.type == 'prismatic':
+        return PyKDL.Joint(jnt.name, F.p, F.M * PyKDL.Vector(*jnt.axis),
+                           PyKDL.Joint.TransAxis)
+    # 'fixed', 'floating', 'planar', 'unknown' -> treated as fixed
+    return PyKDL.Joint(jnt.name, PyKDL.Joint.Fixed)
+
+
+def _add_children_to_tree(robot_model, root, tree):
+    inert = PyKDL.RigidBodyInertia(0)
+    if root.inertial:
+        inert = _kdl_inertia(root.inertial)
+
+    parent_joint_name, parent_link_name = robot_model.parent_map[root.name]
+    parent_joint = robot_model.joint_map[parent_joint_name]
+
+    sgm = PyKDL.Segment(
+        root.name,
+        _kdl_joint(parent_joint),
+        _kdl_pose(parent_joint.origin),
+        inert)
+
+    if not tree.addSegment(sgm, parent_link_name):
+        return False
+
+    if root.name not in robot_model.child_map:
+        return True
+
+    for _joint_name, child_link_name in robot_model.child_map[root.name]:
+        child = robot_model.link_map[child_link_name]
+        if not _add_children_to_tree(robot_model, child, tree):
+            return False
+    return True
+
+
+def treeFromUrdfModel(robot_model, quiet=True):
+    """Construct a PyKDL.Tree from a urdf_parser_py URDF model."""
+    root = robot_model.link_map[robot_model.get_root()]
+    if root.inertial and not quiet:
+        print(f"The root link {root.name} has an inertia specified in the URDF, "
+              f"but KDL does not support a root link with an inertia.")
+
+    tree = PyKDL.Tree(root.name)
+    ok = True
+    for _joint_name, child_link_name in robot_model.child_map[root.name]:
+        child = robot_model.link_map[child_link_name]
+        if not _add_children_to_tree(robot_model, child, tree):
+            ok = False
+            break
+    return (ok, tree)
 
 
 class TcpTorsoPoseNode(Node):
@@ -40,7 +122,7 @@ class TcpTorsoPoseNode(Node):
         # ---------- load URDF ----------
         if urdf_path:
             self.get_logger().info(f'Loading URDF from file: {urdf_path}')
-            with open(urdf_path, 'r') as f:
+            with open(urdf_path, 'rb') as f:
                 urdf_xml = f.read()
             robot_urdf = URDF.from_xml_string(urdf_xml)
         else:
@@ -55,8 +137,13 @@ class TcpTorsoPoseNode(Node):
                     'g1_29dof_lock_waist_with_hand_rev_1_0.urdf')
                 self.get_logger().info(
                     f'/robot_description unavailable, loading default URDF: {default_urdf}')
-                with open(default_urdf, 'r') as f:
+                with open(default_urdf, 'rb') as f:
                     urdf_xml = f.read()
+            # urdf_parser_py uses lxml under the hood, which rejects unicode
+            # strings carrying an encoding declaration ("<?xml ... encoding=...?>").
+            # Always feed it bytes to be safe.
+            if isinstance(urdf_xml, str):
+                urdf_xml = urdf_xml.encode('utf-8')
             robot_urdf = URDF.from_xml_string(urdf_xml)
 
         # ---------- build KDL tree ----------
@@ -66,11 +153,24 @@ class TcpTorsoPoseNode(Node):
             sys.exit(1)
 
         # ---------- extract chain ----------
-        ok, chain = kdl_tree.getChain(base_link, tip_link)
-        if not ok:
+        # PyKDL.Tree.getChain returns a PyKDL.Chain directly (not a tuple).
+        try:
+            chain = kdl_tree.getChain(base_link, tip_link)
+        except Exception as e:
             self.get_logger().fatal(
-                f'Failed to get KDL chain from "{base_link}" to "{tip_link}"')
+                f'Failed to get KDL chain from "{base_link}" to "{tip_link}": {e}')
             sys.exit(1)
+        if chain.getNrOfSegments() == 0:
+            self.get_logger().fatal(
+                f'Empty KDL chain from "{base_link}" to "{tip_link}"')
+            sys.exit(1)
+        # IMPORTANT: keep references to tree and chain on self.
+        # PyKDL solvers (ChainFkSolverPos_recursive) only store the C++ pointer
+        # to the chain, not a Python ref. If the local Python object goes out
+        # of scope and gets garbage-collected, the solver ends up reading freed
+        # memory and JntToCart() starts returning -4 (E_SIZE_MISMATCH).
+        self.kdl_tree = kdl_tree
+        self.kdl_chain = chain
 
         # ---------- build ordered joint name list ----------
         self.kdl_joint_names = []
@@ -144,7 +244,7 @@ class TcpTorsoPoseNode(Node):
         fk_result = PyKDL.Frame()
         fk_ret = self.fk_solver.JntToCart(self.current_joints, fk_result)
         if fk_ret < 0:
-            self.get_logger().error('FK solver failed')
+            self.get_logger().error(f'FK solver failed: ret={fk_ret}')
             return
 
         # Apply TCP offset: +X in wrist_yaw frame

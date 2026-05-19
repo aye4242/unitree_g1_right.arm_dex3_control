@@ -32,6 +32,7 @@ sudo apt install -y \
   ros-humble-tf2-geometry-msgs \
   ros-humble-robot-state-publisher \
   ros-humble-kdl-parser \
+  ros-humble-urdfdom-py \
   ros-humble-urdf \
   ros-humble-ompl \
   ros-humble-geometric-shapes \
@@ -302,6 +303,30 @@ Failed to extract KDL chain for right arm
 ```bash
 ros2 param get /robot_state_publisher robot_description | grep -E "torso_link|right_wrist_yaw_link|right_hand_palm_link"
 ```
+
+### 7.8 `tcp_torso_pose.py` 报 `No module named 'kdl_parser_py'`
+
+错误：
+
+```text
+ModuleNotFoundError: No module named 'kdl_parser_py'
+```
+
+原因：ROS 2 Humble 的 apt 仓库**不提供** `kdl_parser_py` 这个 Python 包，只有 C++ 版的 `ros-humble-kdl-parser`。上游 `ros/kdl_parser` 仓库 `humble` 分支虽然带 `kdl_parser_py` 子目录，但里面用的是 Python 2 写法（`kdl.Joint.None`），在 Python 3 下连导入都过不了，从源码构建也无法直接解决。
+
+处理方式：本项目的 `tcp_torso_pose.py` 已不再依赖 `kdl_parser_py`，改为在脚本内内联一份 Py3 兼容的 `treeFromUrdfModel`（基于 `python3-pykdl` 提供的 `PyKDL.Joint.Fixed`）。脚本现在只依赖 `urdf_parser_py`：
+
+```bash
+sudo apt install -y ros-humble-urdfdom-py
+```
+
+如果机器上 `urdf_parser_py` 也找不到，会先报：
+
+```text
+ModuleNotFoundError: No module named 'urdf_parser_py'
+```
+
+按上面的命令装 `ros-humble-urdfdom-py` 即可。
 
 ## 8. 编译成功判定
 
