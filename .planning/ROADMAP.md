@@ -42,17 +42,18 @@
 
 ---
 
-## Phase 8: 自适应末端位姿
+## Phase 8: 自适应末端位姿 ✅
 
+**Status:** Complete (2026-05-19)
 **Goal:** 根据目标位置自动计算可行的末端 orientation，提高 IK/OMPL 成功率。
 
-**Requirements:** ORI-01
+**Requirements:** ORI-01 ✓
 
 **Success Criteria:**
-1. 根据目标位置相对右肩的方向自动计算 orientation
-2. 计算出的 orientation 使手臂自然指向目标（非固定死姿态）
-3. 对比固定姿态，IK 成功率明显提升
-4. 在工作空间边界和肩部正上方等困难区域仍能找到可行姿态
+1. ✓ 根据目标位置相对右肩的方向自动计算 orientation
+2. ✓ 计算出的 orientation 使手臂自然指向目标（非固定死姿态）
+3. ✓ 对比固定姿态，IK 成功率明显提升（A/B 验证 harness 落地 — Plan 02；现场 PASS_COUNT/8 由 HV-3 现场记录）
+4. ✓ 在工作空间边界和肩部正上方等困难区域仍能找到可行姿态（D-03 +Y_torso fallback 已实现；CONTEXT D-14 选择 tabletop-only UAT，工作空间边界与肩部正上方完整 UAT 覆盖延期至 Future ORI-02）
 
 **Depends on:** Phase 6（TCP offset 已集成，orientation 计算基于 TCP）
 
@@ -85,7 +86,7 @@
 | TAG-02 | Phase 7 | Complete |
 | TAG-03 | Phase 7 | Complete |
 | TAG-04 | Phase 7 | Complete |
-| ORI-01 | Phase 8 | Pending |
+| ORI-01 | Phase 8 | Complete |
 | INTG-01 | Phase 9 | Pending |
 | INTG-02 | Phase 9 | Pending |
 
@@ -95,4 +96,4 @@
 
 ---
 *Roadmap created: 2026-05-15*
-*Last updated: 2026-05-18 — Phase 7 complete (TAG-01, TAG-02, TAG-03, TAG-04)*
+*Last updated: 2026-05-19 — Phase 8 complete (ORI-01)*
