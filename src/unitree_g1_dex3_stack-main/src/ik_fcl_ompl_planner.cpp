@@ -150,6 +150,13 @@ public:
             }
         }
 
+        // Phase 8: adaptive end-effector orientation toggle (D-09, D-10).
+        this->declare_parameter("adaptive_orientation_enabled", true);
+        this->get_parameter("adaptive_orientation_enabled", adaptive_orientation_enabled_);
+        RCLCPP_INFO(this->get_logger(),
+            "adaptive_orientation_enabled = %s",
+            adaptive_orientation_enabled_ ? "true" : "false");
+
         // Parse joint limits from URDF for OMPL bounds
         for (const auto& joint_pair : urdf_model.joints_) {
             const auto& joint = joint_pair.second;
@@ -203,6 +210,31 @@ public:
         assert(right_upper.rows() == kdl_chain_right.getNrOfJoints());
 
         fk_right_solver = std::make_shared<KDL::ChainFkSolverPos_recursive>(kdl_chain_right);
+
+        // Phase 8: cache the right shoulder origin in base_link_ (torso_link) once.
+        // Per D-05, the shoulder reference is the right_shoulder_pitch_link origin;
+        // per D-06, compute via URDF/KDL FK with all-zero joints (no runtime TF lookup).
+        // KDL is 1-based on segmentNr — segmentNr=1 returns the frame at the end of
+        // segment 0 (the segment created by right_shoulder_pitch_joint), whose origin
+        // is invariant of joint state because revolute-joint angle does not move
+        // the child link's origin.
+        {
+            KDL::JntArray zero_jnt(kdl_chain_right.getNrOfJoints());
+            KDL::Frame shoulder_frame;
+            if (fk_right_solver->JntToCart(zero_jnt, shoulder_frame, 1) < 0) {
+                RCLCPP_FATAL(this->get_logger(),
+                    "Failed to compute shoulder origin via FK on segment 1 of right-arm chain");
+                rclcpp::shutdown();
+                return;
+            }
+            right_shoulder_pos_in_base_ = shoulder_frame.p;
+            RCLCPP_INFO(this->get_logger(),
+                "Right shoulder reference point in '%s': [%.4f, %.4f, %.4f]",
+                base_link_.c_str(),
+                right_shoulder_pos_in_base_.x(),
+                right_shoulder_pos_in_base_.y(),
+                right_shoulder_pos_in_base_.z());
+        }
 
         // Collect link names from the planning chain to filter collision objects
         chain_link_names_.insert(base_link_);
@@ -276,6 +308,50 @@ private:
 
     tf2_ros::Buffer tf_buffer_;
     tf2_ros::TransformListener tf_listener_;
+
+    // Phase 8: adaptive end-effector orientation (ORI-01)
+    KDL::Vector right_shoulder_pos_in_base_;
+    bool adaptive_orientation_enabled_ = true;
+
+    enum class AdaptiveOrientationStatus {
+        OK,
+        TARGET_TOO_CLOSE_TO_SHOULDER,
+    };
+
+    // Returns OK and writes out_q*/out_dir_normalized on success; returns
+    // TARGET_TOO_CLOSE_TO_SHOULDER when target is within kMinTargetDistance
+    // of the cached shoulder reference. Honors D-01..D-04, D-08 of CONTEXT.md.
+    AdaptiveOrientationStatus computeAdaptiveOrientation(
+        const KDL::Vector& target_in_base,
+        double& out_qx, double& out_qy, double& out_qz, double& out_qw,
+        KDL::Vector& out_dir_normalized) const
+    {
+        constexpr double kMinTargetDistance     = 0.05;   // m  (PIT-03, D-08)
+        constexpr double kParallelDotThreshold  = 0.95;   // dimensionless  (PIT-02, D-03)
+
+        KDL::Vector d = target_in_base - right_shoulder_pos_in_base_;
+        const double d_norm = d.Norm();
+        if (d_norm < kMinTargetDistance) {
+            return AdaptiveOrientationStatus::TARGET_TOO_CLOSE_TO_SHOULDER;
+        }
+
+        const KDL::Vector x_axis = d / d_norm;                  // D-01: TCP +X = shoulder→target
+
+        KDL::Vector up(0.0, 0.0, 1.0);                          // D-02: torso +Z primary up
+        if (std::abs(KDL::dot(x_axis, up)) > kParallelDotThreshold) {
+            up = KDL::Vector(0.0, 1.0, 0.0);                    // D-03: +Y fallback
+        }
+
+        KDL::Vector y_axis = up * x_axis;                       // KDL operator* on Vector = cross
+        y_axis.Normalize();
+        KDL::Vector z_axis = x_axis * y_axis;                   // already unit, right-handed
+
+        KDL::Rotation R(x_axis, y_axis, z_axis);                // column-vector ctor
+        R.GetQuaternion(out_qx, out_qy, out_qz, out_qw);
+
+        out_dir_normalized = x_axis;
+        return AdaptiveOrientationStatus::OK;
+    }
 
     void buildCollisionObjects()
     {
@@ -384,6 +460,51 @@ private:
                     pose->header.frame_id.c_str(), base_link_.c_str(), ex.what());
                 return;
             }
+        }
+
+        // Phase 8: adaptive end-effector orientation (ORI-01, D-09).
+        // computeAdaptiveOrientation derives the TCP +X approach axis from the
+        // shoulder→target direction. We intentionally MUTATE pose_in_base.pose.orientation
+        // in place so that all downstream code (target_frame, IK seed retry, OMPL setup)
+        // consumes the adaptive value. When adaptive_orientation_enabled_ is false (D-11),
+        // this entire block is skipped and the pre-Phase-8 behavior is preserved
+        // bit-exactly for A/B baseline comparison.
+        if (adaptive_orientation_enabled_) {
+            KDL::Vector target_in_base(
+                pose_in_base.pose.position.x,
+                pose_in_base.pose.position.y,
+                pose_in_base.pose.position.z);
+
+            double qx = 0.0, qy = 0.0, qz = 0.0, qw = 1.0;
+            KDL::Vector dir;
+            const auto status = computeAdaptiveOrientation(
+                target_in_base, qx, qy, qz, qw, dir);
+            if (status == AdaptiveOrientationStatus::TARGET_TOO_CLOSE_TO_SHOULDER) {
+                RCLCPP_ERROR(this->get_logger(),
+                    "Target [%.3f, %.3f, %.3f] within 0.05 m of right shoulder "
+                    "[%.3f, %.3f, %.3f]; adaptive orientation cannot produce a "
+                    "stable direction. Aborting goal.",
+                    target_in_base.x(), target_in_base.y(), target_in_base.z(),
+                    right_shoulder_pos_in_base_.x(),
+                    right_shoulder_pos_in_base_.y(),
+                    right_shoulder_pos_in_base_.z());
+                return;  // D-08
+            }
+            // Phase 8: intentional in-place mutation per D-09  (PIT-05 mitigation)
+            pose_in_base.pose.orientation.x = qx;
+            pose_in_base.pose.orientation.y = qy;
+            pose_in_base.pose.orientation.z = qz;
+            pose_in_base.pose.orientation.w = qw;
+            RCLCPP_INFO(this->get_logger(),
+                "Adaptive orientation: target=[%.3f, %.3f, %.3f] "
+                "shoulder=[%.3f, %.3f, %.3f] dir=[%.3f, %.3f, %.3f] "
+                "q=[%.4f, %.4f, %.4f, %.4f]",
+                target_in_base.x(), target_in_base.y(), target_in_base.z(),
+                right_shoulder_pos_in_base_.x(),
+                right_shoulder_pos_in_base_.y(),
+                right_shoulder_pos_in_base_.z(),
+                dir.x(), dir.y(), dir.z(),
+                qx, qy, qz, qw);  // D-12
         }
 
         // Dynamically generate planning_joints from KDL chain
