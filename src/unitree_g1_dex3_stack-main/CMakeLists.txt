@@ -116,6 +116,7 @@ endif()
 install(PROGRAMS
   scripts/tcp_torso_pose.py
   scripts/apriltag_detector_node.py
+  scripts/v4l2_apriltag_trigger.py
   scripts/adaptive_orientation_ab.py
   scripts/apriltag_goal_bridge.py
   scripts/apriltag_reach_uat.py

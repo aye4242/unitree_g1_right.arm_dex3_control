@@ -2,9 +2,9 @@ import os
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, TimerAction
-from launch.conditions import UnlessCondition
+from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 
@@ -16,6 +16,12 @@ def generate_launch_description():
         ('/tf', LaunchConfiguration('tf_topic')),
         ('/tf_static', LaunchConfiguration('tf_static_topic')),
     ]
+    realsense_backend = IfCondition(PythonExpression([
+        "'", LaunchConfiguration('camera_backend'), "' == 'realsense'"
+    ]))
+    v4l2_backend = IfCondition(PythonExpression([
+        "'", LaunchConfiguration('camera_backend'), "' == 'v4l2_trigger'"
+    ]))
 
     # ---------- launch arguments ----------
     imshow_arg = DeclareLaunchArgument(
@@ -39,7 +45,31 @@ def generate_launch_description():
     camera_only_arg = DeclareLaunchArgument(
         'camera_only',
         default_value='false',
-        description='Only launch robot description, RealSense camera, and camera TF',
+        description='Only launch robot description, selected camera backend, and camera TF',
+    )
+
+    camera_backend_arg = DeclareLaunchArgument(
+        'camera_backend',
+        default_value='realsense',
+        description='Camera backend: realsense or v4l2_trigger',
+    )
+
+    v4l2_config_file_arg = DeclareLaunchArgument(
+        'v4l2_config_file',
+        default_value=os.path.join(package_share, 'config', 'v4l2_apriltag_trigger.yaml'),
+        description='V4L2 triggered AprilTag parameter YAML file',
+    )
+
+    v4l2_video_device_arg = DeclareLaunchArgument(
+        'v4l2_video_device',
+        default_value='/dev/v4l/by-id/usb-Intel_R__RealSense_TM__Depth_Camera_435i_Intel_R__RealSense_TM__Depth_Camera_435i_253243060636-video-index0',
+        description='Stable V4L2 RGB device path for the target D435i',
+    )
+
+    debug_image_dir_arg = DeclareLaunchArgument(
+        'debug_image_dir',
+        default_value='/home/unitree/Desktop/unitree_dex3/detect_img',
+        description='Directory for latest triggered AprilTag debug images',
     )
 
     tf_topic_arg = DeclareLaunchArgument(
@@ -97,6 +127,7 @@ def generate_launch_description():
         }],
         remappings=tf_remappings,
         arguments=['--ros-args', '--log-level', 'info'],
+        condition=realsense_backend,
     )
 
     # 4c. d435_link -> camera_link static TF
@@ -106,6 +137,28 @@ def generate_launch_description():
         name='d435_link_to_camera_link',
         arguments=['0', '0', '0', '0', '0', '0', 'd435_link', 'camera_link'],
         remappings=tf_remappings,
+    )
+
+    camera_link_to_color_frame = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='camera_link_to_camera_color_frame',
+        arguments=['0', '0', '0', '0', '0', '0', 'camera_link', 'camera_color_frame'],
+        remappings=tf_remappings,
+        condition=v4l2_backend,
+    )
+
+    camera_color_to_optical = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='camera_color_frame_to_optical_frame',
+        arguments=[
+            '0', '0', '0',
+            '-0.5', '0.5', '-0.5', '0.5',
+            'camera_color_frame', 'camera_color_optical_frame'
+        ],
+        remappings=tf_remappings,
+        condition=v4l2_backend,
     )
 
     # ---------- delayed components (TimerAction period=3.0) ----------
@@ -122,6 +175,7 @@ def generate_launch_description():
             {'imshow': LaunchConfiguration('imshow')},
         ],
         remappings=tf_remappings,
+        condition=realsense_backend,
     )
 
     # 5b. apriltag_goal_bridge
@@ -140,6 +194,24 @@ def generate_launch_description():
             'fixed_rpy': [-0.0873, -0.0340, 0.0199],
         }],
         remappings=tf_remappings,
+        condition=realsense_backend,
+    )
+
+    v4l2_trigger_node = Node(
+        package='unitree_g1_dex3_stack',
+        executable='v4l2_apriltag_trigger.py',
+        name='v4l2_apriltag_trigger',
+        output='screen',
+        emulate_tty=True,
+        parameters=[
+            LaunchConfiguration('v4l2_config_file'),
+            {
+                'video_device': LaunchConfiguration('v4l2_video_device'),
+                'debug_image_dir': LaunchConfiguration('debug_image_dir'),
+            },
+        ],
+        remappings=tf_remappings,
+        condition=v4l2_backend,
     )
 
     # 5c. planner.launch.py include (with LaunchConfiguration passthrough)
@@ -166,6 +238,7 @@ def generate_launch_description():
     delayed_actions = TimerAction(period=3.0, actions=[
         apriltag_node,
         bridge_node,
+        v4l2_trigger_node,
         planner_launch,
         control_launch,
     ], condition=UnlessCondition(LaunchConfiguration('camera_only')))
@@ -175,10 +248,16 @@ def generate_launch_description():
         adaptive_arg,
         planning_timeout_arg,
         camera_only_arg,
+        camera_backend_arg,
+        v4l2_config_file_arg,
+        v4l2_video_device_arg,
+        debug_image_dir_arg,
         tf_topic_arg,
         tf_static_topic_arg,
         robot_launch,
         realsense_launch,
         d435_to_camera_link,
+        camera_link_to_color_frame,
+        camera_color_to_optical,
         delayed_actions,
     ])
