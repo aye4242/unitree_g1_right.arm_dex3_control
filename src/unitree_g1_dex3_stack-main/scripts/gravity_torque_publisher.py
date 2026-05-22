@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 """Publish right-arm gravity compensation torques using Pinocchio RNEA.
 
 Subscribes to /lf/lowstate, computes gravity torques for 7 right-arm joints,

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 """ROS 2 node: cache /apriltag/target_pose, trigger on G to /goal_pose."""
 
 import os

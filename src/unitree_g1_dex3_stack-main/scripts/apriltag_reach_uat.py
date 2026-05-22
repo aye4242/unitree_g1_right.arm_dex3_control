@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 """Phase 9 end-to-end UAT harness.
 
 Measures TCP position error via KDL FK for 4 tabletop targets.

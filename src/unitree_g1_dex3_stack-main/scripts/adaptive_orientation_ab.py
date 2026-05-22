@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 """Phase 8 A/B verification harness for adaptive end-effector orientation.
 
 Publishes a fixed 8-target tabletop test set in `torso_link` frame to

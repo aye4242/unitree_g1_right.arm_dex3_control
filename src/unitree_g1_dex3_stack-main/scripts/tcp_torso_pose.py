@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 """ROS 2 node that computes the right-arm TCP pose in torso_link frame
 using dynamic forward kinematics via PyKDL + URDF.
 

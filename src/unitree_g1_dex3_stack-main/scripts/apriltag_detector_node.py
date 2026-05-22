@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 """ROS 2 node: detect AprilTag 36h11 in the RealSense color stream,
 filter low-quality / wrong-id detections, apply a tag-local XYZ offset,
 transform both the raw tag pose and the offset target pose into
