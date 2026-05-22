@@ -73,7 +73,7 @@ ament_target_dependencies(dex3_controller
   rclcpp unitree_hg sensor_msgs geometry_msgs std_msgs urdf
 )
 ament_target_dependencies(joint_trajectory_executor
-  rclcpp unitree_hg sensor_msgs geometry_msgs std_msgs trajectory_msgs urdf
+  rclcpp unitree_hg sensor_msgs geometry_msgs std_msgs trajectory_msgs urdf kdl_parser
 )
 ament_target_dependencies(right_hand_pressure_monitor
   rclcpp unitree_hg
@@ -119,6 +119,7 @@ install(PROGRAMS
   scripts/adaptive_orientation_ab.py
   scripts/apriltag_goal_bridge.py
   scripts/apriltag_reach_uat.py
+  scripts/gravity_torque_publisher.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
