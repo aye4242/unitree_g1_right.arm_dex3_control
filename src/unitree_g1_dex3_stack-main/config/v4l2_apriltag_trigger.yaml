@@ -9,8 +9,10 @@ v4l2_apriltag_trigger:
     fps: 6.0
     fourcc: "YUYV"
     sample_count: 4
-    warmup_frames: 2
+    warmup_frames: 12
+    warmup_min_s: 2.0
     sample_interval_s: 0.05
+    continuous_capture: false
 
     tag_family: "tag36h11"
     tag_size: 0.08
@@ -31,6 +33,7 @@ v4l2_apriltag_trigger:
     joint_trajectory_topic: "/joint_trajectory_targets"
     reach_max_distance: 0.55
     trigger_key: "g"
+    detect_only: false
     fixed_orientation_enabled: false
     fixed_rpy: [-0.0873, -0.0340, 0.0199]
 

@@ -5,6 +5,7 @@ import math
 import os
 import select
 import subprocess
+import threading
 import termios
 import time
 import tty
@@ -42,8 +43,10 @@ class V4L2AprilTagTrigger(Node):
         self.declare_parameter('fps', 6.0)
         self.declare_parameter('fourcc', 'YUYV')
         self.declare_parameter('sample_count', 4)
-        self.declare_parameter('warmup_frames', 2)
+        self.declare_parameter('warmup_frames', 12)
+        self.declare_parameter('warmup_min_s', 2.0)
         self.declare_parameter('sample_interval_s', 0.05)
+        self.declare_parameter('continuous_capture', False)
 
         self.declare_parameter('tag_family', 'tag36h11')
         self.declare_parameter('tag_size', 0.08)
@@ -68,6 +71,7 @@ class V4L2AprilTagTrigger(Node):
         self.declare_parameter('joint_trajectory_topic', '/joint_trajectory_targets')
         self.declare_parameter('reach_max_distance', 0.55)
         self.declare_parameter('trigger_key', 'g')
+        self.declare_parameter('detect_only', False)
         self.declare_parameter('fixed_orientation_enabled', False)
         self.declare_parameter('fixed_rpy', [-0.0873, -0.0340, 0.0199])
 
@@ -87,8 +91,11 @@ class V4L2AprilTagTrigger(Node):
         self.fourcc = str(self.get_parameter('fourcc').value)
         self.sample_count = int(self.get_parameter('sample_count').value)
         self.warmup_frames = int(self.get_parameter('warmup_frames').value)
+        self.warmup_min_s = float(self.get_parameter('warmup_min_s').value)
         self.sample_interval_s = float(
             self.get_parameter('sample_interval_s').value)
+        self.continuous_capture = bool(
+            self.get_parameter('continuous_capture').value)
 
         self.tag_family = str(self.get_parameter('tag_family').value)
         self.tag_size = float(self.get_parameter('tag_size').value)
@@ -122,6 +129,7 @@ class V4L2AprilTagTrigger(Node):
             self.get_parameter('joint_trajectory_topic').value)
         self.reach_max = float(self.get_parameter('reach_max_distance').value)
         self.trigger_char = str(self.get_parameter('trigger_key').value).lower()
+        self.detect_only = bool(self.get_parameter('detect_only').value)
         self.fixed_orientation_enabled = bool(
             self.get_parameter('fixed_orientation_enabled').value)
         fixed_rpy = list(self.get_parameter('fixed_rpy').value)
@@ -138,6 +146,16 @@ class V4L2AprilTagTrigger(Node):
         self._shoulder_origin = None
         self._shoulder_retry_count = 0
         self._last_warn_time = 0.0
+        self._capture = None
+        self._capture_thread = None
+        self._capture_stop = threading.Event()
+        self._capture_lock = threading.Lock()
+        self._latest_frame = None
+        self._latest_frame_time = 0.0
+        self._latest_frame_seq = 0
+        self._stream_start_time = 0.0
+        self._stream_read_count = 0
+        self._stream_ready = False
 
         self.detector = Detector(
             families=self.tag_family,
@@ -160,6 +178,10 @@ class V4L2AprilTagTrigger(Node):
         tty.setcbreak(self.fd)
 
         self._validate_video_device()
+        if self.continuous_capture:
+            self._capture_thread = threading.Thread(
+                target=self._capture_loop, daemon=True)
+            self._capture_thread.start()
         self.create_timer(0.1, self._tick)
         self.create_timer(0.5, self._retry_shoulder_lookup)
 
@@ -169,6 +191,9 @@ class V4L2AprilTagTrigger(Node):
             f'to capture {self.sample_count} frames from {self.video_device} '
             f'camera_id={self.camera_id} serial={self.expected_serial} '
             f'{self.image_width}x{self.image_height}@{self.fps:g} {self.fourcc} '
+            f'warmup={self.warmup_frames} frames/{self.warmup_min_s:.1f}s '
+            f'continuous_capture={self.continuous_capture} '
+            f'detect_only={self.detect_only} '
             f'fx={fx:.3f} fy={fy:.3f} cx={cx:.3f} cy={cy:.3f}')
 
     def _validate_video_device(self):
@@ -270,11 +295,11 @@ class V4L2AprilTagTrigger(Node):
                     f'({self._shoulder_retry_count}): {ex}')
 
     def _on_trigger(self):
-        if self._waiting_for_completion:
+        if not self.detect_only and self._waiting_for_completion:
             self.get_logger().warn(
                 '[v4l2_apriltag_trigger] previous goal still in flight, ignoring trigger')
             return
-        if self._shoulder_origin is None:
+        if not self.detect_only and self._shoulder_origin is None:
             self._retry_shoulder_lookup()
             if self._shoulder_origin is None:
                 self.get_logger().warn(
@@ -306,6 +331,13 @@ class V4L2AprilTagTrigger(Node):
         avg_x = sum(xs) / len(xs)
         avg_y = sum(ys) / len(ys)
         avg_z = sum(zs) / len(zs)
+        if self.detect_only:
+            best = max(accepted, key=lambda item: item['decision_margin'])
+            self.get_logger().info(
+                f'[v4l2_apriltag_trigger] detect_only accepted={len(accepted)}/{len(frames)} '
+                f'target=({avg_x:.3f}, {avg_y:.3f}, {avg_z:.3f}) '
+                f'@ {self.output_frame}, best_margin={best["decision_margin"]:.1f}, not publishing {self.goal_pose_topic}')
+            return
 
         sx, sy, sz = self._shoulder_origin
         dist = math.sqrt((avg_x - sx) ** 2 + (avg_y - sy) ** 2 + (avg_z - sz) ** 2)
@@ -339,32 +371,79 @@ class V4L2AprilTagTrigger(Node):
             f'@ {self.output_frame}, |target-shoulder|={dist:.3f} m, publishing {self.goal_pose_topic}')
 
     def _capture_frames(self):
-        cap = cv2.VideoCapture(self.video_device, cv2.CAP_V4L2)
-        if not cap.isOpened():
-            self.get_logger().error(
-                f'[v4l2_apriltag_trigger] failed to open {self.video_device}')
+        if not self.continuous_capture:
+            return self._capture_frames_on_demand()
+        return self._capture_frames_from_stream()
+
+    def _capture_frames_from_stream(self):
+        frames = []
+        last_seq = 0
+        deadline = time.monotonic() + max(
+            1.0,
+            max(1, self.sample_count) / max(self.fps, 1.0)
+            + max(0.0, self.sample_interval_s) * max(0, self.sample_count - 1)
+            + 1.0)
+
+        while len(frames) < max(1, self.sample_count) and time.monotonic() < deadline:
+            with self._capture_lock:
+                frame = self._latest_frame
+                frame_time = self._latest_frame_time
+                seq = self._latest_frame_seq
+                ready = self._stream_ready
+
+            if not ready:
+                self.get_logger().warn(
+                    '[v4l2_apriltag_trigger] camera stream not warmed up yet')
+                return []
+            if frame is None or seq == last_seq:
+                time.sleep(0.01)
+                continue
+            if time.monotonic() - frame_time > 1.0:
+                self.get_logger().warn(
+                    '[v4l2_apriltag_trigger] latest camera frame is stale')
+                return []
+
+            frames.append(frame.copy())
+            last_seq = seq
+            if self.sample_interval_s > 0.0:
+                time.sleep(self.sample_interval_s)
+
+        if len(frames) < max(1, self.sample_count):
+            self.get_logger().warn(
+                f'[v4l2_apriltag_trigger] captured only '
+                f'{len(frames)}/{max(1, self.sample_count)} warmed frames')
+        return frames
+
+    def _capture_frames_on_demand(self):
+        cap = self._open_capture()
+        if cap is None:
             return []
 
         try:
-            cap.set(cv2.CAP_PROP_FRAME_WIDTH, float(self.image_width))
-            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, float(self.image_height))
-            cap.set(cv2.CAP_PROP_FPS, float(self.fps))
-            if len(self.fourcc) == 4:
-                cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*self.fourcc))
-
-            actual_w = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
-            actual_h = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
-            actual_fps = cap.get(cv2.CAP_PROP_FPS)
-            actual_fourcc_int = int(cap.get(cv2.CAP_PROP_FOURCC))
-            actual_fourcc = actual_fourcc_int.to_bytes(4, 'little', signed=False).decode(
-                'latin-1', errors='replace')
-            self.get_logger().info(
-                f'[v4l2_apriltag_trigger] capture opened: '
-                f'{actual_w:.0f}x{actual_h:.0f}@{actual_fps:.1f} {actual_fourcc}')
-
             frames = []
-            for _ in range(max(0, self.warmup_frames)):
-                cap.read()
+            warmup_target = max(0, self.warmup_frames)
+            warmup_start = time.monotonic()
+            warmup_min_deadline = warmup_start + max(0.0, self.warmup_min_s)
+            warmup_max_deadline = warmup_start + max(
+                1.0,
+                max(warmup_target, 1) / max(self.fps, 1.0)
+                + max(0.0, self.warmup_min_s)
+                + 1.0)
+            warmup_reads = 0
+            while ((warmup_reads < warmup_target
+                    or time.monotonic() < warmup_min_deadline)
+                   and time.monotonic() < warmup_max_deadline):
+                ret, _ = cap.read()
+                if ret:
+                    warmup_reads += 1
+                else:
+                    self.get_logger().warn(
+                        '[v4l2_apriltag_trigger] failed to read one warmup frame')
+                    time.sleep(0.05)
+            if warmup_reads < warmup_target:
+                self.get_logger().warn(
+                    f'[v4l2_apriltag_trigger] warmup only read '
+                    f'{warmup_reads}/{warmup_target} frames')
             for _ in range(max(1, self.sample_count)):
                 ret, frame = cap.read()
                 if ret and frame is not None:
@@ -377,6 +456,76 @@ class V4L2AprilTagTrigger(Node):
             return frames
         finally:
             cap.release()
+
+    def _open_capture(self):
+        cap = cv2.VideoCapture(self.video_device, cv2.CAP_V4L2)
+        if not cap.isOpened():
+            self.get_logger().error(
+                f'[v4l2_apriltag_trigger] failed to open {self.video_device}')
+            return None
+
+        cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, float(self.image_width))
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, float(self.image_height))
+        cap.set(cv2.CAP_PROP_FPS, float(self.fps))
+        if len(self.fourcc) == 4:
+            cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*self.fourcc))
+
+        actual_w = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+        actual_h = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        actual_fps = cap.get(cv2.CAP_PROP_FPS)
+        actual_fourcc_int = int(cap.get(cv2.CAP_PROP_FOURCC))
+        actual_fourcc = actual_fourcc_int.to_bytes(4, 'little', signed=False).decode(
+            'latin-1', errors='replace')
+        self.get_logger().info(
+            f'[v4l2_apriltag_trigger] capture opened: '
+            f'{actual_w:.0f}x{actual_h:.0f}@{actual_fps:.1f} {actual_fourcc}')
+        return cap
+
+    def _capture_loop(self):
+        while not self._capture_stop.is_set():
+            cap = self._open_capture()
+            if cap is None:
+                time.sleep(1.0)
+                continue
+
+            self._capture = cap
+            self._stream_start_time = time.monotonic()
+            self._stream_read_count = 0
+            with self._capture_lock:
+                self._latest_frame = None
+                self._latest_frame_time = 0.0
+                self._latest_frame_seq = 0
+                self._stream_ready = False
+
+            try:
+                while not self._capture_stop.is_set():
+                    ret, frame = cap.read()
+                    if not ret or frame is None:
+                        self._warn_throttled(
+                            '[v4l2_apriltag_trigger] failed to read camera frame')
+                        time.sleep(0.05)
+                        continue
+
+                    now = time.monotonic()
+                    self._stream_read_count += 1
+                    ready = (
+                        self._stream_read_count >= max(0, self.warmup_frames)
+                        and now - self._stream_start_time >= max(0.0, self.warmup_min_s)
+                    )
+                    with self._capture_lock:
+                        self._latest_frame = frame.copy()
+                        self._latest_frame_time = now
+                        self._latest_frame_seq += 1
+                        if ready and not self._stream_ready:
+                            self.get_logger().info(
+                                f'[v4l2_apriltag_trigger] camera stream warmed up '
+                                f'({self._stream_read_count} frames, '
+                                f'{now - self._stream_start_time:.1f}s)')
+                        self._stream_ready = ready
+            finally:
+                cap.release()
+                self._capture = None
 
     def _process_frame(self, frame, index):
         if frame.ndim == 2:
@@ -584,6 +733,10 @@ class V4L2AprilTagTrigger(Node):
             os.close(self.fd)
         except Exception:
             pass
+        self._capture_stop.set()
+        if self._capture_thread is not None:
+            self._capture_thread.join(timeout=1.0)
+            self._capture_thread = None
         if self._completion_timer is not None:
             try:
                 self.destroy_timer(self._completion_timer)

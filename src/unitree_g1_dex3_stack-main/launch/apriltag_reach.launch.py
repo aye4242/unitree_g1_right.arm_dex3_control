@@ -72,6 +72,12 @@ def generate_launch_description():
         description='Directory for latest triggered AprilTag debug images',
     )
 
+    detect_only_arg = DeclareLaunchArgument(
+        'detect_only',
+        default_value='false',
+        description='For v4l2_trigger, detect and save/publish AprilTag poses without publishing /goal_pose',
+    )
+
     tf_topic_arg = DeclareLaunchArgument(
         'tf_topic',
         default_value='/unitree_g1_dex3/tf',
@@ -208,6 +214,7 @@ def generate_launch_description():
             {
                 'video_device': LaunchConfiguration('v4l2_video_device'),
                 'debug_image_dir': LaunchConfiguration('debug_image_dir'),
+                'detect_only': LaunchConfiguration('detect_only'),
             },
         ],
         remappings=tf_remappings,
@@ -252,6 +259,7 @@ def generate_launch_description():
         v4l2_config_file_arg,
         v4l2_video_device_arg,
         debug_image_dir_arg,
+        detect_only_arg,
         tf_topic_arg,
         tf_static_topic_arg,
         robot_launch,

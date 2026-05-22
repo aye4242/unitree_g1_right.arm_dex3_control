@@ -30,7 +30,7 @@ apriltag_detector:
 ik_fcl_ompl_planner:
   ros__parameters:
     tcp_offset_x: 0.12
-    adaptive_orientation_enabled: false
+    adaptive_orientation_enabled: true
     collision_detection_enabled: false
     velocity_scale: 0.02
 
