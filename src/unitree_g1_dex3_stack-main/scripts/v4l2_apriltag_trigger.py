@@ -310,9 +310,11 @@ class V4L2AprilTagTrigger(Node):
                 text=True,
                 timeout=2.0,
             )
+        except FileNotFoundError:
+            return self._read_sysfs_video_properties(device_path)
         except Exception as ex:
             self.get_logger().warn(f'udevadm query failed: {ex}')
-            return {}
+            return self._read_sysfs_video_properties(device_path)
 
         properties = {}
         for line in result.stdout.splitlines():
@@ -320,7 +322,41 @@ class V4L2AprilTagTrigger(Node):
                 continue
             key, value = line.split('=', 1)
             properties[key] = value
+        sysfs_properties = self._read_sysfs_video_properties(device_path)
+        for key in ('ID_SERIAL_SHORT', 'ID_USB_INTERFACE_NUM'):
+            if not properties.get(key) and sysfs_properties.get(key):
+                properties[key] = sysfs_properties[key]
         return properties
+
+    def _read_sysfs_video_properties(self, device_path):
+        video_name = os.path.basename(os.path.realpath(device_path))
+        sys_device = os.path.realpath(
+            os.path.join('/sys/class/video4linux', video_name, 'device'))
+        properties = {}
+
+        interface_num = self._read_sysfs_value(
+            os.path.join(sys_device, 'bInterfaceNumber'))
+        if interface_num:
+            properties['ID_USB_INTERFACE_NUM'] = interface_num
+
+        path = sys_device
+        while path and path != '/':
+            serial = self._read_sysfs_value(os.path.join(path, 'serial'))
+            if serial:
+                properties['ID_SERIAL_SHORT'] = serial
+                break
+            parent = os.path.dirname(path)
+            if parent == path:
+                break
+            path = parent
+        return properties
+
+    def _read_sysfs_value(self, path):
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                return f.read().strip()
+        except OSError:
+            return ''
 
     def _tick(self):
         if not select.select([self.fd], [], [], 0.0)[0]:
@@ -430,19 +466,31 @@ class V4L2AprilTagTrigger(Node):
 
         sx, sy, sz = self._shoulder_origin
         dist = math.sqrt((avg_x - sx) ** 2 + (avg_y - sy) ** 2 + (avg_z - sz) ** 2)
+        goal_x = avg_x
+        goal_y = avg_y
+        goal_z = avg_z
         if dist >= self.reach_max:
+            if dist <= 1e-9 or self.reach_max <= 0.0:
+                self.get_logger().warn(
+                    f'[v4l2_apriltag_trigger] invalid reach projection '
+                    f'(dist={dist:.6f}, reach_max={self.reach_max}), not publishing')
+                return
+            scale = self.reach_max / dist
+            goal_x = sx + (avg_x - sx) * scale
+            goal_y = sy + (avg_y - sy) * scale
+            goal_z = sz + (avg_z - sz) * scale
             self.get_logger().warn(
                 f'[v4l2_apriltag_trigger] reach exceeds {dist:.3f} m '
-                f'> {self.reach_max} m, not publishing')
-            return
+                f'> {self.reach_max} m; publishing nearest reach-limit target '
+                f'({goal_x:.3f}, {goal_y:.3f}, {goal_z:.3f}) for planner fallback')
 
         best = max(accepted, key=lambda item: item['decision_margin'])
         goal = PoseStamped()
         goal.header.frame_id = self.output_frame
         goal.header.stamp = self.get_clock().now().to_msg()
-        goal.pose.position.x = avg_x
-        goal.pose.position.y = avg_y
-        goal.pose.position.z = avg_z
+        goal.pose.position.x = goal_x
+        goal.pose.position.y = goal_y
+        goal.pose.position.z = goal_z
         if self.fixed_orientation_enabled:
             qx, qy, qz, qw = self._fixed_orientation_quaternion()
             goal.pose.orientation.x = qx
@@ -457,7 +505,7 @@ class V4L2AprilTagTrigger(Node):
         self.get_logger().info(
             f'[v4l2_apriltag_trigger] accepted={len(accepted)}/{len(frames)} '
             f'tag=({tag_avg_x:.3f}, {tag_avg_y:.3f}, {tag_avg_z:.3f}) '
-            f'target=({avg_x:.3f}, {avg_y:.3f}, {avg_z:.3f}) '
+            f'target=({goal_x:.3f}, {goal_y:.3f}, {goal_z:.3f}) '
             f'delta=({avg_x - tag_avg_x:.3f}, {avg_y - tag_avg_y:.3f}, {avg_z - tag_avg_z:.3f}) '
             f'@ {self.output_frame}, |target-shoulder|={dist:.3f} m, publishing {self.goal_pose_topic}')
 

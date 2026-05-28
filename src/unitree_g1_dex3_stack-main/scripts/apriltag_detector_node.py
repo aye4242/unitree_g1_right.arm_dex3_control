@@ -62,8 +62,8 @@ class AprilTagDetectorNode(Node):
         self.declare_parameter('tag_pose_topic', '/apriltag/tag_pose')
         self.declare_parameter('target_pose_topic', '/apriltag/target_pose')
         self.declare_parameter('tf_lookup_timeout_s', 0.02)
-        # imshow: launch arg (D-15), default true; q-key disables at runtime
-        self.declare_parameter('imshow', True)
+        # imshow: launch arg (D-15), default false for headless/container use
+        self.declare_parameter('imshow', False)
         self.declare_parameter('stream_port', 0)
 
         # ---------- read parameters into instance state ----------

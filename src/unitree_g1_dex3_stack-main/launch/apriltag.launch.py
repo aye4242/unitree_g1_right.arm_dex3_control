@@ -47,7 +47,7 @@ def generate_launch_description():
     )
     imshow_arg = DeclareLaunchArgument(
         'imshow',
-        default_value='true',
+        default_value='false',
         description='Open OpenCV detection window (set false for headless / SSH)',
     )
 

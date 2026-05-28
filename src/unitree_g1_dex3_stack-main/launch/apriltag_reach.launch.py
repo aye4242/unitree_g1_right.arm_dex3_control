@@ -26,7 +26,7 @@ def generate_launch_description():
     # ---------- launch arguments ----------
     imshow_arg = DeclareLaunchArgument(
         'imshow',
-        default_value='true',
+        default_value='false',
         description='Open local OpenCV window (use MJPEG stream instead)',
     )
 
@@ -50,7 +50,7 @@ def generate_launch_description():
 
     camera_backend_arg = DeclareLaunchArgument(
         'camera_backend',
-        default_value='realsense',
+        default_value='v4l2_trigger',
         description='Camera backend: realsense or v4l2_trigger',
     )
 

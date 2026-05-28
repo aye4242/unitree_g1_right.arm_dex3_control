@@ -260,11 +260,23 @@ class AprilTagGoalBridge(Node):
         dist = math.sqrt(
             (avg_x - sx) ** 2 + (avg_y - sy) ** 2 + (avg_z - sz) ** 2)
 
+        goal_x = avg_x
+        goal_y = avg_y
+        goal_z = avg_z
         if dist >= self.reach_max:
+            if dist <= 1e-9 or self.reach_max <= 0.0:
+                self.get_logger().warn(
+                    f'[apriltag_goal_bridge] invalid reach projection '
+                    f'(dist={dist:.6f}, reach_max={self.reach_max}), not publishing')
+                return
+            scale = self.reach_max / dist
+            goal_x = sx + (avg_x - sx) * scale
+            goal_y = sy + (avg_y - sy) * scale
+            goal_z = sz + (avg_z - sz) * scale
             self.get_logger().warn(
                 f'[apriltag_goal_bridge] reach exceeds {dist:.3f} m '
-                f'> {self.reach_max} m, not publishing')
-            return
+                f'> {self.reach_max} m; publishing nearest reach-limit target '
+                f'({goal_x:.3f}, {goal_y:.3f}, {goal_z:.3f}) for planner fallback')
 
         # --- All guards pass (D-01) ---
         self._waiting_for_completion = True
@@ -272,9 +284,9 @@ class AprilTagGoalBridge(Node):
         goal = PoseStamped()
         goal.header.frame_id = 'torso_link'
         goal.header.stamp = self.get_clock().now().to_msg()
-        goal.pose.position.x = avg_x
-        goal.pose.position.y = avg_y
-        goal.pose.position.z = avg_z
+        goal.pose.position.x = goal_x
+        goal.pose.position.y = goal_y
+        goal.pose.position.z = goal_z
         if self.fixed_orientation_enabled:
             qx, qy, qz, qw = self._fixed_orientation_quaternion()
             goal.pose.orientation.x = qx
@@ -287,7 +299,7 @@ class AprilTagGoalBridge(Node):
         self.goal_pub.publish(goal)
         self.get_logger().info(
             f'[apriltag_goal_bridge] G pressed — '
-            f'target=({avg_x:.3f}, {avg_y:.3f}, {avg_z:.3f}) @ torso_link, '
+            f'target=({goal_x:.3f}, {goal_y:.3f}, {goal_z:.3f}) @ torso_link, '
             f'|target-shoulder|={dist:.3f} m, publishing /goal_pose')
 
     # ------------------------------------------------------------------
