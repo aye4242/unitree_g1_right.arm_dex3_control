@@ -1,19 +1,4 @@
-"""Phase 7 standalone test launch for the AprilTag detector.
-
-Composes:
-- robot.launch.py (robot_state_publisher with the locked-waist URDF
-  + CycloneDDS env vars)
-- realsense2_camera/launch/rs_launch.py (RGB-only, 640x480x15,
-  align_depth disabled per D-15)
-- a static d435_link → camera_link transform (so RealSense's
-  camera_*_optical_frame chain attaches under the URDF's d435_link)
-- apriltag_detector_node.py loaded with config/apriltag.yaml,
-  with `imshow` overridable via launch arg.
-
-Single-purpose detection launch — intentionally omits the visualizer,
-the manipulation pipeline, the executor, and the trigger node (Phase 9
-composes the end-to-end launch separately).
-"""
+"""Standalone V4L2 AprilTag detection launch."""
 
 import os
 
@@ -27,7 +12,10 @@ from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
     package_share = get_package_share_directory('unitree_g1_dex3_stack')
-    realsense_share = get_package_share_directory('realsense2_camera')
+    tf_remappings = [
+        ('/tf', LaunchConfiguration('tf_topic')),
+        ('/tf_static', LaunchConfiguration('tf_static_topic')),
+    ]
 
     # ---------- launch arguments ----------
     urdf_name_arg = DeclareLaunchArgument(
@@ -42,13 +30,33 @@ def generate_launch_description():
     )
     config_file_arg = DeclareLaunchArgument(
         'config_file',
-        default_value=os.path.join(package_share, 'config', 'apriltag.yaml'),
-        description='AprilTag detector parameter YAML file',
+        default_value=os.path.join(package_share, 'config', 'v4l2_apriltag_trigger.yaml'),
+        description='V4L2 triggered AprilTag parameter YAML file',
     )
-    imshow_arg = DeclareLaunchArgument(
-        'imshow',
-        default_value='false',
-        description='Open OpenCV detection window (set false for headless / SSH)',
+    v4l2_video_device_arg = DeclareLaunchArgument(
+        'v4l2_video_device',
+        default_value='auto',
+        description='Stable V4L2 RGB device path for the target D435i',
+    )
+    debug_image_dir_arg = DeclareLaunchArgument(
+        'debug_image_dir',
+        default_value='/home/unitree/Desktop/unitree_dex3/detect_img',
+        description='Directory for latest triggered AprilTag debug images',
+    )
+    detect_only_arg = DeclareLaunchArgument(
+        'detect_only',
+        default_value='true',
+        description='Detect and save/publish AprilTag poses without publishing /goal_pose',
+    )
+    tf_topic_arg = DeclareLaunchArgument(
+        'tf_topic',
+        default_value='/tf',
+        description='TF topic used by this launch',
+    )
+    tf_static_topic_arg = DeclareLaunchArgument(
+        'tf_static_topic',
+        default_value='/tf_static',
+        description='TF static topic used by this launch',
     )
 
     # ---------- robot (robot_state_publisher + CycloneDDS env) ----------
@@ -59,27 +67,8 @@ def generate_launch_description():
         launch_arguments={
             'urdf_name': LaunchConfiguration('urdf_name'),
             'urdf_path': LaunchConfiguration('urdf_path'),
-        }.items(),
-    )
-
-    # ---------- RealSense D435i (RGB only, 640x480x15) ----------
-    realsense_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(realsense_share, 'launch', 'rs_launch.py')
-        ),
-        launch_arguments={
-            'serial_no': '_243722074823',
-            'enable_color': 'true',
-            'enable_depth': 'false',
-            'enable_infra1': 'false',
-            'enable_infra2': 'false',
-            'enable_gyro': 'false',
-            'enable_accel': 'false',
-            'enable_sync': 'false',
-            'align_depth.enable': 'false',
-            'rgb_camera.color_profile': '640x480x15',
-            'accelerate_gpu_with_glsl': 'true',
-            'initial_reset': 'false',
+            'tf_topic': LaunchConfiguration('tf_topic'),
+            'tf_static_topic': LaunchConfiguration('tf_static_topic'),
         }.items(),
     )
 
@@ -89,30 +78,58 @@ def generate_launch_description():
         executable='static_transform_publisher',
         name='d435_link_to_camera_link',
         arguments=['0', '0', '0', '0', '0', '0', 'd435_link', 'camera_link'],
+        remappings=tf_remappings,
     )
 
-    # ---------- AprilTag detector node ----------
-    # parameters list: YAML loads first; the dict overlay forces `imshow`
-    # to follow the launch argument regardless of YAML.
-    apriltag_node = Node(
+    camera_link_to_color_frame = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='camera_link_to_camera_color_frame',
+        arguments=['0', '0', '0', '0', '0', '0', 'camera_link', 'camera_color_frame'],
+        remappings=tf_remappings,
+    )
+
+    camera_color_to_optical = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='camera_color_frame_to_optical_frame',
+        arguments=[
+            '0', '0', '0',
+            '-0.5', '0.5', '-0.5', '0.5',
+            'camera_color_frame', 'camera_color_optical_frame'
+        ],
+        remappings=tf_remappings,
+    )
+
+    v4l2_trigger_node = Node(
         package='unitree_g1_dex3_stack',
-        executable='apriltag_detector_node.py',
-        name='apriltag_detector',
+        executable='v4l2_apriltag_trigger.py',
+        name='v4l2_apriltag_trigger',
         output='screen',
         emulate_tty=True,
         parameters=[
             LaunchConfiguration('config_file'),
-            {'imshow': LaunchConfiguration('imshow')},
+            {
+                'video_device': LaunchConfiguration('v4l2_video_device'),
+                'debug_image_dir': LaunchConfiguration('debug_image_dir'),
+                'detect_only': LaunchConfiguration('detect_only'),
+            },
         ],
+        remappings=tf_remappings,
     )
 
     return LaunchDescription([
         urdf_name_arg,
         urdf_path_arg,
         config_file_arg,
-        imshow_arg,
+        v4l2_video_device_arg,
+        debug_image_dir_arg,
+        detect_only_arg,
+        tf_topic_arg,
+        tf_static_topic_arg,
         robot_launch,
-        realsense_launch,
         d435_to_camera_link,
-        apriltag_node,
+        camera_link_to_color_frame,
+        camera_color_to_optical,
+        v4l2_trigger_node,
     ])

@@ -48,7 +48,6 @@
   <exec_depend>python3-yaml</exec_depend>
 
   <!-- AprilTag detector runtime deps (Phase 7) -->
-  <exec_depend>realsense2_camera</exec_depend>
   <exec_depend>python3-opencv</exec_depend>
 
   <!-- ament_index_cpp for resource lookup -->

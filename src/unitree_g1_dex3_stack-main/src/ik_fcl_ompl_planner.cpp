@@ -40,6 +40,7 @@
 #include <algorithm>
 #include <random>
 #include <sstream>
+#include <iomanip>
 
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
@@ -78,6 +79,7 @@ public:
         this->declare_parameter("fallback_step", 0.005);
         this->declare_parameter("ik_timeout", 0.1);
         this->declare_parameter("ik_random_seed_tries", 3);
+        this->declare_parameter("fallback_total_timeout_s", 2.0);
 
         // Fetch robot_description from global parameter server
         std::string urdf_xml;
@@ -126,6 +128,7 @@ public:
         this->get_parameter("fallback_step", fallback_step_);
         this->get_parameter("ik_timeout", ik_timeout_);
         this->get_parameter("ik_random_seed_tries", ik_random_seed_tries_);
+        this->get_parameter("fallback_total_timeout_s", fallback_total_timeout_s_);
 
         if (!urdf_model.initString(urdf_xml)) {
             RCLCPP_FATAL(this->get_logger(), "Failed to parse URDF");
@@ -180,6 +183,9 @@ public:
         RCLCPP_INFO(this->get_logger(),
             "ik: timeout=%.3f s, random_seed_tries=%d",
             ik_timeout_, ik_random_seed_tries_);
+        RCLCPP_INFO(this->get_logger(),
+            "press fallback: total_timeout=%.3f s",
+            fallback_total_timeout_s_);
 
         // Parse joint limits from URDF for OMPL bounds
         for (const auto& joint_pair : urdf_model.joints_) {
@@ -337,6 +343,19 @@ private:
     double fallback_step_ = 0.005;
     double ik_timeout_ = 0.1;
     int ik_random_seed_tries_ = 3;
+    double fallback_total_timeout_s_ = 2.0;
+
+    struct GoalCandidate {
+        std::string label;
+        KDL::Vector position;
+        double qx = 0.0;
+        double qy = 0.0;
+        double qz = 0.0;
+        double qw = 1.0;
+        double retraction = 0.0;
+        int retraction_step = 0;
+        bool fallback_candidate = false;
+    };
 
     tf2_ros::Buffer tf_buffer_;
     tf2_ros::TransformListener tf_listener_;
@@ -594,146 +613,215 @@ private:
         const KDL::Vector shoulder_to_target = original_target - right_shoulder_pos_in_base_;
         const double shoulder_to_target_norm = shoulder_to_target.Norm();
         KDL::Vector retract_unit(0.0, 0.0, 0.0);
-        int max_candidate_idx = 0;
+        int max_retract_step = 0;
         if (fallback_enabled_ && fallback_max_retraction_ > 0.0 &&
             fallback_step_ > 0.0 && shoulder_to_target_norm > 1e-6) {
             retract_unit = shoulder_to_target / shoulder_to_target_norm;
-            max_candidate_idx = static_cast<int>(
+            max_retract_step = static_cast<int>(
                 std::floor(fallback_max_retraction_ / fallback_step_ + 1e-9));
-            max_candidate_idx = std::max(0, max_candidate_idx);
+            max_retract_step = std::max(0, max_retract_step);
         } else if (fallback_enabled_) {
             RCLCPP_WARN(this->get_logger(),
                 "Fallback disabled for this goal: max_retraction=%.4f, step=%.4f, shoulder_target_norm=%.6f",
                 fallback_max_retraction_, fallback_step_, shoulder_to_target_norm);
         }
 
-        for (int candidate_idx = 0; candidate_idx <= max_candidate_idx; ++candidate_idx) {
-        const double retraction = fallback_step_ * static_cast<double>(candidate_idx);
-        const KDL::Vector candidate_position(
-            original_target.x() - retraction * retract_unit.x(),
-            original_target.y() - retraction * retract_unit.y(),
-            original_target.z() - retraction * retract_unit.z());
-        double qx = original_orientation.x;
-        double qy = original_orientation.y;
-        double qz = original_orientation.z;
-        double qw = original_orientation.w;
+        std::vector<GoalCandidate> candidates;
         if (adaptive_orientation_enabled_) {
-            KDL::Vector dir;
-            const auto status = computeAdaptiveOrientation(
-                candidate_position, qx, qy, qz, qw, dir);
-            if (status == AdaptiveOrientationStatus::TARGET_TOO_CLOSE_TO_SHOULDER) {
-                if (candidate_idx == 0) {
+            for (int step = 0; step <= max_retract_step; ++step) {
+                const double retraction = fallback_step_ * static_cast<double>(step);
+                const KDL::Vector candidate_position(
+                    original_target.x() - retraction * retract_unit.x(),
+                    original_target.y() - retraction * retract_unit.y(),
+                    original_target.z() - retraction * retract_unit.z());
+                double qx = original_orientation.x;
+                double qy = original_orientation.y;
+                double qz = original_orientation.z;
+                double qw = original_orientation.w;
+                KDL::Vector dir;
+                const auto status = computeAdaptiveOrientation(
+                    candidate_position, qx, qy, qz, qw, dir);
+                if (status == AdaptiveOrientationStatus::TARGET_TOO_CLOSE_TO_SHOULDER) {
+                    if (step == 0) {
+                        RCLCPP_ERROR(this->get_logger(),
+                            "Target [%.3f, %.3f, %.3f] within 0.05 m of right shoulder "
+                            "[%.3f, %.3f, %.3f]; adaptive orientation cannot produce a "
+                            "stable direction. Aborting goal.",
+                            candidate_position.x(), candidate_position.y(), candidate_position.z(),
+                            right_shoulder_pos_in_base_.x(),
+                            right_shoulder_pos_in_base_.y(),
+                            right_shoulder_pos_in_base_.z());
+                        return;
+                    }
+                    RCLCPP_WARN(this->get_logger(),
+                        "Fallback candidate step=%d retraction=%.4f m is too close to shoulder; stopping fallback search",
+                        step, retraction);
+                    break;
+                }
+                RCLCPP_INFO(this->get_logger(),
+                    "Adaptive orientation step=%d: target=[%.3f, %.3f, %.3f] "
+                    "shoulder=[%.3f, %.3f, %.3f] dir=[%.3f, %.3f, %.3f] "
+                    "q=[%.4f, %.4f, %.4f, %.4f]",
+                    step,
+                    candidate_position.x(), candidate_position.y(), candidate_position.z(),
+                    right_shoulder_pos_in_base_.x(),
+                    right_shoulder_pos_in_base_.y(),
+                    right_shoulder_pos_in_base_.z(),
+                    dir.x(), dir.y(), dir.z(),
+                    qx, qy, qz, qw);
+                GoalCandidate candidate;
+                candidate.label = step == 0 ? "adaptive-base" : "adaptive-retract";
+                candidate.position = candidate_position;
+                candidate.qx = qx;
+                candidate.qy = qy;
+                candidate.qz = qz;
+                candidate.qw = qw;
+                candidate.retraction = retraction;
+                candidate.retraction_step = step;
+                candidate.fallback_candidate = step > 0;
+                candidates.push_back(candidate);
+            }
+        } else {
+            GoalCandidate base_candidate;
+            base_candidate.label = "base";
+            base_candidate.position = original_target;
+            base_candidate.qx = original_orientation.x;
+            base_candidate.qy = original_orientation.y;
+            base_candidate.qz = original_orientation.z;
+            base_candidate.qw = original_orientation.w;
+            candidates.push_back(base_candidate);
+            if (fallback_enabled_ && max_retract_step > 0) {
+                for (int step = 1; step <= max_retract_step; ++step) {
+                    const double retraction = fallback_step_ * static_cast<double>(step);
+                    GoalCandidate candidate;
+                    candidate.label = "base-retract";
+                    candidate.position = KDL::Vector(
+                        original_target.x() - retraction * retract_unit.x(),
+                        original_target.y() - retraction * retract_unit.y(),
+                        original_target.z() - retraction * retract_unit.z());
+                    candidate.qx = original_orientation.x;
+                    candidate.qy = original_orientation.y;
+                    candidate.qz = original_orientation.z;
+                    candidate.qw = original_orientation.w;
+                    candidate.retraction = retraction;
+                    candidate.retraction_step = step;
+                    candidate.fallback_candidate = true;
+                    candidates.push_back(candidate);
+                }
+            }
+        }
+
+        if (candidates.empty()) {
+            RCLCPP_ERROR(this->get_logger(), "No goal candidates generated. Aborting.");
+            return;
+        }
+        const int max_candidate_idx = static_cast<int>(candidates.size()) - 1;
+        const auto fallback_start_time = std::chrono::steady_clock::now();
+
+        for (int candidate_idx = 0; candidate_idx <= max_candidate_idx; ++candidate_idx) {
+            const auto& candidate = candidates[candidate_idx];
+            if (!adaptive_orientation_enabled_ && candidate.fallback_candidate && fallback_total_timeout_s_ > 0.0) {
+                const double elapsed = std::chrono::duration<double>(
+                    std::chrono::steady_clock::now() - fallback_start_time).count();
+                if (elapsed > fallback_total_timeout_s_) {
                     RCLCPP_ERROR(this->get_logger(),
-                        "Target [%.3f, %.3f, %.3f] within 0.05 m of right shoulder "
-                        "[%.3f, %.3f, %.3f]; adaptive orientation cannot produce a "
-                        "stable direction. Aborting goal.",
-                        candidate_position.x(), candidate_position.y(), candidate_position.z(),
-                        right_shoulder_pos_in_base_.x(),
-                        right_shoulder_pos_in_base_.y(),
-                        right_shoulder_pos_in_base_.z());
-                    return;
+                        "All fallback candidates exhausted by timeout after %.2f s", elapsed);
+                    break;
                 }
-                RCLCPP_WARN(this->get_logger(),
-                    "Fallback candidate idx=%d retraction=%.4f m is too close to shoulder; stopping fallback search",
-                    candidate_idx, retraction);
-                break;
             }
+            const double retraction = candidate.retraction;
+            const KDL::Vector candidate_position = candidate.position;
+            const double qx = candidate.qx;
+            const double qy = candidate.qy;
+            const double qz = candidate.qz;
+            const double qw = candidate.qw;
             RCLCPP_INFO(this->get_logger(),
-                "Adaptive orientation idx=%d: target=[%.3f, %.3f, %.3f] "
-                "shoulder=[%.3f, %.3f, %.3f] dir=[%.3f, %.3f, %.3f] "
-                "q=[%.4f, %.4f, %.4f, %.4f]",
-                candidate_idx,
-                candidate_position.x(), candidate_position.y(), candidate_position.z(),
-                right_shoulder_pos_in_base_.x(),
-                right_shoulder_pos_in_base_.y(),
-                right_shoulder_pos_in_base_.z(),
-                dir.x(), dir.y(), dir.z(),
-                qx, qy, qz, qw);
-        }
-        RCLCPP_INFO(this->get_logger(),
-            "Attempting target idx=%d/%d retract=%.4f m pos=[%.4f, %.4f, %.4f]",
-            candidate_idx, max_candidate_idx, retraction,
-            candidate_position.x(), candidate_position.y(), candidate_position.z());
-        KDL::Frame target_frame(KDL::Rotation::Quaternion(
-                                    qx,
-                                    qy,
-                                    qz,
-                                    qw),
-                                candidate_position);
+                "Attempting target idx=%d/%d source=%s retract_step=%d retract=%.4f m pos=[%.4f, %.4f, %.4f]",
+                candidate_idx, max_candidate_idx, candidate.label.c_str(),
+                candidate.retraction_step, retraction,
+                candidate_position.x(), candidate_position.y(), candidate_position.z());
+            KDL::Frame target_frame(KDL::Rotation::Quaternion(
+                                        qx,
+                                        qy,
+                                        qz,
+                                        qw),
+                                    candidate_position);
 
-        KDL::JntArray seed(planning_joints.size());
-        for (size_t i = 0; i < planning_joints.size(); ++i) seed(i) = planning_positions[i];
-        auto& solver = ik_right;
-        KDL::JntArray goal(planning_joints.size());
-        auto ik_result_str = [](int result) {
-            switch (result) {
-                case -1: return "Solver init error: invalid chain or limits";
-                case -3: return "No solution found";
-                default: return result > 0 ? "Success" : "Unknown error";
+            KDL::JntArray seed(planning_joints.size());
+            for (size_t i = 0; i < planning_joints.size(); ++i) seed(i) = planning_positions[i];
+            auto solver = ik_right;
+            KDL::JntArray goal(planning_joints.size());
+            auto ik_result_str = [](int result) {
+                switch (result) {
+                    case -1: return "Solver init error: invalid chain or limits";
+                    case -3: return "No solution found";
+                    default: return result > 0 ? "Success" : "Unknown error";
+                }
+            };
+            auto try_ik_candidate = [&](const KDL::JntArray& candidate_seed, const std::string& label, bool log_failure) {
+                KDL::JntArray candidate_goal(planning_joints.size());
+                int result = solver->CartToJnt(candidate_seed, target_frame, candidate_goal);
+                if (result <= 0) {
+                    if (log_failure) {
+                        RCLCPP_INFO(this->get_logger(), "TRAC-IK %s/%s result: %s (code: %d)",
+                            candidate.label.c_str(), label.c_str(), ik_result_str(result), result);
+                    } else {
+                        RCLCPP_DEBUG(this->get_logger(), "TRAC-IK %s/%s result: %s (code: %d)",
+                            candidate.label.c_str(), label.c_str(), ik_result_str(result), result);
+                    }
+                    return false;
+                }
+                RCLCPP_INFO(this->get_logger(), "TRAC-IK %s/%s result: %s (code: %d)",
+                    candidate.label.c_str(), label.c_str(), ik_result_str(result), result);
+                if (isInCollision(candidate_goal, this->collision_skip_pairs_, planning_links)) {
+                    RCLCPP_WARN(this->get_logger(), "TRAC-IK %s/%s solution rejected: collision",
+                        candidate.label.c_str(), label.c_str());
+                    return false;
+                }
+                goal = candidate_goal;
+                RCLCPP_INFO(this->get_logger(), "TRAC-IK %s/%s solution accepted",
+                    candidate.label.c_str(), label.c_str());
+                return true;
+            };
+
+            bool goal_found = try_ik_candidate(seed, "current-seed", true);
+            if (!goal_found) {
+                KDL::JntArray neutral_seed(planning_joints.size());
+                for (size_t i = 0; i < planning_joints.size(); ++i) neutral_seed(i) = 0.0;
+                goal_found = try_ik_candidate(neutral_seed, "neutral-seed", true);
             }
-        };
-        auto try_ik_candidate = [&](const KDL::JntArray& candidate_seed, const std::string& label, bool log_failure) {
-            KDL::JntArray candidate_goal(planning_joints.size());
-            int result = solver->CartToJnt(candidate_seed, target_frame, candidate_goal);
-            if (result <= 0) {
-                if (log_failure) {
-                    RCLCPP_INFO(this->get_logger(), "TRAC-IK %s result: %s (code: %d)",
-                        label.c_str(), ik_result_str(result), result);
+            if (!goal_found) {
+                std::random_device rd;
+                std::mt19937 gen(rd());
+                const int max_random_tries = std::max(0, ik_random_seed_tries_);
+                for (int random_tries = 0; random_tries < max_random_tries && !goal_found; ++random_tries) {
+                    KDL::JntArray random_seed(planning_joints.size());
+                    for (size_t i = 0; i < planning_joints.size(); ++i) {
+                        auto lim_it = joint_limits_.find(planning_joints[i]);
+                        double low = lim_it != joint_limits_.end() ? lim_it->second.first : -3.14;
+                        double high = lim_it != joint_limits_.end() ? lim_it->second.second : 3.14;
+                        std::uniform_real_distribution<> dis(low, high);
+                        random_seed(i) = dis(gen);
+                    }
+                    goal_found = try_ik_candidate(random_seed, "random-seed", false);
+                }
+                if (!goal_found && max_random_tries > 0) {
+                    RCLCPP_WARN(this->get_logger(),
+                        "TRAC-IK random-seed exhausted for target idx=%d source=%s after %d tries",
+                        candidate_idx, candidate.label.c_str(), max_random_tries);
+                }
+            }
+            if (!goal_found) {
+                if (candidate_idx < max_candidate_idx) {
+                    RCLCPP_WARN(this->get_logger(),
+                        "IK failed for target idx=%d source=%s retraction=%.4f m; trying next fallback candidate",
+                        candidate_idx, candidate.label.c_str(), retraction);
                 } else {
-                    RCLCPP_DEBUG(this->get_logger(), "TRAC-IK %s result: %s (code: %d)",
-                        label.c_str(), ik_result_str(result), result);
+                    RCLCPP_ERROR(this->get_logger(),
+                        "IK failed to find a collision-free goal state for final target candidate. Aborting.");
                 }
-                return false;
+                continue;
             }
-            RCLCPP_INFO(this->get_logger(), "TRAC-IK %s result: %s (code: %d)",
-                label.c_str(), ik_result_str(result), result);
-            if (isInCollision(candidate_goal, this->collision_skip_pairs_, planning_links)) {
-                RCLCPP_WARN(this->get_logger(), "TRAC-IK %s solution rejected: collision", label.c_str());
-                return false;
-            }
-            goal = candidate_goal;
-            RCLCPP_INFO(this->get_logger(), "TRAC-IK %s solution accepted", label.c_str());
-            return true;
-        };
-
-        bool goal_found = try_ik_candidate(seed, "current-seed", true);
-        if (!goal_found) {
-            KDL::JntArray neutral_seed(planning_joints.size());
-            for (size_t i = 0; i < planning_joints.size(); ++i) neutral_seed(i) = 0.0;
-            goal_found = try_ik_candidate(neutral_seed, "neutral-seed", true);
-        }
-        if (!goal_found) {
-            std::random_device rd;
-            std::mt19937 gen(rd());
-            const int max_random_tries = std::max(0, ik_random_seed_tries_);
-            for (int random_tries = 0; random_tries < max_random_tries && !goal_found; ++random_tries) {
-                KDL::JntArray random_seed(planning_joints.size());
-                for (size_t i = 0; i < planning_joints.size(); ++i) {
-                    auto lim_it = joint_limits_.find(planning_joints[i]);
-                    double low = lim_it != joint_limits_.end() ? lim_it->second.first : -3.14;
-                    double high = lim_it != joint_limits_.end() ? lim_it->second.second : 3.14;
-                    std::uniform_real_distribution<> dis(low, high);
-                    random_seed(i) = dis(gen);
-                }
-                goal_found = try_ik_candidate(random_seed, "random-seed", false);
-            }
-            if (!goal_found && max_random_tries > 0) {
-                RCLCPP_WARN(this->get_logger(),
-                    "TRAC-IK random-seed exhausted for target idx=%d after %d tries",
-                    candidate_idx, max_random_tries);
-            }
-        }
-        if (!goal_found) {
-            if (candidate_idx < max_candidate_idx) {
-                RCLCPP_WARN(this->get_logger(),
-                    "IK failed for target idx=%d retraction=%.4f m; trying next fallback candidate",
-                    candidate_idx, retraction);
-            } else {
-                RCLCPP_ERROR(this->get_logger(),
-                    "IK failed to find a collision-free goal state for final target candidate. Aborting.");
-            }
-            continue;
-        }
 
         // ------------------------------------------------------------------
         // FK diagnostic: verify IK goal reaches target and start is correct
@@ -1068,17 +1156,18 @@ private:
             if (candidate_idx > 0) {
                 RCLCPP_WARN(this->get_logger(),
                     "[fallback] Used candidate %d/%d, retraction=%.4f m, pos=[%.4f, %.4f, %.4f] "
-                    "(original=[%.4f, %.4f, %.4f])",
+                    "(original=[%.4f, %.4f, %.4f], source=%s)",
                     candidate_idx, max_candidate_idx, retraction,
                     candidate_position.x(), candidate_position.y(), candidate_position.z(),
-                    original_target.x(), original_target.y(), original_target.z());
+                    original_target.x(), original_target.y(), original_target.z(),
+                    candidate.label.c_str());
             }
             return;
         } else {
             if (candidate_idx < max_candidate_idx) {
                 RCLCPP_WARN(this->get_logger(),
-                    "OMPL failed for target idx=%d retraction=%.4f m; trying next fallback candidate",
-                    candidate_idx, retraction);
+                    "OMPL failed for target idx=%d source=%s retraction=%.4f m; trying next fallback candidate",
+                    candidate_idx, candidate.label.c_str(), retraction);
             } else {
                 RCLCPP_WARN(this->get_logger(),
                     "OMPL failed to find a path for final target candidate");

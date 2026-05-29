@@ -1,32 +1,3 @@
-# AprilTag detector parameters (Phase 7 — TAG-02)
-# Node name MUST match: rclpy.Node('apriltag_detector')
-# Note: `imshow` is intentionally NOT here — it is a launch argument
-# (see launch/apriltag.launch.py), not a YAML parameter.
-apriltag_detector:
-  ros__parameters:
-    # ---------- detection ----------
-    tag_family: "tag36h11"
-    tag_size: 0.08              # physical edge length of a tag (meters)
-
-    # ---------- target selection ----------
-    target_tag_id: 0            # only this tag id is published (D-07)
-
-    # ---------- offset (tag-local frame, applied as T_cam_tag * Translate(offset)) ----------
-    offset_xyz: [0.0, -0.06, -0.1]  # [x, y, z] in tag-local frame (meters)
-
-    # ---------- filtering ----------
-    decision_margin_min: 25.0   # reject low-quality detections (D-10)
-
-    # ---------- output frame & topics ----------
-    output_frame: "torso_link"
-    rgb_topic: "/camera/camera/color/image_raw"
-    camera_info_topic: "/camera/camera/color/camera_info"
-    tag_pose_topic: "/apriltag/tag_pose"
-    target_pose_topic: "/apriltag/target_pose"
-
-    # ---------- TF lookup ----------
-    tf_lookup_timeout_s: 0.02
-
 ik_fcl_ompl_planner:
   ros__parameters:
     tcp_offset_x: 0.12

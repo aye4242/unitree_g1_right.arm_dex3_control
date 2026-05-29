@@ -20,6 +20,7 @@ def launch_setup(context, *args, **kwargs):
     planner_type = str(LaunchConfiguration('planner_type').perform(context))
     adaptive_orientation_enabled = LaunchConfiguration('adaptive_orientation_enabled').perform(context)
     config_file = str(LaunchConfiguration('config_file').perform(context))
+    fallback_total_timeout_s = LaunchConfiguration('fallback_total_timeout_s').perform(context)
 
     parameters = {
         'trajectory_time_step': trajectory_time_step,
@@ -34,6 +35,8 @@ def launch_setup(context, *args, **kwargs):
         parameters['adaptive_orientation_enabled'] = adaptive_orientation_enabled.lower() == 'true'
     if collision_skip_pairs:
         parameters['collision_skip_pairs'] = collision_skip_pairs
+    if fallback_total_timeout_s:
+        parameters['fallback_total_timeout_s'] = float(fallback_total_timeout_s)
 
     return [
         Node(
@@ -68,6 +71,7 @@ def generate_launch_description():
         DeclareLaunchArgument('planner_type', default_value='RRTConnect'),
         DeclareLaunchArgument('adaptive_orientation_enabled', default_value=''),
         DeclareLaunchArgument('collision_skip_pairs', default_value='right_hand_thumb_0_link:right_wrist_yaw_link'),
+        DeclareLaunchArgument('fallback_total_timeout_s', default_value=''),
         DeclareLaunchArgument('tf_topic', default_value='/tf'),
         DeclareLaunchArgument('tf_static_topic', default_value='/tf_static'),
     ]

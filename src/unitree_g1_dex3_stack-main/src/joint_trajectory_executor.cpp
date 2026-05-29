@@ -8,9 +8,11 @@
 
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
 #include <trajectory_msgs/msg/joint_trajectory_point.hpp>
+#include <std_msgs/msg/empty.hpp>
 
 
 #include <array>
+#include <algorithm>
 #include <vector>
 #include <chrono>
 #include <map>
@@ -90,6 +92,10 @@ public:
   : Node("joint_trajectory_executor")
   {
     RCLCPP_INFO(this->get_logger(), "Joint Trajectory Executor Node Initialized");
+    this->declare_parameter("auto_return_to_standing", true);
+    this->get_parameter("auto_return_to_standing", auto_return_to_standing_);
+    RCLCPP_INFO(this->get_logger(), "auto_return_to_standing=%s",
+      auto_return_to_standing_ ? "true" : "false");
 
     rclcpp::QoS qos_profile(10);
     qos_profile.best_effort();
@@ -103,6 +109,10 @@ public:
     lowstate_sub_ = this->create_subscription<unitree_hg::msg::LowState>(
       "/lf/lowstate", 10,
       std::bind(&JointTrajectoryExecutor::lowstateCallback, this, std::placeholders::_1));
+
+    return_to_standing_sub_ = this->create_subscription<std_msgs::msg::Empty>(
+      "/executor/return_to_standing", 10,
+      std::bind(&JointTrajectoryExecutor::returnToStandingCallback, this, std::placeholders::_1));
 
     // Load URDF and parse joint limits
     std::string urdf_xml;
@@ -186,12 +196,37 @@ public:
     cmd_pub_->publish(final_cmd);
   }
 
+  void executeShutdownRampIfNeeded() {
+    if (auto_return_to_standing_) {
+      return;
+    }
+    if (ramp_to_standing_executed_.load()) {
+      return;
+    }
+    bool expected = false;
+    if (!busy_.compare_exchange_strong(expected, true)) {
+      RCLCPP_WARN(this->get_logger(), "Shutdown ramp skipped because executor is busy");
+      return;
+    }
+    if (initial_standing_pose_ready_ && !latest_joint_positions_.empty()) {
+      RCLCPP_WARN(this->get_logger(), "shutdown ramp triggered");
+      executeRampToStanding(latest_joint_positions_);
+    }
+    busy_.store(false);
+  }
+
 private:
   rclcpp::Publisher<unitree_hg::msg::LowCmd>::SharedPtr cmd_pub_;
   rclcpp::Subscription<trajectory_msgs::msg::JointTrajectory>::SharedPtr traj_sub_;
   rclcpp::Subscription<unitree_hg::msg::LowState>::SharedPtr lowstate_sub_;
+  rclcpp::Subscription<std_msgs::msg::Empty>::SharedPtr return_to_standing_sub_;
   std::map<std::string, JointLimits> joint_limits_;
   std::vector<float> latest_joint_positions_;
+  std::vector<float> initial_standing_pose_;
+  bool initial_standing_pose_ready_ = false;
+  bool auto_return_to_standing_ = true;
+  std::atomic<bool> busy_{false};
+  std::atomic<bool> ramp_to_standing_executed_{false};
 
   // KDL gravity compensation
   KDL::Chain kdl_chain_right_;
@@ -221,6 +256,69 @@ private:
     return torques;
   }
 
+  void executeRampToStanding(const std::vector<float>& ramp_start_positions) {
+    if (!initial_standing_pose_ready_) {
+      RCLCPP_WARN(this->get_logger(), "Cannot ramp to standing: initial standing pose not ready");
+      return;
+    }
+
+    const double interp_duration = 3.0;
+    const int interp_steps = 750;
+    auto sleep_ns = std::chrono::nanoseconds(static_cast<int64_t>((interp_duration / interp_steps) * 1e9));
+    for (int step = 0; step <= interp_steps; ++step) {
+      double t = static_cast<double>(step) / interp_steps;
+      double value = (1.0 - t) * 1.0 + t * 0.0;
+      unitree_hg::msg::LowCmd final_cmd;
+      final_cmd.motor_cmd[JointIndex::kNotUsedJoint].q = static_cast<float>(value);
+      for (const auto& pair : joint_name_to_index) {
+        size_t idx = pair.second;
+        final_cmd.motor_cmd[idx].mode = 1;
+        if (ramp_start_positions.size() > idx && initial_standing_pose_.size() > idx) {
+          final_cmd.motor_cmd[idx].q = static_cast<float>(
+            (1.0 - t) * ramp_start_positions[idx] + t * initial_standing_pose_[idx]);
+        } else if (latest_joint_positions_.size() > idx) {
+          final_cmd.motor_cmd[idx].q = latest_joint_positions_[idx];
+        } else {
+          final_cmd.motor_cmd[idx].q = 0.0f;
+        }
+        final_cmd.motor_cmd[idx].dq = 0.f;
+        bool is_wrist = (pair.first.find("wrist") != std::string::npos);
+        final_cmd.motor_cmd[idx].kp = is_wrist ? 40.0f : 100.0f;
+        final_cmd.motor_cmd[idx].kd = 5.0f;
+        final_cmd.motor_cmd[idx].tau = 0.f;
+      }
+      if (gravity_enabled_) {
+        std::array<float, 7> q_ra;
+        for (size_t k = 0; k < 7; ++k) {
+          q_ra[k] = final_cmd.motor_cmd[kRightArmJointIndices[k]].q;
+        }
+        auto grav_tau = computeGravityTorques(q_ra);
+        for (size_t k = 0; k < 7; ++k) {
+          final_cmd.motor_cmd[kRightArmJointIndices[k]].tau = grav_tau[k];
+        }
+      }
+      cmd_pub_->publish(final_cmd);
+      rclcpp::sleep_for(sleep_ns);
+    }
+    ramp_to_standing_executed_.store(true);
+  }
+
+  void returnToStandingCallback(const std_msgs::msg::Empty::SharedPtr) {
+    bool expected = false;
+    if (!busy_.compare_exchange_strong(expected, true)) {
+      RCLCPP_WARN(this->get_logger(), "return_to_standing ignored because executor is busy");
+      return;
+    }
+    if (latest_joint_positions_.empty()) {
+      RCLCPP_WARN(this->get_logger(), "return_to_standing ignored: no lowstate received yet");
+      busy_.store(false);
+      return;
+    }
+    RCLCPP_INFO(this->get_logger(), "return_to_standing requested");
+    executeRampToStanding(latest_joint_positions_);
+    busy_.store(false);
+  }
+
   void lowstateCallback(const unitree_hg::msg::LowState::SharedPtr msg) {
     // Store latest positions for all arm joints
     latest_joint_positions_.resize(joint_name_to_index.size(), 0.0f);
@@ -230,12 +328,23 @@ private:
         latest_joint_positions_[idx] = msg->motor_state[idx].q;
       }
     }
+    if (!initial_standing_pose_ready_) {
+      initial_standing_pose_ = latest_joint_positions_;
+      initial_standing_pose_ready_ = true;
+      RCLCPP_INFO(this->get_logger(), "Cached initial standing pose from first lowstate frame");
+    }
   }
 
   void trajectoryCallback(const trajectory_msgs::msg::JointTrajectory::SharedPtr msg) {
+    bool expected = false;
+    if (!busy_.compare_exchange_strong(expected, true)) {
+      RCLCPP_WARN(this->get_logger(), "Trajectory ignored because executor is busy");
+      return;
+    }
     // Find out which hand to use based on the joint names
     if (msg->joint_names.empty()) {
       RCLCPP_ERROR(this->get_logger(), "Received empty joint names in trajectory message");
+      busy_.store(false);
       return;
     }
 
@@ -288,6 +397,7 @@ private:
       RCLCPP_ERROR(this->get_logger(),
         "Trajectory missing %zu right-arm joint(s): %s — rejecting trajectory; no LowCmd published.",
         missing.size(), missing_oss.str().c_str());
+      busy_.store(false);
       return;
     }
 
@@ -462,65 +572,13 @@ private:
         rclcpp::sleep_for(hold_sleep_ns);
       }
     }
-    RCLCPP_INFO(this->get_logger(), "Trajectory execution complete, ramping back to standing pose.");
-
-    // Plan 01-12: use the trajectory end-point (computed from the last
-    // waypoint above) as the ramp's starting pose, not the stale
-    // latest_joint_positions_.
-    std::vector<float> ramp_start_positions = trajectory_endpoint;
-
-    // Smoothly interpolate final_cmd.motor_cmd[JointIndex::kNotUsedJoint].q from 1.0 to 0.0
-    // Plan 01-08: 3 s ramp duration preserved. Plan 01-09 drives an explicit
-    // q interpolation from trajectory end-point to standing snapshot.
-    // Plan 01-11: bump steps 150 -> 750 so ramp publishes at 250 Hz (was 50 Hz),
-    // matching reference smooth_exit cadence so firmware cannot wedge between frames.
-    const double interp_duration = 3.0; // seconds
-    const int interp_steps = 750;
-    auto sleep_ns = std::chrono::nanoseconds(static_cast<int64_t>((interp_duration / interp_steps) * 1e9));
-    for (int step = 0; step <= interp_steps; ++step) {
-      double t = static_cast<double>(step) / interp_steps;
-      double value = (1.0 - t) * 1.0 + t * 0.0; // Linear interpolation from 1.0 (matching trajectory/hold) to 0.0
-      unitree_hg::msg::LowCmd final_cmd;
-      final_cmd.motor_cmd[JointIndex::kNotUsedJoint].q = static_cast<float>(value);
-      // Plan 01-09: drive the arm explicitly from trajectory end-point to
-      // standing snapshot under stiff servoing (kp/kd back to 60/1.5).
-      // Frame 0 (t=0): q = ramp start = trajectory end-point (matches actual,
-      // no jerk). Frame 150 (t=1): q = standing snapshot (arm is at standing).
-      // Master switch then hands off to body controller with arm already there.
-      // Plan 04-03 D-06 Option A: all 28 body joints locked with kp=60; q interpolates to standing_pose over 3 s.
-      for (const auto& pair : joint_name_to_index) {
-        size_t idx = pair.second;
-        // Plan 01-10: enable PD control mode here too, so the q-interpolation
-        // computed below is actually tracked stiffly by the motor controllers.
-        final_cmd.motor_cmd[idx].mode = 1;
-        if (ramp_start_positions.size() > idx && standing_pose.size() > idx) {
-          final_cmd.motor_cmd[idx].q = static_cast<float>(
-            (1.0 - t) * ramp_start_positions[idx] + t * standing_pose[idx]);
-        } else if (latest_joint_positions_.size() > idx) {
-          final_cmd.motor_cmd[idx].q = latest_joint_positions_[idx];
-        } else {
-          final_cmd.motor_cmd[idx].q = 0.0f;
-        }
-        final_cmd.motor_cmd[idx].dq = 0.f;
-        bool is_wrist = (pair.first.find("wrist") != std::string::npos);
-        final_cmd.motor_cmd[idx].kp = is_wrist ? 40.0f : 100.0f;
-        final_cmd.motor_cmd[idx].kd = 5.0f;
-        final_cmd.motor_cmd[idx].tau = 0.f;
-      }
-      // Gravity compensation for ramp
-      if (gravity_enabled_) {
-        std::array<float, 7> q_ra;
-        for (size_t k = 0; k < 7; ++k) {
-          q_ra[k] = final_cmd.motor_cmd[kRightArmJointIndices[k]].q;
-        }
-        auto grav_tau = computeGravityTorques(q_ra);
-        for (size_t k = 0; k < 7; ++k) {
-          final_cmd.motor_cmd[kRightArmJointIndices[k]].tau = grav_tau[k];
-        }
-      }
-      cmd_pub_->publish(final_cmd);
-      rclcpp::sleep_for(sleep_ns);
+    if (auto_return_to_standing_ || g_shutdown_requested.load()) {
+      RCLCPP_INFO(this->get_logger(), "Trajectory execution complete, ramping back to standing pose.");
+      executeRampToStanding(trajectory_endpoint);
+    } else {
+      RCLCPP_INFO(this->get_logger(), "auto_return_to_standing=false, holding at trajectory endpoint");
     }
+    busy_.store(false);
   }
 };
 
@@ -539,6 +597,7 @@ int main(int argc, char **argv) {
   while (rclcpp::ok() && !g_shutdown_requested.load()) {
     exec.spin_some(std::chrono::milliseconds(50));
   }
+  node->executeShutdownRampIfNeeded();
 
   // SIGINT/SIGTERM received (or rclcpp::ok went false). The trajectory-end
   // ramp inside trajectoryCallback (line ~249) is the only graceful release

@@ -38,6 +38,6 @@ v4l2_apriltag_trigger:
     fixed_rpy: [-0.0873, -0.0340, 0.0199]
 
     save_debug_images: true
-    debug_image_dir: "/home/unitree/Desktop/unitree_dex3/detect_img"
+    debug_image_dir: "/workspaces/unitree_dex3/detect_img"
     save_raw_images: false
     jpeg_quality: 90

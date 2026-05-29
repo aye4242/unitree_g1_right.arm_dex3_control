@@ -119,6 +119,7 @@ install(PROGRAMS
   scripts/v4l2_apriltag_trigger.py
   scripts/adaptive_orientation_ab.py
   scripts/apriltag_goal_bridge.py
+  scripts/apriltag_button_press_node.py
   scripts/apriltag_reach_uat.py
   scripts/gravity_torque_publisher.py
   DESTINATION lib/${PROJECT_NAME}

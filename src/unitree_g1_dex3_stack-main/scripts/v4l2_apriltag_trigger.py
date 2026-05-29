@@ -19,6 +19,7 @@ from rclpy.node import Node
 from rclpy.time import Time
 
 from geometry_msgs.msg import PoseStamped
+from std_msgs.msg import Empty
 from trajectory_msgs.msg import JointTrajectory
 
 import tf2_geometry_msgs  # noqa: F401
@@ -26,6 +27,14 @@ import tf2_ros
 
 from pupil_apriltags import Detector
 from scipy.spatial.transform import Rotation as R
+
+
+def _as_bool(value):
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() in ('1', 'true', 'yes', 'on')
+    return bool(value)
 
 
 class V4L2AprilTagTrigger(Node):
@@ -71,6 +80,8 @@ class V4L2AprilTagTrigger(Node):
         self.declare_parameter('joint_trajectory_topic', '/joint_trajectory_targets')
         self.declare_parameter('reach_max_distance', 0.55)
         self.declare_parameter('trigger_key', 'g')
+        self.declare_parameter('trigger_topic', '')
+        self.declare_parameter('publish_intermediate_poses', True)
         self.declare_parameter('detect_only', False)
         self.declare_parameter('fixed_orientation_enabled', False)
         self.declare_parameter('fixed_rpy', [-0.0873, -0.0340, 0.0199])
@@ -95,7 +106,7 @@ class V4L2AprilTagTrigger(Node):
         self.warmup_min_s = float(self.get_parameter('warmup_min_s').value)
         self.sample_interval_s = float(
             self.get_parameter('sample_interval_s').value)
-        self.continuous_capture = bool(
+        self.continuous_capture = _as_bool(
             self.get_parameter('continuous_capture').value)
 
         self.tag_family = str(self.get_parameter('tag_family').value)
@@ -130,16 +141,19 @@ class V4L2AprilTagTrigger(Node):
             self.get_parameter('joint_trajectory_topic').value)
         self.reach_max = float(self.get_parameter('reach_max_distance').value)
         self.trigger_char = str(self.get_parameter('trigger_key').value).lower()
-        self.detect_only = bool(self.get_parameter('detect_only').value)
-        self.fixed_orientation_enabled = bool(
+        self.trigger_topic = str(self.get_parameter('trigger_topic').value)
+        self.publish_intermediate_poses = _as_bool(
+            self.get_parameter('publish_intermediate_poses').value)
+        self.detect_only = _as_bool(self.get_parameter('detect_only').value)
+        self.fixed_orientation_enabled = _as_bool(
             self.get_parameter('fixed_orientation_enabled').value)
         fixed_rpy = list(self.get_parameter('fixed_rpy').value)
         self.fixed_rpy = [float(v) for v in fixed_rpy[:3]]
 
-        self.save_debug_images = bool(
+        self.save_debug_images = _as_bool(
             self.get_parameter('save_debug_images').value)
         self.debug_image_dir = str(self.get_parameter('debug_image_dir').value)
-        self.save_raw_images = bool(self.get_parameter('save_raw_images').value)
+        self.save_raw_images = _as_bool(self.get_parameter('save_raw_images').value)
         self.jpeg_quality = int(self.get_parameter('jpeg_quality').value)
 
         self._waiting_for_completion = False
@@ -173,28 +187,36 @@ class V4L2AprilTagTrigger(Node):
         self.target_pose_pub = self.create_publisher(PoseStamped, self.target_pose_topic, 10)
         self.create_subscription(
             JointTrajectory, self.joint_trajectory_topic, self._traj_cb, 10)
+        if self.trigger_topic:
+            self.create_subscription(Empty, self.trigger_topic, self._trigger_topic_cb, 10)
 
-        self.fd = os.open('/dev/tty', os.O_RDONLY | os.O_NONBLOCK)
-        self.old_settings = termios.tcgetattr(self.fd)
-        tty.setcbreak(self.fd)
+        self.fd = None
+        self.old_settings = None
+        if self.trigger_char:
+            self.fd = os.open('/dev/tty', os.O_RDONLY | os.O_NONBLOCK)
+            self.old_settings = termios.tcgetattr(self.fd)
+            tty.setcbreak(self.fd)
 
         self._validate_video_device()
         if self.continuous_capture:
             self._capture_thread = threading.Thread(
                 target=self._capture_loop, daemon=True)
             self._capture_thread.start()
-        self.create_timer(0.1, self._tick)
+        if self.fd is not None:
+            self.create_timer(0.1, self._tick)
         self.create_timer(0.5, self._retry_shoulder_lookup)
 
         fx, fy, cx, cy = self.camera_params
         self.get_logger().info(
-            f'[v4l2_apriltag_trigger] Ready — press {self.trigger_char.upper()} '
+            f'[v4l2_apriltag_trigger] Ready — trigger_key={self.trigger_char or "disabled"} '
+            f'trigger_topic={self.trigger_topic or "disabled"} '
             f'to capture {self.sample_count} frames from {self.video_device} '
             f'camera_id={self.camera_id} serial={self.expected_serial} '
             f'{self.image_width}x{self.image_height}@{self.fps:g} {self.fourcc} '
             f'warmup={self.warmup_frames} frames/{self.warmup_min_s:.1f}s '
             f'continuous_capture={self.continuous_capture} '
             f'detect_only={self.detect_only} '
+            f'publish_intermediate_poses={self.publish_intermediate_poses} '
             f'offset_xyz=[{self.offset_xyz[0]:.3f}, {self.offset_xyz[1]:.3f}, {self.offset_xyz[2]:.3f}] '
             f'fx={fx:.3f} fy={fy:.3f} cx={cx:.3f} cy={cy:.3f}')
 
@@ -359,6 +381,8 @@ class V4L2AprilTagTrigger(Node):
             return ''
 
     def _tick(self):
+        if self.fd is None:
+            return
         if not select.select([self.fd], [], [], 0.0)[0]:
             return
         try:
@@ -367,6 +391,9 @@ class V4L2AprilTagTrigger(Node):
             return
         if ch and ch.lower() == self.trigger_char:
             self._on_trigger()
+
+    def _trigger_topic_cb(self, _msg):
+        self._on_trigger()
 
     def _traj_cb(self, msg):
         if not msg.points:
@@ -454,8 +481,22 @@ class V4L2AprilTagTrigger(Node):
         tag_avg_x = sum(tag_xs) / len(tag_xs)
         tag_avg_y = sum(tag_ys) / len(tag_ys)
         tag_avg_z = sum(tag_zs) / len(tag_zs)
+        best = max(accepted, key=lambda item: item['decision_margin'])
+        final_tag_pose = best['tag_torso']
+        final_target_pose = best['target_torso']
+        final_stamp = self.get_clock().now().to_msg()
+        final_tag_pose.header.stamp = final_stamp
+        final_tag_pose.pose.position.x = tag_avg_x
+        final_tag_pose.pose.position.y = tag_avg_y
+        final_tag_pose.pose.position.z = tag_avg_z
+        final_target_pose.header.stamp = final_stamp
+        final_target_pose.pose.position.x = avg_x
+        final_target_pose.pose.position.y = avg_y
+        final_target_pose.pose.position.z = avg_z
+        if not self.publish_intermediate_poses:
+            self.tag_pose_pub.publish(final_tag_pose)
+            self.target_pose_pub.publish(final_target_pose)
         if self.detect_only:
-            best = max(accepted, key=lambda item: item['decision_margin'])
             self.get_logger().info(
                 f'[v4l2_apriltag_trigger] detect_only accepted={len(accepted)}/{len(frames)} '
                 f'tag=({tag_avg_x:.3f}, {tag_avg_y:.3f}, {tag_avg_z:.3f}) '
@@ -484,7 +525,6 @@ class V4L2AprilTagTrigger(Node):
                 f'> {self.reach_max} m; publishing nearest reach-limit target '
                 f'({goal_x:.3f}, {goal_y:.3f}, {goal_z:.3f}) for planner fallback')
 
-        best = max(accepted, key=lambda item: item['decision_margin'])
         goal = PoseStamped()
         goal.header.frame_id = self.output_frame
         goal.header.stamp = self.get_clock().now().to_msg()
@@ -796,8 +836,9 @@ class V4L2AprilTagTrigger(Node):
 
         pose_torso.header.stamp = self.get_clock().now().to_msg()
         target_torso.header.stamp = pose_torso.header.stamp
-        self.tag_pose_pub.publish(pose_torso)
-        self.target_pose_pub.publish(target_torso)
+        if self.publish_intermediate_poses:
+            self.tag_pose_pub.publish(pose_torso)
+            self.target_pose_pub.publish(target_torso)
         return {
             'tag_torso': pose_torso,
             'target_torso': target_torso,
@@ -884,14 +925,16 @@ class V4L2AprilTagTrigger(Node):
             self._last_warn_time = now
 
     def destroy_node(self):
-        try:
-            termios.tcsetattr(self.fd, termios.TCSADRAIN, self.old_settings)
-        except Exception:
-            pass
-        try:
-            os.close(self.fd)
-        except Exception:
-            pass
+        if self.fd is not None and self.old_settings is not None:
+            try:
+                termios.tcsetattr(self.fd, termios.TCSADRAIN, self.old_settings)
+            except Exception:
+                pass
+        if self.fd is not None:
+            try:
+                os.close(self.fd)
+            except Exception:
+                pass
         self._capture_stop.set()
         if self._capture_thread is not None:
             self._capture_thread.join(timeout=1.0)
