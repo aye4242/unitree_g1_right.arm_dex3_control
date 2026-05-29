@@ -1,0 +1,68 @@
+在docker内编译unitree_dex3：
+colcon --log-base /workspaces/unitree_dex3/log_container build \
+  --base-paths /workspaces/unitree_dex3/src \
+  --build-base /workspaces/unitree_dex3/build_container \
+  --install-base /workspaces/unitree_dex3/install_container \
+  --packages-select unitree_g1_dex3_stack \
+  --cmake-args -DBUILD_IK_FCL_OMPL_PLANNER=ON -DPython3_EXECUTABLE=/usr/bin/python3
+source:
+source install_container/setup.bash
+
+
+启动docker： bash /home/unitree/Desktop/unitree_container/run.sh
+shell打开后会自动source：
+/opt/ros/humble/setup.bash
+/opt/unitree_ros2/cyclonedds_ws/install/setup.bash
+/workspaces/unitree_dex3/install_container/setup.bash
+
+不启动reach launch，单独调试：
+ros2 launch unitree_g1_dex3_stack robot.launch
+ros2 launch unitree_g1_dex3_stack control.launch
+ros2 launch unitree_g1_dex3_stack planner.launch.py adaptive_orientation_enabled:=true
+
+点位发布：
+ros2 topic pub /goal_pose geometry_msgs/msg/PoseStamped '{header: {frame_id: "torso_link", stamp: {sec: 0, nanosec: 0}}, pose: {position: {x: 0.4, y: -0.2, z: 0.18}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}}}' --once
+
+读取右臂tcp在torso link下的位姿：
+确保关节处于发布状态ros2 launch unitree_g1_dex3_stack robot.launch
+ros2 run unitree_g1_dex3_stack tcp_torso_pose.py
+
+默认执行控制 detect_only: false
+只检测，不执行：ros2 launch unitree_g1_dex3_stack apriltag_reach.launch.py camera_backend:=v4l2_trigger detect_only:=true
+检测并执行控制：
+ros2 launch unitree_g1_dex3_stack apriltag_reach.launch.py
+按G识别April Tag位置并计算右臂应该到达的相对位置
+
+通过卸力和锁定实现右臂的拖拽的固定：
+/home/unitree/Desktop/unitree_container/run.sh right-arm-mode
+输入free可以自由拖动，输入lock锁定，输入status查看当前关节角度
+
+灵巧手控制：
+伸出中指：root@unitree-g1-nx:/workspaces/unitree_dex3_cpp/example# python3 control_dex3_right_setpoint.py enP8p1s0 0 -1.05 -1.7 1.7 1.8 0 0
+合上：root@unitree-g1-nx:/workspaces/unitree_dex3_cpp/example# python3 control_dex3_right_setpoint.py enP8p1s0 0 -1.05 -1.7 1.7 1.8 1.7 1.8
+
+
+
+Button press 编译：
+cd /home/unitree/Desktop/unitree_container
+./run.sh bash -lc 'colcon --log-base /workspaces/unitree_dex3/log_container build --base-paths /workspaces/unitree_dex3/src --build-base /workspaces/unitree_dex3/build_container --install-base /workspaces/unitree_dex3/install_container --packages-select unitree_g1_dex3_stack --cmake-args -DBUILD_IK_FCL_OMPL_PLANNER=ON -DPython3_EXECUTABLE=/usr/bin/python3'
+
+Button press dry-run，不控制灵巧手：
+./run.sh ros2 launch unitree_g1_dex3_stack apriltag_button_press.launch.py dry_run:=true
+启动后按 G
+
+Button press 真机执行：
+./run.sh ros2 launch unitree_g1_dex3_stack apriltag_button_press.launch.py dry_run:=false
+启动后按 G
+
+Button press 只启动相机识别：
+./run.sh ros2 launch unitree_g1_dex3_stack apriltag_button_press.launch.py camera_only:=true
+
+手动触发 button press 相机拍照：
+ros2 topic pub /apriltag/capture_trigger std_msgs/msg/Empty '{}' --once
+
+手动右臂回 standing：
+ros2 topic pub /executor/return_to_standing std_msgs/msg/Empty '{}' --once
+
+采集 button press fallback 姿态数据库：
+./run.sh ros2 launch unitree_g1_dex3_stack press_pose_capture.launch.py

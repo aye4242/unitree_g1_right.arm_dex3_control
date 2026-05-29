@@ -1,0 +1,24 @@
+# Build outputs
+build/
+install/
+log/
+build_container/
+install_container/
+log_container/
+**/build/
+**/install/
+**/log/
+**/build_container/
+**/install_container/
+**/log_container/
+
+# Python/cache artifacts
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+
+# Editor/OS
+.vscode/
+.idea/
+.DS_Store

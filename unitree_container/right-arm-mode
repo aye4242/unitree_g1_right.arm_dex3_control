@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+if [[ -f /opt/ros/humble/setup.bash ]]; then
+  source /opt/ros/humble/setup.bash
+fi
+if [[ -f /opt/unitree_ros2/cyclonedds_ws/install/setup.bash ]]; then
+  source /opt/unitree_ros2/cyclonedds_ws/install/setup.bash
+fi
+if [[ -f /workspaces/unitree_dex3/install_container/setup.bash ]]; then
+  source /workspaces/unitree_dex3/install_container/setup.bash
+fi
+
+set -u
+
+export LD_LIBRARY_PATH="/usr/local/lib:${LD_LIBRARY_PATH:-}"
+export PYTHONPATH="/opt/unitree_dex3_tools:/workspaces/xr_teleoperate/teleop:/workspaces/unitree_dex3:/workspaces/unitree_dex3_cpp/build:/workspaces/unitree_sdk2_python:${PYTHONPATH:-}"
+
+if [[ ! -f /workspaces/unitree_dex3/right_arm_mode.py ]]; then
+  echo "right_arm_mode.py not found at /workspaces/unitree_dex3/right_arm_mode.py" >&2
+  exit 1
+fi
+if [[ ! -d /workspaces/xr_teleoperate/teleop ]]; then
+  echo "xr_teleoperate/teleop is required for robot_control and model assets" >&2
+  exit 1
+fi
+
+cd /workspaces/xr_teleoperate/teleop
+exec /usr/bin/python3 /workspaces/unitree_dex3/right_arm_mode.py "$@"
