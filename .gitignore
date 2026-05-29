@@ -18,6 +18,17 @@ __pycache__/
 *.so
 *.egg-info/
 
+# Runtime/debug artifacts
+debug.log
+detect_img/
+yolo_last_detection.jpg
+*.jpg
+*.png
+!unitree_dex3_cpp/asset/*.png
+
+# Planning/temp
+.planning/
+
 # Editor/OS
 .vscode/
 .idea/
