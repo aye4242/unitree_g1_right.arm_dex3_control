@@ -63,6 +63,3 @@ ros2 topic pub /apriltag/capture_trigger std_msgs/msg/Empty '{}' --once
 
 手动右臂回 standing：
 ros2 topic pub /executor/return_to_standing std_msgs/msg/Empty '{}' --once
-
-采集 button press fallback 姿态数据库：
-./run.sh ros2 launch unitree_g1_dex3_stack press_pose_capture.launch.py
