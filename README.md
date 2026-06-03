@@ -5,6 +5,10 @@ Unitree G1 右臂 + Dex-3 灵巧手 ROS 2 全栈：AprilTag V4L2 检测 → OMPL
 ## 简要说明：
 该项目基于April Tag定位，然后基于识别的April Tag的坐标系做偏移，红绿蓝分别代表XYZ轴。计算出灵巧手需要按压的位置，然后通过OMPL规划器规划路径，最后执行。
 TCP定义：right_wrist_yaw_link沿着x轴（指向手指伸出方向）向前一段距离offset
+!!WARNING
+如果测试时出现手臂没有正常回到初始姿态，终端报类似：[apriltag_button_press_node.py-9] [ERROR] [1780482173.690901458] [apriltag_button_press_node]: [apriltag_button_press_node] Dex-3 close-hand timed out: Command '['/usr/bin/python3', '/workspaces/unitree_dex3_cpp/example/control_dex3_right_setpoint.py', 'enP8p1s0', '0.000000', '-1.050000', '-1.700000', '1.700000', '1.800000', '1.700000', '1.800000']' timed out after 7.5 seconds
+请新开一个终端发布：ros2 topic pub /executor/return_to_standing std_msgs/msg/Empty '{}' --once 手动让右臂缓慢回到原点。 
+如果关掉报错的终端，下次开启后可能会导致右臂瞬间冲击回到原点
 
 考虑到ompl规划时间和可能的碰撞误检导致规划失败，暂时把碰撞检测环节跳过，使用两个固定位姿应对偏左的坐标
 ![detected_02.jpg](https://wp-cdn.4ce.cn/v2/mcyX4AW.jpeg)
