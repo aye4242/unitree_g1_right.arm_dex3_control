@@ -252,9 +252,16 @@ class AprilTagButtonPressNode(Node):
             for line in completed.stdout.splitlines():
                 self.get_logger().info(f'[Dex3 {label}] {line}')
         if completed.returncode != 0:
-            self.get_logger().error(
-                f'[apriltag_button_press_node] Dex-3 {label} exited with {completed.returncode}')
-            return False
+            # CycloneDDS C++ assertion on exit (SIGABRT/-6) is a known cleanup
+            # crash; the script completed successfully if it printed "Done."
+            if completed.returncode == -6 and completed.stdout and 'Done.' in completed.stdout:
+                self.get_logger().warn(
+                    f'[apriltag_button_press_node] Dex-3 {label} exited with -6 '
+                    f'(CycloneDDS cleanup crash after "Done." — treating as success)')
+            else:
+                self.get_logger().error(
+                    f'[apriltag_button_press_node] Dex-3 {label} exited with {completed.returncode}')
+                return False
         return not self._shutdown
 
     def _publish_return_to_standing(self):

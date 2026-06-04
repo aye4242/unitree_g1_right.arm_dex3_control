@@ -2,15 +2,44 @@
 
 Unitree G1 右臂 + Dex-3 灵巧手 ROS 2 全栈：AprilTag V4L2 检测 → OMPL 规划 → 右臂执行 → 灵巧手按压。
 
-## 简要说明：
-该项目基于April Tag定位，然后基于识别的April Tag的坐标系做偏移，红绿蓝分别代表XYZ轴。计算出灵巧手需要按压的位置，然后通过OMPL规划器规划路径，最后执行。
-TCP定义：right_wrist_yaw_link沿着x轴（指向手指伸出方向）向前一段距离offset
-!!WARNING
-如果测试时出现手臂没有正常回到初始姿态，终端报类似：[apriltag_button_press_node.py-9] [ERROR] [1780482173.690901458] [apriltag_button_press_node]: [apriltag_button_press_node] Dex-3 close-hand timed out: Command '['/usr/bin/python3', '/workspaces/unitree_dex3_cpp/example/control_dex3_right_setpoint.py', 'enP8p1s0', '0.000000', '-1.050000', '-1.700000', '1.700000', '1.800000', '1.700000', '1.800000']' timed out after 7.5 seconds
-请新开一个终端发布：ros2 topic pub /executor/return_to_standing std_msgs/msg/Empty '{}' --once 手动让右臂缓慢回到原点。 
-如果关掉报错的终端，下次开启后可能会导致右臂瞬间冲击回到原点
+## 简要说明
 
-考虑到ompl规划时间和可能的碰撞误检导致规划失败，暂时把碰撞检测环节跳过，使用两个固定位姿应对偏左的坐标
+该项目基于 AprilTag 定位，然后基于识别的 AprilTag 的坐标系做偏移（红绿蓝分别代表 XYZ 轴），计算出灵巧手需要按压的位置，然后通过 OMPL 规划器规划路径，最后执行。
+
+- **TCP 定义**：`right_wrist_yaw_link` 沿着 x 轴（指向手指伸出方向）向前一段距离 offset
+- **部署机器**：`192.168.100.30`
+
+```bash
+# 进入容器
+bash /home/unitree/Desktop/unitree_container/run.sh
+
+# 编译
+colcon --log-base /workspaces/unitree_dex3/log_container build \
+  --base-paths /workspaces/unitree_dex3/src \
+  --build-base /workspaces/unitree_dex3/build_container \
+  --install-base /workspaces/unitree_dex3/install_container \
+  --packages-select unitree_g1_dex3_stack \
+  --cmake-args -DBUILD_IK_FCL_OMPL_PLANNER=ON -DPython3_EXECUTABLE=/usr/bin/python3
+
+# （在 unitree_dex3）source install_container/setup.bash
+
+# 只识别
+ros2 launch unitree_g1_dex3_stack apriltag_button_press.launch.py camera_only:=true
+
+# 真机执行（启动后按 G）
+ros2 launch unitree_g1_dex3_stack apriltag_button_press.launch.py dry_run:=false
+```
+
+> ⚠️ **WARNING**：如果测试时出现手臂没有正常回到初始姿态，终端报类似：
+> `[apriltag_button_press_node] Dex-3 close-hand timed out: Command '...' timed out after 7.5 seconds`
+> 请新开一个终端发布：
+> ```bash
+> ros2 topic pub /executor/return_to_standing std_msgs/msg/Empty '{}' --once
+> ```
+> 手动让右臂缓慢回到原点。如果关掉报错的终端，下次开启后可能会导致右臂瞬间冲击回到原点。
+
+考虑到 OMPL 规划时间和可能的碰撞误检导致规划失败，暂时把碰撞检测环节跳过，使用两个固定位姿应对偏左的坐标：
+
 ![detected_02.jpg](https://wp-cdn.4ce.cn/v2/mcyX4AW.jpeg)
 
 **运行环境**：所有 ROS 2 节点均在 Docker 容器内运行（`unitree-dex3:humble`），宿主机通过 `run.sh` 启动。
@@ -417,7 +446,7 @@ python3 /workspaces/unitree_dex3_cpp/example/control_dex3_right_setpoint.py enP8
 python3 /workspaces/unitree_dex3_cpp/example/control_dex3_right_setpoint.py enP8p1s0 0 -1.05 -1.7 1.7 1.8 1.7 1.8
 ```
 
-## 7. 问题排查
+## 8. 问题排查
 
 ### 相机打不开 / V4L2 设备占用
 
@@ -472,7 +501,7 @@ Python cyclonedds 意外加载了 ROS Humble 的 `/opt/ros/humble/.../libddsc.so
 
 ---
 
-## 8. 已知的坑
+## 9. 已知的坑
 
 1. **源码改完必须重编译** — `install_container/` 是编译拷贝，直接改 `src/` 下的源码不会生效
 2. **路径是容器路径** — 配置文件中所有路径（`dex3_setpoint_script`、`debug_image_dir` 等）都是 `/workspaces/...`，不是 `/home/unitree/Desktop/...`
@@ -487,7 +516,7 @@ Python cyclonedds 意外加载了 ROS Humble 的 `/opt/ros/humble/.../libddsc.so
 
 ---
 
-## 9. 文件结构
+## 10. 文件结构
 
 ```
 src/unitree_g1_dex3_stack-main/
@@ -515,7 +544,7 @@ src/unitree_g1_dex3_stack-main/
 
 ---
 
-## 10. ROS 2 Topic 速查
+## 11. ROS 2 Topic 速查
 
 | Topic | 类型 | 说明 |
 |---|---|---|
@@ -529,12 +558,11 @@ src/unitree_g1_dex3_stack-main/
 
 ---
 
-# 技术架构（首页版）
+## 12. 技术架构
 
 > 原始文档路径：`unitree_dex3/src/unitree_g1_dex3_stack-main/docs/ARCHITECTURE.md`
 
-
-## 1. 系统总览
+### 12.1 系统总览
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -577,9 +605,9 @@ src/unitree_g1_dex3_stack-main/
 
 ---
 
-## 2. 节点职责
+### 12.2 节点职责
 
-### 2.1 基础层（robot.launch.py）
+#### 基础层（robot.launch.py）
 
 | 节点 | 语言 | 职责 |
 |---|---|---|
@@ -588,7 +616,7 @@ src/unitree_g1_dex3_stack-main/
 
 URDF 文件：`robots/g1_description/g1_29dof_lock_waist_with_hand_rev_1_0_collision_primitives.urdf`
 
-### 2.2 感知层（V4L2 AprilTag Trigger）
+#### 感知层（V4L2 AprilTag Trigger）
 
 | 节点 | 语言 | 职责 |
 |---|---|---|
@@ -606,7 +634,7 @@ URDF 文件：`robots/g1_description/g1_29dof_lock_waist_with_hand_rev_1_0_colli
 - `/apriltag/tag_pose` — tag 原始位姿（torso_link 系）
 - `/apriltag/target_pose` — tag + `offset_xyz` 偏移后的目标位姿
 
-### 2.3 规划层（ik_fcl_ompl_planner）
+#### 规划层（ik_fcl_ompl_planner）
 
 | 节点 | 语言 | 职责 |
 |---|---|---|
@@ -639,7 +667,7 @@ URDF 文件：`robots/g1_description/g1_29dof_lock_waist_with_hand_rev_1_0_colli
 - FCL 库，基于 URDF 碰撞几何
 - 默认关闭（`collision_detection_enabled: false`），因为右臂操作空间碰撞风险低
 
-### 2.4 执行层（joint_trajectory_executor）
+#### 执行层（joint_trajectory_executor）
 
 | 节点 | 语言 | 职责 |
 |---|---|---|
@@ -657,7 +685,7 @@ URDF 文件：`robots/g1_description/g1_29dof_lock_waist_with_hand_rev_1_0_colli
 - kp/kd 分关节配置，wrist kd = 5.0
 - 输出到 Unitree `/arm_sdk` DDS topic（`unitree_hg/LowCmd`）
 
-### 2.5 编排层（apriltag_button_press_node）
+#### 编排层（apriltag_button_press_node）
 
 | 节点 | 语言 | 职责 |
 |---|---|---|
@@ -671,9 +699,9 @@ URDF 文件：`robots/g1_description/g1_29dof_lock_waist_with_hand_rev_1_0_colli
 
 ---
 
-## 3. 数据流
+### 12.3 数据流
 
-### 3.1 AprilTag Reach 数据流
+#### AprilTag Reach 数据流
 
 ```
 [键盘 G] → v4l2_apriltag_trigger
@@ -697,7 +725,7 @@ URDF 文件：`robots/g1_description/g1_29dof_lock_waist_with_hand_rev_1_0_colli
          [auto_return_to_standing] → ramp 回站立
 ```
 
-### 3.2 Button Press 数据流
+#### Button Press 数据流
 
 ```
 [键盘 G] → apriltag_button_press_node
@@ -721,7 +749,7 @@ URDF 文件：`robots/g1_description/g1_29dof_lock_waist_with_hand_rev_1_0_colli
 
 ---
 
-## 4. 坐标系
+### 12.4 坐标系
 
 ```
                     torso_link (base_link)
@@ -753,9 +781,9 @@ AprilTag 检测在 `camera_color_optical_frame` 系下得到 tag 位姿，通过
 
 ---
 
-## 5. 硬件接口
+### 12.5 硬件接口
 
-### 5.1 DDS Topic（Unitree SDK）
+#### DDS Topic（Unitree SDK）
 
 | Topic | 方向 | 说明 |
 |---|---|---|
@@ -766,7 +794,7 @@ AprilTag 检测在 `camera_color_optical_frame` 系下得到 tag 位姿，通过
 - 网卡：`enP8p1s0`
 - 容器通过 `--network host --privileged` 直连 DDS 网络
 
-### 5.2 V4L2 相机
+#### V4L2 相机
 
 | 属性 | 值 |
 |---|---|
@@ -778,7 +806,7 @@ AprilTag 检测在 `camera_color_optical_frame` 系下得到 tag 位姿，通过
 
 不使用 RealSense SDK / `realsense2_camera`，直接 V4L2 采集 RGB。
 
-### 5.3 Dex-3 灵巧手
+#### Dex-3 灵巧手
 
 | 属性 | 值 |
 |---|---|
@@ -789,16 +817,16 @@ AprilTag 检测在 `camera_color_optical_frame` 系下得到 tag 位姿，通过
 
 ---
 
-## 6. 构建系统
+### 12.6 构建系统
 
-### 6.1 CMake 选项
+#### CMake 选项
 
 | 选项 | 默认 | 说明 |
 |---|---|---|
 | `BUILD_IK_FCL_OMPL_PLANNER` | `OFF` | 编译 C++ 规划器（依赖 TRAC-IK, OMPL, FCL） |
 | `Python3_EXECUTABLE` | 系统默认 | 容器内必须指定 `/usr/bin/python3` |
 
-### 6.2 C++ 可执行文件
+#### C++ 可执行文件
 
 | 二进制 | 源文件 | 说明 |
 |---|---|---|
@@ -809,7 +837,7 @@ AprilTag 检测在 `camera_color_optical_frame` 系下得到 tag 位姿，通过
 | `right_hand_pressure_monitor` | `right_hand_pressure_monitor.cpp` | 手指压力监控 |
 | `visual_detection_tester` | `visual_detection_tester.cpp` | 视觉检测调试工具 |
 
-### 6.3 Python 脚本
+#### Python 脚本
 
 | 脚本 | 说明 |
 |---|---|
@@ -823,7 +851,7 @@ AprilTag 检测在 `camera_color_optical_frame` 系下得到 tag 位姿，通过
 
 ---
 
-## 7. 配置文件对照
+### 12.7 配置文件对照
 
 | 配置文件 | 使用场景 | 包含的节点参数 |
 |---|---|---|
@@ -844,7 +872,7 @@ AprilTag 检测在 `camera_color_optical_frame` 系下得到 tag 位姿，通过
 
 ---
 
-## 8. Launch 组合关系
+### 12.8 Launch 组合关系
 
 ```
 apriltag_button_press.launch.py
@@ -881,7 +909,7 @@ apriltag.launch.py (相机调试)
 
 ---
 
-## 9. 运行时依赖
+### 12.9 运行时依赖
 
 | 层级 | 依赖 |
 |---|---|
