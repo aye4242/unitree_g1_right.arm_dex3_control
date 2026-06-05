@@ -42,6 +42,7 @@ ros2 launch unitree_g1_dex3_stack apriltag_button_press.launch.py dry_run:=false
 
 ![detected_02.jpg](https://wp-cdn.4ce.cn/v2/mcyX4AW.jpeg)
 
+![detected_02.jpg](https://wp-cdn.4ce.cn/v2/UrGEIYU.jpeg)
 **运行环境**：所有 ROS 2 节点均在 Docker 容器内运行（`unitree-dex3:humble`），宿主机通过 `run.sh` 启动。
 
 ---
