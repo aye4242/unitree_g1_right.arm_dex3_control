@@ -44,6 +44,8 @@ ros2 launch unitree_g1_dex3_stack apriltag_button_press.launch.py dry_run:=false
 
 ![detected_02.jpg](https://wp-cdn.4ce.cn/v2/UrGEIYU.jpeg)
 
+有一个待解决的问题：相机识别到Tag码的yz轴（绿色和蓝色），有时候可能会出现位置互换的情况
+
 **运行环境**：所有 ROS 2 节点均在 Docker 容器内运行（`unitree-dex3:humble`），宿主机通过 `run.sh` 启动。
 
 ---
