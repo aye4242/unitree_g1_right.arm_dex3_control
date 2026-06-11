@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-IMAGE_NAME="${IMAGE_NAME:-unitree-dex3:humble}"
+IMAGE_NAME="${IMAGE_NAME:-unitree-dex3:humble-tf}"
 CONTAINER_NAME="${CONTAINER_NAME:-unitree-dex3-dev}"
 UNITREE_NET_IF="${UNITREE_NET_IF:-enP8p1s0}"
 UNITREE_DEX3_DIR="${UNITREE_DEX3_DIR:-/home/unitree/Desktop/unitree_dex3}"
 UNITREE_DEX3_CPP_DIR="${UNITREE_DEX3_CPP_DIR:-/home/unitree/Desktop/unitree_dex3_cpp}"
+YOLONAS_OCR_DIR="${YOLONAS_OCR_DIR:-/home/unitree/Desktop/yolonas_ocr}"
 XR_TELEOPERATE_DIR="${XR_TELEOPERATE_DIR:-/home/unitree/Desktop/xr_teleoperate}"
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 CONTAINER_SHELL_SCRIPT="${SCRIPT_DIR}/container_shell.sh"
@@ -62,6 +63,7 @@ DOCKER_RUN_ARGS=(
   -e "PYTHONPATH=${PYTHONPATH_VALUE}"
   "${DISPLAY_ARGS[@]}"
   -v /dev:/dev
+  -v "${YOLONAS_OCR_DIR}:/workspaces/yolonas_ocr"
   -v "${UNITREE_DEX3_DIR}:/workspaces/unitree_dex3"
   -v "${UNITREE_DEX3_CPP_DIR}:/workspaces/unitree_dex3_cpp"
   -v "${CONTAINER_TOOLS_DIR}:/opt/unitree_dex3_tools:ro"
