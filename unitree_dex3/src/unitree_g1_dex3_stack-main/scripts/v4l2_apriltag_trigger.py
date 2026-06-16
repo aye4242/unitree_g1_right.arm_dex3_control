@@ -211,6 +211,7 @@ class V4L2AprilTagTrigger(Node):
         self.dist_coeffs_live = None
         self._camera_info_logged = False
         self._camera_info_event = threading.Event()
+        self._camera_info_fallback_warned = False
 
         self.detector = Detector(
             families=self.tag_family,
@@ -555,10 +556,6 @@ class V4L2AprilTagTrigger(Node):
                 self.get_logger().warn(
                     '[v4l2_apriltag_trigger] shoulder origin not yet available')
                 return
-        if self.use_live_camera_info and not self._wait_for_camera_info(timeout_s=2.0):
-            self.get_logger().warn(
-                f'[v4l2_apriltag_trigger] no CameraInfo on {self.camera_info_topic}; '
-                f'using fallback camera_matrix from parameters')
         if self.tf_stable_required and not self._wait_for_stable_tf():
             self.get_logger().warn(
                 '[v4l2_apriltag_trigger] TF did not stabilize before capture')
@@ -663,15 +660,6 @@ class V4L2AprilTagTrigger(Node):
             f'target=({goal_x:.3f}, {goal_y:.3f}, {goal_z:.3f}) '
             f'delta=({avg_x - tag_avg_x:.3f}, {avg_y - tag_avg_y:.3f}, {avg_z - tag_avg_z:.3f}) '
             f'@ {self.output_frame}, |target-shoulder|={dist:.3f} m, publishing {self.goal_pose_topic}')
-
-    def _wait_for_camera_info(self, timeout_s):
-        if not self.use_live_camera_info or self._camera_info_event.is_set():
-            return True
-        deadline = time.monotonic() + max(0.0, timeout_s)
-        while time.monotonic() < deadline:
-            if self._camera_info_event.wait(timeout=0.05):
-                return True
-        return self._camera_info_event.is_set()
 
     def _lookup_stable_transform_sample(self):
         transform = self.tf_buffer.lookup_transform(
@@ -926,7 +914,13 @@ class V4L2AprilTagTrigger(Node):
         else:
             gray_detect = gray
 
-        camera_matrix, dist_coeffs, camera_params, _ = self._current_camera_model()
+        camera_matrix, dist_coeffs, camera_params, camera_model_source = self._current_camera_model()
+        if (self.use_live_camera_info and camera_model_source == 'fallback'
+                and not self._camera_info_fallback_warned):
+            self.get_logger().warn(
+                f'[v4l2_apriltag_trigger] no CameraInfo on {self.camera_info_topic}; '
+                f'using fallback camera_matrix from parameters')
+            self._camera_info_fallback_warned = True
         fx, fy, cx, cy = camera_params
         cam_params = (fx * scale, fy * scale, cx * scale, cy * scale)
         detections = self.detector.detect(
