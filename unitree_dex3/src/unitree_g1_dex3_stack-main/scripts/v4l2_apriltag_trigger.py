@@ -102,6 +102,11 @@ class V4L2AprilTagTrigger(Node):
         self.declare_parameter('debug_image_dir', '/home/unitree/Desktop/unitree_dex3/detect_img')
         self.declare_parameter('save_raw_images', False)
         self.declare_parameter('jpeg_quality', 90)
+        # Baseline compensation parameters
+        self.declare_parameter('baseline_compensation_enabled', False)
+        self.declare_parameter('baseline_x', 0.0)
+        self.declare_parameter('baseline_y', 0.0)
+        self.declare_parameter('baseline_z', 0.0)
 
         self.camera_id = str(self.get_parameter('camera_id').value)
         self.expected_serial = str(self.get_parameter('expected_serial').value)
@@ -186,6 +191,18 @@ class V4L2AprilTagTrigger(Node):
         self.debug_image_dir = str(self.get_parameter('debug_image_dir').value)
         self.save_raw_images = _as_bool(self.get_parameter('save_raw_images').value)
         self.jpeg_quality = int(self.get_parameter('jpeg_quality').value)
+
+        # Read baseline compensation parameters
+        self.baseline_enabled = _as_bool(self.get_parameter('baseline_compensation_enabled').value)
+        self.baseline = np.array([
+            float(self.get_parameter('baseline_x').value),
+            float(self.get_parameter('baseline_y').value),
+            float(self.get_parameter('baseline_z').value),
+        ])
+        if self.baseline_enabled:
+            self.get_logger().info(
+                f'[baseline_compensation] enabled, baseline: ({self.baseline[0]:.4f}, '
+                f'{self.baseline[1]:.4f}, {self.baseline[2]:.4f})')
 
         self._waiting_for_completion = False
         self._completion_timer = None
@@ -605,6 +622,20 @@ class V4L2AprilTagTrigger(Node):
         final_target_pose.pose.position.x = avg_x
         final_target_pose.pose.position.y = avg_y
         final_target_pose.pose.position.z = avg_z
+
+        # Apply baseline compensation
+        if self.baseline_enabled:
+            current_tag = np.array([tag_avg_x, tag_avg_y, tag_avg_z])
+            offset_compensation = current_tag - self.baseline
+            final_target_pose.pose.position.x -= offset_compensation[0]
+            final_target_pose.pose.position.y -= offset_compensation[1]
+            final_target_pose.pose.position.z -= offset_compensation[2]
+            self.get_logger().info(
+                f'[baseline_compensation] offset: ({offset_compensation[0]:.4f}, '
+                f'{offset_compensation[1]:.4f}, {offset_compensation[2]:.4f}) '
+                f'corrected: ({final_target_pose.pose.position.x:.3f}, '
+                f'{final_target_pose.pose.position.y:.3f}, {final_target_pose.pose.position.z:.3f})')
+
         if not self.publish_intermediate_poses:
             self.tag_pose_pub.publish(final_tag_pose)
             self.target_pose_pub.publish(final_target_pose)

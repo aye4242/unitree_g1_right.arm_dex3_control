@@ -43,6 +43,10 @@ v4l2_apriltag_trigger:
     debug_image_dir: "/workspaces/unitree_dex3/detect_img"
     save_raw_images: false
     jpeg_quality: 90
+    baseline_compensation_enabled: true
+    baseline_x: 0.4680
+    baseline_y: -0.0700
+    baseline_z: 0.1322
 
 apriltag_button_press_node:
   ros__parameters:
