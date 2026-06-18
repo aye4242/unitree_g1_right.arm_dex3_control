@@ -122,6 +122,7 @@ install(PROGRAMS
   scripts/apriltag_button_press_node.py
   scripts/apriltag_reach_uat.py
   scripts/gravity_torque_publisher.py
+  scripts/button_detector_node.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

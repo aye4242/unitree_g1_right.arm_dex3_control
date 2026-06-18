@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Robot Camera</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #111; color: #eee; font-family: sans-serif; }
+    main { display: grid; min-height: 100%; place-items: center; }
+    img { max-width: 100vw; max-height: 100vh; object-fit: contain; }
+    .bar { position: fixed; left: 0; top: 0; right: 0; padding: 8px 10px; background: rgba(0,0,0,.65); font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="bar">Robot camera live snapshot: <span id="stamp"></span></div>
+  <main><img id="frame" src="latest.jpg"></main>
+  <script>
+    const img = document.getElementById('frame');
+    const stamp = document.getElementById('stamp');
+    setInterval(() => {
+      const t = Date.now();
+      img.src = 'latest.jpg?t=' + t;
+      stamp.textContent = new Date(t).toLocaleTimeString();
+    }, 250);
+  </script>
+</body>
+</html>

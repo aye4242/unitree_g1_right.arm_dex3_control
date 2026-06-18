@@ -7,7 +7,7 @@ v4l2_apriltag_trigger:
     image_width: 640
     image_height: 480
     fps: 6.0
-    fourcc: "YUYV"
+    fourcc: "MJPG"
     sample_count: 4
     warmup_frames: 12
     warmup_min_s: 5.0

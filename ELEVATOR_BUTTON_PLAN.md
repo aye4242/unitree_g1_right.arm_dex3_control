@@ -1,280 +1,442 @@
-# 电梯按键视觉方案 — 方案B增强版
+# 电梯按键视觉定位方案
 
-> 无侵入 · 语义感知 · 触觉闭环  
-> 适用平台：Unitree G1 + Dex3-1 灵巧手 + Intel D435i + ROS 2
-
----
-
-## 开发策略：三步递进
-
-### 第一步 — SatArw/yolonas_ocr 现有模型（立即尝试）
-
-先用 [SatArw/yolonas_ocr](https://github.com/SatArw/yolonas_ocr) 仓库中的现有模型验证检测+识别效果：
-
-| 组件 | 文件 | 说明 |
-|------|------|------|
-| 按钮检测 | `frozen_model/detection_graph.pb` | Faster R-CNN，TF1，类别：`button` |
-| 字符识别 | `frozen_model/ocr_graph.pb` | 专用OCR，47字符，输入180×180 |
-
-**接入方式：**
-- 用 `tf.compat.v1` 加载 `.pb` 冻结图（兼容TF2环境）
-- 检测输出 BBox → 深度投影 → 发布 `/elevator/target_pose`
-- OCR 输出楼层字符 → 发布 `/elevator/floor_label`
-
-**验证目标：** 确认现有模型在目标电梯环境下的检测率和识别率是否可用。
-
-### 第二步 — 纯 OCR 兜底（如第一步效果差）
-
-若 `detection_graph.pb` 在目标环境表现不佳，切换为 PaddleOCR 全图扫描：
-
-```python
-import re
-valid = [d for d in ocr_results if re.match(r'^(B?\d+F?|[A-Z]?\d+)$', d['text'])]
-```
-
-### 第三步 — 训练 YOLOv11n（如前两步均不满足要求）
-
-自采数据（50-100张）+ labelImg 标注 → 训练专用模型。
-
-```
-yolo train model=yolo11n.pt data=elevator.yaml epochs=50 imgsz=640
-```
-
-### 决策流程
-
-```
-尝试 SatArw 现有模型
-  ├── 检测率 > 80% 且识别准确 → 直接集成，进入执行层开发
-  ├── 检测差但识别OK         → 换 PaddleOCR 全图 + 保留 ocr_graph.pb
-  └── 整体效果不满足         → 训练 YOLOv11n（第三步）
-```
+**核心策略：一次性标定 + 纯视觉运行**
 
 ---
 
-## 背景与动机
+## 一、方案概述
 
-### 现有方案（AprilTag）的局限
+### 核心思路
 
-| 问题 | 说明 |
+**标定阶段（实验室，一次性）：**
+使用 AprilTag 建立相机坐标系到机器人坐标系的变换关系，保存变换矩阵。
+
+**运行阶段（电梯内，无需 AprilTag）：**
+使用 yolonas_ocr + D435i 深度信息直接检测和定位按键，应用变换矩阵转换到机器人坐标系。
+
+### 方案优势
+
+| 项目 | 说明 |
 |------|------|
-| 侵入性 | 必须在电梯面板贴 AprilTag 标签 |
-| 无语义 | 只知道"按哪里"，不知道"按几楼" |
-| 依赖人工 | 每个电梯环境都需要重新布置标签 |
-
-### 方案B增强版目标
-
-- 直接识别电梯原生按钮，无需贴标签
-- 通过 OCR 获取楼层语义（"按3楼"）
-- 触觉闭环判定按压成功，不依赖纯视觉坐标
+| ✅ 实用性强 | 实际使用不需要 AprilTag 辅助板 |
+| ✅ 适用性广 | 适用于任何电梯环境 |
+| ✅ 精度足够 | 总误差 ±7mm，满足按压需求 |
+| ✅ 部署快速 | 一次标定，永久使用 |
 
 ---
 
-## 整体架构
+## 二、技术架构
+
+### 2.1 系统流程
 
 ```
-感知层（双环语义定位）
-  ├── YOLOv11  →  按钮 2D BBox
-  ├── D435i 深度图  →  Z 坐标（毫米精度）
-  └── PaddleOCR  →  楼层数字识别
+标定阶段（一次性）：
+AprilTag 检测 → 相机坐标 Pc
+       +
+机器人按压记录 → 机器人坐标 Pr
+       ↓
+  计算变换矩阵 T
+       ↓
+   保存到配置文件
 
-        ↓ /elevator/target_pose (PoseStamped, torso_link)
-
-决策层（五阶段状态机）
-  IDLE → DETECT → ALIGN → PRESS → VERIFY → RETURN
-
-        ↓ /goal_pose + Dex3 setpoint
-
-执行层（顺应性按压）
-  ├── 渐进式轨迹控制（模拟 Z 轴柔顺）
-  └── 触觉阵列闭环（/dex3/right/tactile_agg）
+运行阶段（实际使用）：
+yolonas_ocr 检测 → 像素坐标 (u,v) + 深度 d
+       ↓
+   相机坐标 Pc = deproject(u,v,d)
+       ↓
+   应用变换 Pr = T × Pc
+       ↓
+   机器人按压目标位置
 ```
+
+### 2.2 硬件配置
+
+- **相机：** Intel RealSense D435i（RGB-D）
+- **机器人：** 宇树 G1 右臂 + Dex3 灵巧手
+- **检测模型：** yolonas_ocr（已训练）
+  - `frozen_model/detection_graph.pb`（按键检测）
+  - `frozen_model/ocr_graph.pb`（字符识别）
 
 ---
 
-## 一、感知层：双环语义定位
+## 三、坐标变换原理
 
-### 1.1 粗检索 — YOLO 按钮检测
+### 3.1 坐标系定义
 
-- 订阅 `/camera/color/image_raw`
-- YOLOv11n 框选面板区域内所有按钮（2D BBox）
-- PaddleOCR 对每个 BBox crop 识别楼层字符
-- 建立映射表：`{楼层字符 → 像素中心坐标 (cx, cy)}`
+**相机坐标系：**
+- 原点：相机光心
+- X 向右，Y 向下，Z 向前
+- 单位：米
 
-**YOLO 权重选择：**
+**机器人坐标系：**
+- 原点：机器人基座/躯干
+- 根据机器人定义（通常 X 前 Y 左 Z 上）
+- 单位：米
 
-| 选项 | 工作量 | 精度 |
-|------|--------|------|
-| 通用 YOLO + 手工 ROI 裁剪送 OCR | 0天 | 中 |
-| 标注 ~200 张图微调 YOLOv11n | 2-3天 | 高 |
+### 3.2 变换公式
 
-### 1.2 精定位 — D435i 深度投影
-
-锁定目标按键后，从深度图提取 Z 坐标：
+**步骤 1：像素坐标 → 相机 3D 坐标**
 
 ```python
-# 深度图切片 + 双边滤波去噪（应对金属反光面板）
-roi = depth_img[y1:y2, x1:x2]
-roi_filtered = cv2.bilateralFilter(roi.astype(np.float32), 9, 75, 75)
-depth_m = np.median(roi_filtered[roi_filtered > 0]) / 1000.0
-
-# 反投影：像素 → 相机坐标系
-x_c = (cx - K[0,2]) * depth_m / K[0,0]
-y_c = (cy - K[1,2]) * depth_m / K[1,1]
-z_c = depth_m
-
-# TF2 变换至 torso_link → 发布 /elevator/target_pose
+# 使用 D435i 内参和深度
+point_camera = rs.rs2_deproject_pixel_to_point(
+    intrinsics,  # 相机内参（fx, fy, cx, cy）
+    [pixel_x, pixel_y],
+    depth  # 单位：米
+)
+# 返回：[Xc, Yc, Zc] 在相机坐标系中
 ```
 
-**精度估算（机器人站稳状态）：**
-
-- D435i 深度误差：±2mm @ 0.5m，±6mm @ 1.5m
-- YOLO 中心点像素误差：±3~5px ≈ ±3mm
-- **综合误差：< 10mm** ✅ 满足按压需求
-
-### 1.3 ROS Topic 接口
-
-| Topic | 方向 | 说明 |
-|-------|------|------|
-| `/camera/color/image_raw` | 订阅 | RGB 图像（已有） |
-| `/camera/color/camera_info` | 订阅 | 内参（已有） |
-| `/camera/depth/image_rect_raw` | 订阅 | **新增** |
-| `/elevator/target_pose` | 发布 | 目标按键三维位姿 |
-| `/elevator/floor_label` | 发布 | OCR 识别的楼层字符（String） |
-
----
-
-## 二、决策层：五阶段状态机
-
-```
-┌─────────┐    站稳 + 触发     ┌──────────┐
-│  IDLE   │ ─────────────────► │  DETECT  │
-└─────────┘                    └──────────┘
-                                     │ 目标楼层确认
-                                     ▼
-                               ┌──────────┐
-                               │  ALIGN   │ ← (可选) Livox 对齐面板朝向
-                               └──────────┘
-                                     │
-                                     ▼
-                               ┌──────────┐
-                               │  PRESS   │ ← 渐进刺击 + Dex3 伸指
-                               └──────────┘
-                                     │
-                                     ▼
-                               ┌──────────┐
-                               │  VERIFY  │ ← 触觉阵列判定成功
-                               └──────────┘
-                                     │
-                                     ▼
-                               ┌──────────┐
-                               │  RETURN  │ ← 回缩 + return_to_standing
-                               └──────────┘
-```
-
-| 阶段 | 触发条件 | 执行动作 |
-|------|---------|---------|
-| IDLE | — | 等待触发键（G 键 或 ROS topic） |
-| DETECT | 触发 | YOLO + OCR 建立楼层→坐标映射 |
-| ALIGN | 检测完成 | (可选) 激光雷达辅助调整朝向 |
-| PRESS | 对齐完成 | 渐进轨迹 + Dex3 伸中指 → 按压 |
-| VERIFY | 触觉阈值达到 | 判定成功，Dex3 复位 |
-| RETURN | 验证完成 | 手臂回缩 → return_to_standing |
-
----
-
-## 三、执行层：顺应性按压
-
-### 3.1 渐进式轨迹控制（Z 轴柔顺替代方案）
-
-不修改底层控制器，用多步渐进模拟顺应性：
-
-```
-pre-contact（目标前 5cm）
-  → 每步前进 2mm，检查触觉反馈
-  → 合力超阈值 → 停止，判定成功
-  → 超出最大步数 → 失败回退
-```
-
-参数建议：单步 2mm，最大 30 步（共 6cm 探进空间），每步超时 500ms。
-
-### 3.2 触觉闭环判定（核心安全保障）
-
-**数据来源：** `/dex3/right/tactile_agg`（Float32MultiArray）
+**步骤 2：相机坐标系 → 机器人坐标系**
 
 ```python
-INVALID = 30000
-SCALE   = 10000.0
-
-valid = [p / SCALE - baseline[i]
-         for i, p in enumerate(msg.data)
-         if p != INVALID]
-
-# 合力 > 阈值 且持续 0.5s → 判定按压成功
-if sum(valid) > PRESS_THRESHOLD:  # 建议 5N-8N
-    press_success = True
-```
-
-触觉判定优于纯视觉坐标到达：视觉有 5~10mm 残差，刚性"到坐标即停"可能顶坏减速器；触觉是物理接触的直接证明。
-
----
-
-## 四、实施路线图
-
-### Phase 1 — 核心路径（预计 3-5 天）
-
-```
-[ ] 新建 button_detector_node.py
-      YOLO + D435i深度 + PaddleOCR
-      发布 /elevator/target_pose + /elevator/floor_label
-
-[ ] 改造 apriltag_button_press_node.py
-      订阅 /dex3/right/tactile_agg
-      用力阈值判定替换原"等待轨迹时间"逻辑
-      兼容接收 /elevator/target_pose
-```
-
-### Phase 2 — 增强（预计 1-2 周）
-
-```
-[ ] 五阶段状态机重构
-[ ] YOLOv11n 按钮数据集标注 + 微调
-[ ] Livox Mid-360 面板朝向对齐集成
+# 应用标定得到的变换矩阵 T (4×4)
+point_camera_homo = np.array([Xc, Yc, Zc, 1.0])
+point_robot_homo = T @ point_camera_homo
+point_robot = point_robot_homo[:3]
+# 返回：[Xr, Yr, Zr] 在机器人坐标系中
 ```
 
 ---
 
-## 五、与被否定方案的区分
+## 四、精度分析
 
-| 方案 | 否定原因 | 本方案的区别 |
-|------|---------|------------|
-| YoloNAS OCR | TF1依赖 + 无3D坐标 + 模型未开源 | 用 PaddleOCR（已在项目）+ D435i真实深度 |
-| YOLO-3D (niconielsen) | Depth Anything 相对深度，无物理单位 | 用 D435i 硬件深度（绝对毫米精度） |
+### 4.1 误差来源
+
+假设按键距离相机 **0.5 米**：
+
+| 误差源 | 典型值 | 说明 |
+|--------|--------|------|
+| 检测框中心 | ±2-3 像素 | yolonas_ocr 边界框定位 |
+| 像素投影误差 | ±3mm | 2像素 @ 0.5m 距离 |
+| D435i 深度 | ±5mm | 深度传感器精度 @ 0.5m |
+| 坐标变换 | ±3mm | 标定质量决定 |
+
+### 4.2 总误差估算
+
+使用误差传播公式（RSS）：
+
+```
+σ_total = √(σ_pixel² + σ_depth² + σ_transform²)
+        = √(3² + 5² + 3²)
+        ≈ ±7mm
+```
+
+**结论：**
+- 按键尺寸：40-50mm
+- 误差：±7mm（< 15% 按键尺寸）
+- ✅ **满足按压精度需求**
 
 ---
 
-## 六、关键参数速查
+## 五、实施步骤
+
+### 阶段 1：环境准备（0.5 天）
+
+**硬件检查：**
+- [ ] D435i 相机连接测试
+- [ ] 相机固定稳定性检查
+- [ ] 相机视野覆盖按键区域
+
+**软件环境：**
+```bash
+pip install pyrealsense2 opencv-python numpy scipy
+```
+
+**模型验证：**
+```bash
+cd yolonas_ocr
+python batch_detect.py  # 验证模型可用
+```
+
+### 阶段 2：相机内参确认（0.5 天）
+
+D435i 出厂已标定，直接读取内参：
+
+```python
+import pyrealsense2 as rs
+
+pipeline = rs.pipeline()
+config = rs.config()
+config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 30)
+config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 30)
+
+pipeline.start(config)
+frames = pipeline.wait_for_frames()
+color_frame = frames.get_color_frame()
+
+intrinsics = color_frame.profile.as_video_stream_profile().intrinsics
+print(f"fx={intrinsics.fx}, fy={intrinsics.fy}")
+print(f"cx={intrinsics.cx}, cy={intrinsics.cy}")
+```
+
+### 阶段 3：坐标系标定（1-2 天）
+
+**3.1 准备 AprilTag 板**
+- 打印 AprilTag（推荐 tag36h11）
+- 固定在平整板上
+- 记录 Tag 尺寸
+
+**3.2 数据采集（5-10 个位姿）**
+
+在不同位置和角度采集数据：
+
+```
+位姿要求：
+- 距离：0.3m - 1.0m
+- 角度：±30° 俯仰和偏航
+- 位置：左、中、右、上、下
+
+每个位姿记录：
+1. 相机检测 AprilTag → Pc_tag
+2. 机器人按压 Tag 中心 → Pr_tag
+3. 保存数据对
+```
+
+**3.3 计算变换矩阵**
+
+```python
+import numpy as np
+
+def compute_transform(camera_points, robot_points):
+    """
+    计算从相机坐标系到机器人坐标系的变换
+    """
+    # 中心化
+    cam_mean = np.mean(camera_points, axis=0)
+    rob_mean = np.mean(robot_points, axis=0)
+    cam_centered = camera_points - cam_mean
+    rob_centered = robot_points - rob_mean
+    
+    # SVD 求解旋转矩阵
+    H = cam_centered.T @ rob_centered
+    U, S, Vt = np.linalg.svd(H)
+    R = Vt.T @ U.T
+    
+    if np.linalg.det(R) < 0:
+        Vt[-1, :] *= -1
+        R = Vt.T @ U.T
+    
+    t = rob_mean - R @ cam_mean
+    
+    # 构造齐次变换矩阵
+    T = np.eye(4)
+    T[:3, :3] = R
+    T[:3, 3] = t
+    
+    return T
+
+# 使用采集的数据
+T = compute_transform(camera_points_array, robot_points_array)
+np.save('camera_to_robot_transform.npy', T)
+```
+
+### 阶段 4：检测节点开发（2-3 天）
+
+**4.1 创建检测节点**
+
+文件：`elevator_vision/scripts/button_detector_node.py`
+
+```python
+#!/usr/bin/env python3
+import rclpy
+from rclpy.node import Node
+import numpy as np
+import cv2
+import pyrealsense2 as rs
+from geometry_msgs.msg import PoseStamped
+
+class ButtonDetectorNode(Node):
+    def __init__(self):
+        super().__init__('button_detector')
+        
+        # 加载变换矩阵
+        self.T = np.load('camera_to_robot_transform.npy')
+        
+        # 加载 yolonas_ocr 模型
+        self.load_detection_model()
+        
+        # 初始化相机
+        self.init_camera()
+        
+        # 发布检测结果
+        self.pose_pub = self.create_publisher(
+            PoseStamped, 
+            '/elevator/button_pose', 
+            10
+        )
+        
+        # 定时检测
+        self.create_timer(0.1, self.detect_callback)
+    
+    def detect_callback(self):
+        # 1. 获取图像和深度
+        frames = self.pipeline.wait_for_frames()
+        color_frame = frames.get_color_frame()
+        depth_frame = frames.get_depth_frame()
+        
+        if not color_frame or not depth_frame:
+            return
+        
+        # 2. 转换为 numpy 数组
+        color_image = np.asanyarray(color_frame.get_data())
+        depth_image = np.asanyarray(depth_frame.get_data())
+        
+        # 3. yolonas_ocr 检测
+        detections = self.detect_buttons(color_image)
+        
+        # 4. 对每个检测结果
+        for det in detections:
+            cx, cy = det['center']
+            text = det['text']
+            
+            # 5. 获取深度
+            depth = depth_frame.get_distance(int(cx), int(cy))
+            
+            if depth == 0 or depth > 3.0:
+                continue
+            
+            # 6. 像素 → 相机 3D
+            point_cam = rs.rs2_deproject_pixel_to_point(
+                self.intrinsics, [cx, cy], depth
+            )
+            
+            # 7. 相机 → 机器人坐标系
+            point_cam_homo = np.array([*point_cam, 1.0])
+            point_robot = self.T @ point_cam_homo
+            
+            # 8. 发布目标位置
+            pose = PoseStamped()
+            pose.header.frame_id = 'torso_link'
+            pose.header.stamp = self.get_clock().now().to_msg()
+            pose.pose.position.x = point_robot[0]
+            pose.pose.position.y = point_robot[1]
+            pose.pose.position.z = point_robot[2]
+            
+            self.pose_pub.publish(pose)
+            self.get_logger().info(
+                f"检测到按键 '{text}' 位置: "
+                f"({point_robot[0]:.3f}, {point_robot[1]:.3f}, {point_robot[2]:.3f})"
+            )
+```
+
+**4.2 集成到现有系统**
+
+修改 `apriltag_button_press_node.py`，订阅 `/elevator/button_pose` 替代原来的 AprilTag 话题。
+
+### 阶段 5：测试和优化（1-2 天）
+
+**测试内容：**
+1. 静态精度测试（固定距离和角度）
+2. 动态鲁棒性测试（不同光照、角度）
+3. 实际按压成功率统计
+
+**优化方向：**
+- 深度滤波（去除噪声）
+- 多帧平均（提高稳定性）
+- 置信度阈值调整
+
+---
+
+## 六、关键参数配置
 
 ```yaml
-# 感知层
-yolo_conf_threshold: 0.45
-ocr_lang: "ch"                    # 中文楼层（如"3F"）或 "en"
-depth_bilateral_d: 9
-depth_bilateral_sigma: 75
+# 相机配置
+camera:
+  width: 1280
+  height: 720
+  fps: 30
+  
+# 检测参数
+detection:
+  confidence_threshold: 0.5  # 检测置信度阈值
+  max_distance: 1.5  # 最大检测距离（米）
+  min_distance: 0.3  # 最小检测距离（米）
 
-# 执行层
-pre_contact_offset_x: 0.05       # 预接触退后 5cm（现有）
-press_step_m: 0.002              # 每步前进 2mm
-press_max_steps: 30              # 最大探进 6cm
-press_step_timeout_s: 0.5        # 每步超时
+# 深度处理
+depth:
+  filter_enable: true
+  filter_type: 'bilateral'  # 双边滤波
+  filter_d: 9
+  filter_sigma: 75
 
-# 触觉闭环
-tactile_press_threshold_n: 6.0  # 判定按压成功的合力阈值（N）
-tactile_hold_duration_s: 0.5    # 持续时间要求
-tactile_invalid_value: 30000    # 无效 taxel 标记值
-tactile_scale: 10000.0          # 压力归一化系数
+# 坐标变换
+transform:
+  matrix_file: 'camera_to_robot_transform.npy'
 ```
 
 ---
 
-*文档生成时间：2026-06-09*  
-*基于项目 `unitree_g1_right.arm_dex3_control` 现有代码分析*
+## 七、故障排查
+
+### 问题 1：深度值为 0 或不准确
+
+**可能原因：**
+- 反光表面
+- 距离超出范围
+- 光照太强/太弱
+
+**解决方案：**
+```python
+# 使用邻域深度中值
+roi = depth_image[cy-5:cy+5, cx-5:cx+5]
+depth = np.median(roi[roi > 0])
+```
+
+### 问题 2：检测不到按键
+
+**可能原因：**
+- 模型不适配当前环境
+- 光照条件差异大
+
+**解决方案：**
+- 调低置信度阈值
+- 图像预处理（对比度增强）
+- 重新训练或微调模型
+
+### 问题 3：按压位置偏移
+
+**可能原因：**
+- 标定精度不够
+- 相机移动或松动
+
+**解决方案：**
+- 重新标定（多采集几个位姿）
+- 检查相机固定是否牢固
+- 使用 AprilTag 实时校准（混合模式）
+
+---
+
+## 八、项目时间表
+
+| 阶段 | 任务 | 预计时间 |
+|------|------|---------|
+| 1 | 环境准备 | 0.5 天 |
+| 2 | 相机内参确认 | 0.5 天 |
+| 3 | 坐标系标定 | 1-2 天 |
+| 4 | 检测节点开发 | 2-3 天 |
+| 5 | 测试和优化 | 1-2 天 |
+| **总计** | | **5-8 天** |
+
+---
+
+## 九、总结
+
+本方案通过 **一次性标定 + 纯视觉运行** 实现了无需 AprilTag 辅助板的电梯按键检测和按压。
+
+**核心优势：**
+1. ✅ **实用性强：** 适用于任何电梯，无需辅助设备
+2. ✅ **精度足够：** ±7mm 误差满足按压需求
+3. ✅ **部署简单：** 一次标定，永久使用
+4. ✅ **成本低：** 复用现有硬件和模型
+
+**预期效果：**
+- 检测成功率：> 95%
+- 按压成功率：> 90%
+- 单次检测时间：< 1s
+
+---
+
+*文档版本：v2.0*  
+*创建日期：2026-06-16*  
+*方案：一次性标定 + 纯视觉运行*
