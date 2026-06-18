@@ -24,11 +24,14 @@ import time
 import numpy as np
 import rclpy
 from rclpy.node import Node
+from rclpy.duration import Duration
 from sensor_msgs.msg import Image, CameraInfo
 from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import String
 from cv_bridge import CvBridge
 from pathlib import Path
+import tf2_ros
+import tf2_geometry_msgs  # noqa: F401
 
 pass  # ButtonDetector imported after frozen_model_dir param is read (see __init__)
 
@@ -39,8 +42,10 @@ class ButtonDetectorNode(Node):
 
         self.declare_parameter('target_floor',     0)
         self.declare_parameter('det_threshold',    0.5)
+        self.declare_parameter('camera_frame',     'camera_color_optical_frame')
         self.declare_parameter('output_frame',     'torso_link')
-        self.declare_parameter('frozen_model_dir', '')
+        self.declare_parameter('tf_lookup_timeout_s', 0.2)
+        self.declare_parameter('frozen_model_dir', '/workspaces/yolonas_ocr/frozen_model')
         self.declare_parameter('input_backend',    'ros')
         self.declare_parameter('video_device',     'auto')
         self.declare_parameter('image_width',      640)
@@ -53,7 +58,9 @@ class ButtonDetectorNode(Node):
         self.declare_parameter('transform_matrix_path', '')
 
         self.target_floor = self.get_parameter('target_floor').value
+        self.camera_frame = self.get_parameter('camera_frame').value
         self.output_frame = self.get_parameter('output_frame').value
+        self.tf_timeout_s = float(self.get_parameter('tf_lookup_timeout_s').value)
         thresh            = self.get_parameter('det_threshold').value
         model_dir         = self.get_parameter('frozen_model_dir').value or None
         self.input_backend = str(self.get_parameter('input_backend').value).lower()
@@ -80,20 +87,32 @@ class ButtonDetectorNode(Node):
         self._capture = None
         self._last_no_floor_log = 0.0
 
-        # 加载静态变换矩阵
-        transform_path = self.get_parameter('transform_matrix_path').value
-        if not transform_path:
-            transform_path = str(Path(__file__).parent.parent / 'transforms' / 'camera_to_robot.npy')
-        self.T_cam_to_robot = np.load(transform_path)
-        self.get_logger().info(f'已加载变换矩阵: {transform_path}')
+        # TF2 动态变换
+        self.tf_buffer = tf2_ros.Buffer()
+        self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
 
-        self.pose_pub  = self.create_publisher(PoseStamped, '/elevator/target_pose', 10)
+        # 移除静态变换矩阵加载（改用TF2）
+        # transform_path = self.get_parameter('transform_matrix_path').value
+        # if not transform_path:
+        #     transform_path = str(Path(__file__).parent.parent / 'transforms' / 'camera_to_robot.npy')
+        # self.T_cam_to_robot = np.load(transform_path)
+        # self.get_logger().info(f'已加载变换矩阵: {transform_path}')
+
+        self.pose_pub  = self.create_publisher(PoseStamped, '/apriltag/target_pose', 10)
         self.label_pub = self.create_publisher(String,      '/elevator/floor_label',  10)
 
         qos = rclpy.qos.QoSPresetProfiles.SENSOR_DATA.value
-        self.declare_parameter('image_topic', '/camera/realsense2_camera/color/image_raw')
-        self.declare_parameter('info_topic',  '/camera/realsense2_camera/color/camera_info')
-        self.declare_parameter('depth_topic', '/camera/realsense2_camera/depth/image_rect_raw')
+        self.declare_parameter('image_topic', '/camera/camera/color/image_raw')
+        self.declare_parameter('info_topic',  '/camera/camera/color/camera_info')
+        self.declare_parameter('depth_topic', '/camera/camera/depth/image_rect_raw')
+        self.declare_parameter('capture_trigger_topic', '/apriltag/capture_trigger')
+
+        # 订阅触发话题（与旧方案兼容）
+        capture_topic = str(self.get_parameter('capture_trigger_topic').value)
+        if capture_topic:
+            from std_msgs.msg import Empty
+            self.create_subscription(Empty, capture_topic, self._trigger_cb, 10)
+            self.get_logger().info(f'subscribed to capture trigger: {capture_topic}')
 
         if self.input_backend == 'v4l2':
             self._init_v4l2()
@@ -111,6 +130,10 @@ class ButtonDetectorNode(Node):
             f'button_detector_node ready  backend={self.input_backend} '
             f'threshold={thresh} target_floor={self.target_floor} '
             f'output_frame={self.output_frame}')
+
+    def _trigger_cb(self, msg):
+        """响应按压节点的capture trigger（与旧方案兼容）"""
+        self.get_logger().info('received capture trigger, processing next frame...')
 
     def _info_cb(self, msg: CameraInfo):
         if self.camera_info is None:
@@ -170,8 +193,21 @@ class ButtonDetectorNode(Node):
         ih, iw = img_bgr.shape[:2]
         dx = int(cx_px * dw / iw)
         dy = int(cy_px * dh / ih)
-        depth_mm = float(self.latest_depth[
-            np.clip(dy, 0, dh - 1), np.clip(dx, 0, dw - 1)])
+
+        # 深度中值滤波（5x5邻域）
+        window = 2
+        y1 = max(0, dy - window)
+        y2 = min(dh, dy + window + 1)
+        x1 = max(0, dx - window)
+        x2 = min(dw, dx + window + 1)
+        roi = self.latest_depth[y1:y2, x1:x2]
+        valid_depths = roi[roi > 0]
+
+        if len(valid_depths) == 0:
+            self.get_logger().warn(f'no valid depth in ROI at ({dx},{dy})')
+            return
+
+        depth_mm = float(np.median(valid_depths))
 
         if depth_mm <= 0 or depth_mm > 3000:
             self.get_logger().warn(f'invalid depth {depth_mm:.0f}mm at ({dx},{dy})')
@@ -181,33 +217,30 @@ class ButtonDetectorNode(Node):
         d = depth_mm / 1000.0
 
         # 相机坐标系中的3D点
-        point_cam = np.array([
-            (cx_px - cx) * d / fx,
-            (cy_px - cy) * d / fy,
-            d,
-            1.0
-        ])
-
-        # 应用静态变换矩阵
-        point_robot = self.T_cam_to_robot @ point_cam
-
-        # 发布机器人坐标系中的目标位置
-        pose_out = PoseStamped()
+        pose_cam = PoseStamped()
         if stamp is not None:
-            pose_out.header.stamp = stamp
+            pose_cam.header.stamp = stamp
         else:
-            pose_out.header.stamp = self.get_clock().now().to_msg()
-        pose_out.header.frame_id = self.output_frame
-        pose_out.pose.position.x = point_robot[0]
-        pose_out.pose.position.y = point_robot[1]
-        pose_out.pose.position.z = point_robot[2]
-        pose_out.pose.orientation.w = 1.0
+            pose_cam.header.stamp = self.get_clock().now().to_msg()
+        pose_cam.header.frame_id = self.camera_frame
+        pose_cam.pose.position.x = (cx_px - cx) * d / fx
+        pose_cam.pose.position.y = (cy_px - cy) * d / fy
+        pose_cam.pose.position.z = d
+        pose_cam.pose.orientation.w = 1.0
 
-        self.pose_pub.publish(pose_out)
+        # 使用TF2动态变换到机器人坐标系
+        try:
+            timeout = Duration(seconds=self.tf_timeout_s)
+            pose_robot = self.tf_buffer.transform(pose_cam, self.output_frame, timeout=timeout)
 
-        self.get_logger().info(
-            f"floor='{candidate['text']}' conf={candidate['score']:.2f} "
-            f"depth={d:.3f}m  torso({point_robot[0]:.3f},{point_robot[1]:.3f},{point_robot[2]:.3f})")
+            self.pose_pub.publish(pose_robot)
+
+            self.get_logger().info(
+                f"floor='{candidate['text']}' conf={candidate['score']:.2f} "
+                f"depth={d:.3f}m  torso({pose_robot.pose.position.x:.3f},"
+                f"{pose_robot.pose.position.y:.3f},{pose_robot.pose.position.z:.3f})")
+        except tf2_ros.TransformException as ex:
+            self.get_logger().warn(f'TF transform failed: {ex}')
 
     def _init_v4l2(self):
         import cv2
