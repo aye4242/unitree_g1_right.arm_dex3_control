@@ -86,6 +86,7 @@ class ButtonDetectorNode(Node):
         self.latest_depth = None   # np.ndarray uint16, mm
         self._capture = None
         self._last_no_floor_log = 0.0
+        self._last_image_time = 0.0   # 用于检测图像断流
 
         # TF2 动态变换
         self.tf_buffer = tf2_ros.Buffer()
@@ -133,7 +134,13 @@ class ButtonDetectorNode(Node):
 
     def _trigger_cb(self, msg):
         """响应按压节点的capture trigger（与旧方案兼容）"""
-        self.get_logger().info('received capture trigger, processing next frame...')
+        age = time.monotonic() - self._last_image_time
+        if self._last_image_time == 0.0 or age > 3.0:
+            self.get_logger().warn(
+                f'capture trigger received but no image in {age:.1f}s — '
+                'check RealSense is publishing!')
+        else:
+            self.get_logger().info('received capture trigger, processing next frame...')
 
     def _info_cb(self, msg: CameraInfo):
         if self.camera_info is None:
@@ -148,6 +155,7 @@ class ButtonDetectorNode(Node):
             msg, desired_encoding='passthrough')
 
     def _rgb_cb(self, msg: Image):
+        self._last_image_time = time.monotonic()
         if self.camera_info is None or self.latest_depth is None:
             return
 
@@ -216,12 +224,9 @@ class ButtonDetectorNode(Node):
         fx, fy, cx, cy = self.camera_info
         d = depth_mm / 1000.0
 
-        # 相机坐标系中的3D点
+        # 相机坐标系中的3D点（用Time(0)请求最新TF，避免时间戳过期）
         pose_cam = PoseStamped()
-        if stamp is not None:
-            pose_cam.header.stamp = stamp
-        else:
-            pose_cam.header.stamp = self.get_clock().now().to_msg()
+        pose_cam.header.stamp = rclpy.time.Time().to_msg()
         pose_cam.header.frame_id = self.camera_frame
         pose_cam.pose.position.x = (cx_px - cx) * d / fx
         pose_cam.pose.position.y = (cy_px - cy) * d / fy
