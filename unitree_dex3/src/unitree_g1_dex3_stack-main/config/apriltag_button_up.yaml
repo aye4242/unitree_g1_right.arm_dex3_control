@@ -7,7 +7,7 @@ v4l2_apriltag_trigger:
     image_width: 640
     image_height: 480
     fps: 6.0
-    fourcc: "MJPG"
+    fourcc: "YUYV"
     sample_count: 4
     warmup_frames: 12
     warmup_min_s: 2.0
@@ -17,7 +17,7 @@ v4l2_apriltag_trigger:
     tag_family: "tag36h11"
     tag_size: 0.08
     target_tag_id: 0
-    offset_xyz: [-0.11, -0.01, -0.06]
+    offset_xyz: [-0.10, -0.10, -0.06]
     decision_margin_min: 25.0
     detect_scale: 0.5
 
@@ -43,6 +43,10 @@ v4l2_apriltag_trigger:
     debug_image_dir: "/workspaces/unitree_dex3/detect_img"
     save_raw_images: false
     jpeg_quality: 90
+    baseline_compensation_enabled: true
+    baseline_x: 0.4680
+    baseline_y: -0.0700
+    baseline_z: 0.1322
 
 apriltag_button_press_node:
   ros__parameters:
