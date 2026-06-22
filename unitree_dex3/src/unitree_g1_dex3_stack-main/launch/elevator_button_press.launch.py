@@ -68,7 +68,7 @@ def generate_launch_description():
         name='apriltag_button_press_node',
         output='screen',
         emulate_tty=True,
-        parameters=[config_file, {'dry_run': LaunchConfiguration('dry_run'), 'capture_wait_timeout_s': 25.0}],
+        parameters=[config_file, {'dry_run': LaunchConfiguration('dry_run'), 'capture_wait_timeout_s': 60.0}],
         remappings=tf_remappings,
     )
 

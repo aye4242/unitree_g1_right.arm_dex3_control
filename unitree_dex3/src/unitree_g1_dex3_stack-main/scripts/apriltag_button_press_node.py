@@ -272,20 +272,27 @@ class AprilTagButtonPressNode(Node):
         self.get_logger().info('[apriltag_button_press_node] published /executor/return_to_standing')
 
     def _run_sequence(self):
+        _CACHE_TTL = 30.0  # 电梯面板位置不变，允许30s内缓存复用（覆盖手臂按压动作期间的相机断流）
         try:
-            self._target_event.clear()
-            if self.capture_pub is not None:
-                self.capture_pub.publish(Empty())
-                self.get_logger().info('[apriltag_button_press_node] requested AprilTag capture')
-            if not self._wait_event(self._target_event, self.capture_wait_timeout_s):
-                self.get_logger().warn('[apriltag_button_press_node] no fresh AprilTag target after trigger')
-                return
+            with self._lock:
+                cached_age = (time.monotonic() - self._last_target_time) if self._last_target else float('inf')
+            if cached_age >= _CACHE_TTL:
+                self._target_event.clear()
+                if self.capture_pub is not None:
+                    self.capture_pub.publish(Empty())
+                self.get_logger().info(
+                    f'[apriltag_button_press_node] waiting for YOLO detection (up to {self.capture_wait_timeout_s:.0f}s)...')
+                if not self._wait_event(self._target_event, self.capture_wait_timeout_s):
+                    self.get_logger().warn('[apriltag_button_press_node] no detection within timeout')
+                    return
+            else:
+                if self.capture_pub is not None:
+                    self.capture_pub.publish(Empty())
             with self._lock:
                 target = _copy_pose_stamped(self._last_target)
                 age_s = time.monotonic() - self._last_target_time
-            if age_s > self.target_pose_stale_s:
-                self.get_logger().warn(
-                    f'[apriltag_button_press_node] target stale after capture ({age_s:.2f}s)')
+            if age_s > _CACHE_TTL:
+                self.get_logger().warn(f'[apriltag_button_press_node] target stale ({age_s:.2f}s)')
                 return
             self.get_logger().info(
                 f'[apriltag_button_press_node] tag accepted: '
