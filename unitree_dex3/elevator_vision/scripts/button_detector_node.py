@@ -20,6 +20,7 @@ button_detector_node.py — 电梯按钮视觉检测 ROS2 节点
 import glob
 import os
 import sys
+import threading
 import time
 import numpy as np
 import rclpy
@@ -87,6 +88,11 @@ class ButtonDetectorNode(Node):
         self._capture = None
         self._last_no_floor_log = 0.0
         self._last_image_time = 0.0   # 用于检测图像断流
+        # 后台推理线程（避免YOLO阻塞rgb_cb导致RealSense停流）
+        self._latest_frame = None     # (img_bgr, depth_snapshot)
+        self._frame_lock = threading.Lock()
+        self._frame_event = threading.Event()
+        threading.Thread(target=self._inference_loop, daemon=True).start()
 
         # TF2 动态变换
         self.tf_buffer = tf2_ros.Buffer()
@@ -158,12 +164,31 @@ class ButtonDetectorNode(Node):
         self._last_image_time = time.monotonic()
         if self.camera_info is None or self.latest_depth is None:
             return
-
         import cv2
         img_bgr = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
-        self._process_bgr(img_bgr, stamp=msg.header.stamp)
+        # 只存最新帧，立刻返回，不在回调中跑YOLO
+        with self._frame_lock:
+            self._latest_frame = (img_bgr, self.latest_depth.copy())
+        self._frame_event.set()
 
-    def _process_bgr(self, img_bgr, stamp=None):
+    def _inference_loop(self):
+        """后台线程：消费最新帧跑YOLO推理，不阻塞ROS2 executor"""
+        self.get_logger().info('inference thread started')
+        while rclpy.ok():
+            if not self._frame_event.wait(timeout=1.0):
+                continue
+            self._frame_event.clear()
+            with self._frame_lock:
+                frame_data = self._latest_frame
+            if frame_data is None:
+                continue
+            img_bgr, depth = frame_data
+            try:
+                self._process_bgr(img_bgr, depth=depth)
+            except Exception as e:
+                self.get_logger().error(f'inference error: {e}', throttle_duration_sec=5.0)
+
+    def _process_bgr(self, img_bgr, stamp=None, depth=None):
         results = self.detector.detect(img_bgr)
         self._save_debug_image(img_bgr, results)
 
@@ -189,7 +214,7 @@ class ButtonDetectorNode(Node):
         lbl.data = candidate['text']
         self.label_pub.publish(lbl)
 
-        if self.camera_info is None or self.latest_depth is None:
+        if self.camera_info is None or depth is None:
             self.get_logger().info(
                 f"floor='{candidate['text']}' conf={candidate['score']:.2f} "
                 f"pixel({candidate['cx']},{candidate['cy']})")
@@ -197,25 +222,33 @@ class ButtonDetectorNode(Node):
 
         # ── 深度投影 ───────────────────────────────────────────────────────────
         cx_px, cy_px = candidate['cx'], candidate['cy']
-        dh, dw = self.latest_depth.shape[:2]
+        dh, dw = depth.shape[:2]
         ih, iw = img_bgr.shape[:2]
-        dx = int(cx_px * dw / iw)
-        dy = int(cy_px * dh / ih)
+        sx, sy = dw / iw, dh / ih
 
-        # 深度中值滤波（5x5邻域）
-        window = 2
-        y1 = max(0, dy - window)
-        y2 = min(dh, dy + window + 1)
-        x1 = max(0, dx - window)
-        x2 = min(dw, dx + window + 1)
-        roi = self.latest_depth[y1:y2, x1:x2]
+        # 用整个bbox区域采样深度（内收10%避免背景），应对发光按键中心depth无效问题
+        x1b, y1b, x2b, y2b = candidate['bbox']
+        shrink_x = max(1, int((x2b - x1b) * 0.1 * sx))
+        shrink_y = max(1, int((y2b - y1b) * 0.1 * sy))
+        rx1 = max(0, int(x1b * sx) + shrink_x)
+        rx2 = min(dw, int(x2b * sx) - shrink_x)
+        ry1 = max(0, int(y1b * sy) + shrink_y)
+        ry2 = min(dh, int(y2b * sy) - shrink_y)
+        roi = depth[ry1:ry2, rx1:rx2]
         valid_depths = roi[roi > 0]
 
+        # 降级：bbox采样不足时回退到中心点9×9
+        if len(valid_depths) < 5:
+            dx, dy = int(cx_px * sx), int(cy_px * sy)
+            roi = depth[max(0, dy-4):dy+5, max(0, dx-4):dx+5]
+            valid_depths = roi[roi > 0]
+
         if len(valid_depths) == 0:
-            self.get_logger().warn(f'no valid depth in ROI at ({dx},{dy})')
+            self.get_logger().warn(f'no valid depth in button bbox ({x1b},{y1b},{x2b},{y2b})')
             return
 
-        depth_mm = float(np.median(valid_depths))
+        # 取25th百分位：发光中心depth无效→有效点偏向按键物理面近侧
+        depth_mm = float(np.percentile(valid_depths, 25))
 
         if depth_mm <= 0 or depth_mm > 3000:
             self.get_logger().warn(f'invalid depth {depth_mm:.0f}mm at ({dx},{dy})')

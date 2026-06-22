@@ -71,6 +71,8 @@ class AprilTagButtonPressNode(Node):
         self.declare_parameter('alt_rpy_y_threshold', float('inf'))
         self.declare_parameter('alt_rpy', [0.0, -1.5708, 0.0])
         self.declare_parameter('pre_contact_offset_x', 0.05)
+        self.declare_parameter('press_y_offset', 0.0)
+        self.declare_parameter('press_z_offset', 0.0)
         self.declare_parameter('dex3_setpoint_script', '/workspaces/unitree_dex3_cpp/example/control_dex3_right_setpoint.py')
         self.declare_parameter('dex3_net_if', 'enP8p1s0')
         self.declare_parameter('pre_extend_pose', [0.0, -1.05, -1.7, 1.7, 1.8, 0.0, 0.0])
@@ -97,6 +99,8 @@ class AprilTagButtonPressNode(Node):
         alt_rpy = [float(v) for v in list(self.get_parameter('alt_rpy').value)[:3]]
         self.alt_quat = _quaternion_from_rpy(alt_rpy)
         self.pre_contact_offset_x = float(self.get_parameter('pre_contact_offset_x').value)
+        self.press_y_offset = float(self.get_parameter('press_y_offset').value)
+        self.press_z_offset = float(self.get_parameter('press_z_offset').value)
         self.dex3_setpoint_script = str(self.get_parameter('dex3_setpoint_script').value)
         self.dex3_net_if = str(self.get_parameter('dex3_net_if').value)
         self.pre_extend_pose = [float(v) for v in list(self.get_parameter('pre_extend_pose').value)[:7]]
@@ -302,10 +306,14 @@ class AprilTagButtonPressNode(Node):
             pre = self._make_goal(
                 target,
                 x=target.pose.position.x - self.pre_contact_offset_x,
-                y=target.pose.position.y,
-                z=target.pose.position.z,
+                y=target.pose.position.y + self.press_y_offset,
+                z=target.pose.position.z + self.press_z_offset,
             )
-            press = self._make_goal(target)
+            press = self._make_goal(
+                target,
+                y=target.pose.position.y + self.press_y_offset,
+                z=target.pose.position.z + self.press_z_offset,
+            )
 
             if not self._send_goal_and_wait('pre-contact', pre):
                 return

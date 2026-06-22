@@ -95,7 +95,7 @@ def generate_launch_description():
         DeclareLaunchArgument('dry_run', default_value='false'),
         robot_launch,
         camera_to_robot_tf,
-        TimerAction(period=3.0, actions=[
+        TimerAction(period=20.0, actions=[
             button_detector_node,
             planner_launch,
             control_launch,
