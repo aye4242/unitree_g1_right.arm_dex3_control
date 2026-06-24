@@ -68,7 +68,13 @@ def generate_launch_description():
         name='apriltag_button_press_node',
         output='screen',
         emulate_tty=True,
-        parameters=[config_file, {'dry_run': LaunchConfiguration('dry_run'), 'capture_wait_timeout_s': 60.0}],
+        parameters=[config_file, {
+            'dry_run': LaunchConfiguration('dry_run'),
+            'capture_wait_timeout_s': 60.0,
+            'press_x_offset': LaunchConfiguration('press_x_offset'),
+            'press_y_offset': LaunchConfiguration('press_y_offset'),
+            'press_z_offset': LaunchConfiguration('press_z_offset'),
+        }],
         remappings=tf_remappings,
     )
 
@@ -93,6 +99,9 @@ def generate_launch_description():
         DeclareLaunchArgument('target_floor', default_value='0'),
         DeclareLaunchArgument('det_threshold', default_value='0.5'),
         DeclareLaunchArgument('dry_run', default_value='false'),
+        DeclareLaunchArgument('press_x_offset', default_value='0.0'),
+        DeclareLaunchArgument('press_y_offset', default_value='0.0'),
+        DeclareLaunchArgument('press_z_offset', default_value='0.0'),
         robot_launch,
         camera_to_robot_tf,
         TimerAction(period=20.0, actions=[

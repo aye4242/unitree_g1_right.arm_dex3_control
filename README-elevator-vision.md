@@ -272,9 +272,16 @@ dmesg | grep -i "usb\|video\|disconnect" | tail -20
 ### 2. RGB 只有 ~3fps（USB 带宽不足）
 
 **症状**：
+
 ```bash
 ros2 topic hz /camera/camera/color/image_raw --window 10
 # 显示：average rate: 2.93 Hz  （应为30Hz）
+  ros2 topic hz /camera/camera/color/image_raw
+
+  以及：
+
+  ros2 node list | grep realsense
+  ros2 node list | grep camera
 ```
 
 **原因**：1280×720 RGB8 未压缩格式带宽约 83MB/s，超过 USB 2.0 上限（~60MB/s），相机被迫降帧。

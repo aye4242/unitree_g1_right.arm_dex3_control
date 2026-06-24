@@ -71,6 +71,7 @@ class AprilTagButtonPressNode(Node):
         self.declare_parameter('alt_rpy_y_threshold', float('inf'))
         self.declare_parameter('alt_rpy', [0.0, -1.5708, 0.0])
         self.declare_parameter('pre_contact_offset_x', 0.05)
+        self.declare_parameter('press_x_offset', 0.0)
         self.declare_parameter('press_y_offset', 0.0)
         self.declare_parameter('press_z_offset', 0.0)
         self.declare_parameter('dex3_setpoint_script', '/workspaces/unitree_dex3_cpp/example/control_dex3_right_setpoint.py')
@@ -99,6 +100,7 @@ class AprilTagButtonPressNode(Node):
         alt_rpy = [float(v) for v in list(self.get_parameter('alt_rpy').value)[:3]]
         self.alt_quat = _quaternion_from_rpy(alt_rpy)
         self.pre_contact_offset_x = float(self.get_parameter('pre_contact_offset_x').value)
+        self.press_x_offset = float(self.get_parameter('press_x_offset').value)
         self.press_y_offset = float(self.get_parameter('press_y_offset').value)
         self.press_z_offset = float(self.get_parameter('press_z_offset').value)
         self.dex3_setpoint_script = str(self.get_parameter('dex3_setpoint_script').value)
@@ -305,12 +307,13 @@ class AprilTagButtonPressNode(Node):
 
             pre = self._make_goal(
                 target,
-                x=target.pose.position.x - self.pre_contact_offset_x,
+                x=target.pose.position.x - self.pre_contact_offset_x + self.press_x_offset,
                 y=target.pose.position.y + self.press_y_offset,
                 z=target.pose.position.z + self.press_z_offset,
             )
             press = self._make_goal(
                 target,
+                x=target.pose.position.x + self.press_x_offset,
                 y=target.pose.position.y + self.press_y_offset,
                 z=target.pose.position.z + self.press_z_offset,
             )
