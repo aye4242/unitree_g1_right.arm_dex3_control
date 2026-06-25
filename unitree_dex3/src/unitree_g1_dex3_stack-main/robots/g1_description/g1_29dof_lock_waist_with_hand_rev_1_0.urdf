@@ -592,6 +592,8 @@
   </joint>
   <link name="d435_link" />
   <joint name="d435_joint" type="fixed">
+    <!-- 新标定 2026-06-24 已验证数据多样性不足，暂回退旧参数 -->
+    <!-- <origin xyz="-0.0036850 0.0181330 0.4542140" rpy="0.0006871 0.9023070 -0.0110290" /> -->
     <origin xyz="0.0576235 0.01753 0.42987" rpy="0 0.8307767239493009 0" />
     <parent link="torso_link" />
     <child link="d435_link" />

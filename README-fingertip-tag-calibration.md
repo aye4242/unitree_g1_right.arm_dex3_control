@@ -26,10 +26,11 @@ ros2 launch unitree_g1_dex3_stack robot.launch.py \
 **终端2**（容器）：静态相机TF
 ```bash
 ros2 run tf2_ros static_transform_publisher \
-  0.057624 0.017529 0.429869 \
-  -0.659252 0.659252 -0.255707 0.255707 \
+  -0.003685 0.018133 0.454214 \
+  -0.664050 0.671876 -0.233167 0.230768 \
   torso_link camera_color_optical_frame \
   --ros-args -r /tf:=/unitree_g1_dex3/tf -r /tf_static:=/unitree_g1_dex3/tf_static
+# 旧参数备份(2024标定): 0.057624 0.017529 0.429869 -0.659252 0.659252 -0.255707 0.255707
 ```
 
 **终端3**（容器）：重力补偿自由拖动（同一终端切换，不能开两个进程）
@@ -81,15 +82,20 @@ sshpass -p 123 ssh unitree@192.168.100.30 "ffmpeg -f v4l2 -i /dev/video4 -frames
    ```
    记录 `tag=(cx, cy, cz)` → **camera_point**
 
-4. **终端5**（容器）读TCP坐标：
+4. **终端5**（容器）读TCP坐标（位置 + 旋转）：
    ```bash
    ros2 run tf2_ros tf2_echo \
      --ros-args -r /tf:=/unitree_g1_dex3/tf -r /tf_static:=/unitree_g1_dex3/tf_static \
      -- torso_link right_tcp_link
    ```
-   记录 `Translation: [rx, ry, rz]` → **robot_point**
+   记录：
+   - `Translation: [rx, ry, rz]` → **robot_point**
+   - `Rotation: in Quaternion [qx, qy, qz, qw]` → **robot_quat**
 
-5. 填入 `calibration_data.md`
+5. 填入 `calibration_data.md`，格式：
+   ```
+   tag=(cx,cy,cz)  Translation:[rx,ry,rz]  Rotation:[qx,qy,qz,qw]
+   ```
 
 ### 计算结果
 
