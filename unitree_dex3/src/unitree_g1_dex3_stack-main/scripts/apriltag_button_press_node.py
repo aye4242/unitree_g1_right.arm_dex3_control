@@ -71,6 +71,9 @@ class AprilTagButtonPressNode(Node):
         self.declare_parameter('alt_rpy_y_threshold', float('inf'))
         self.declare_parameter('alt_rpy', [0.0, -1.5708, 0.0])
         self.declare_parameter('pre_contact_offset_x', 0.05)
+        self.declare_parameter('press_x_offset', 0.0)
+        self.declare_parameter('press_y_offset', 0.0)
+        self.declare_parameter('press_z_offset', 0.0)
         self.declare_parameter('dex3_setpoint_script', '/workspaces/unitree_dex3_cpp/example/control_dex3_right_setpoint.py')
         self.declare_parameter('dex3_net_if', 'enP8p1s0')
         self.declare_parameter('pre_extend_pose', [0.0, -1.05, -1.7, 1.7, 1.8, 0.0, 0.0])
@@ -97,6 +100,9 @@ class AprilTagButtonPressNode(Node):
         alt_rpy = [float(v) for v in list(self.get_parameter('alt_rpy').value)[:3]]
         self.alt_quat = _quaternion_from_rpy(alt_rpy)
         self.pre_contact_offset_x = float(self.get_parameter('pre_contact_offset_x').value)
+        self.press_x_offset = float(self.get_parameter('press_x_offset').value)
+        self.press_y_offset = float(self.get_parameter('press_y_offset').value)
+        self.press_z_offset = float(self.get_parameter('press_z_offset').value)
         self.dex3_setpoint_script = str(self.get_parameter('dex3_setpoint_script').value)
         self.dex3_net_if = str(self.get_parameter('dex3_net_if').value)
         self.pre_extend_pose = [float(v) for v in list(self.get_parameter('pre_extend_pose').value)[:7]]
@@ -272,20 +278,27 @@ class AprilTagButtonPressNode(Node):
         self.get_logger().info('[apriltag_button_press_node] published /executor/return_to_standing')
 
     def _run_sequence(self):
+        _CACHE_TTL = 30.0  # 电梯面板位置不变，允许30s内缓存复用（覆盖手臂按压动作期间的相机断流）
         try:
-            self._target_event.clear()
-            if self.capture_pub is not None:
-                self.capture_pub.publish(Empty())
-                self.get_logger().info('[apriltag_button_press_node] requested AprilTag capture')
-            if not self._wait_event(self._target_event, self.capture_wait_timeout_s):
-                self.get_logger().warn('[apriltag_button_press_node] no fresh AprilTag target after trigger')
-                return
+            with self._lock:
+                cached_age = (time.monotonic() - self._last_target_time) if self._last_target else float('inf')
+            if cached_age >= _CACHE_TTL:
+                self._target_event.clear()
+                if self.capture_pub is not None:
+                    self.capture_pub.publish(Empty())
+                self.get_logger().info(
+                    f'[apriltag_button_press_node] waiting for YOLO detection (up to {self.capture_wait_timeout_s:.0f}s)...')
+                if not self._wait_event(self._target_event, self.capture_wait_timeout_s):
+                    self.get_logger().warn('[apriltag_button_press_node] no detection within timeout')
+                    return
+            else:
+                if self.capture_pub is not None:
+                    self.capture_pub.publish(Empty())
             with self._lock:
                 target = _copy_pose_stamped(self._last_target)
                 age_s = time.monotonic() - self._last_target_time
-            if age_s > self.target_pose_stale_s:
-                self.get_logger().warn(
-                    f'[apriltag_button_press_node] target stale after capture ({age_s:.2f}s)')
+            if age_s > _CACHE_TTL:
+                self.get_logger().warn(f'[apriltag_button_press_node] target stale ({age_s:.2f}s)')
                 return
             self.get_logger().info(
                 f'[apriltag_button_press_node] tag accepted: '
@@ -294,11 +307,16 @@ class AprilTagButtonPressNode(Node):
 
             pre = self._make_goal(
                 target,
-                x=target.pose.position.x - self.pre_contact_offset_x,
-                y=target.pose.position.y,
-                z=target.pose.position.z,
+                x=target.pose.position.x - self.pre_contact_offset_x + self.press_x_offset,
+                y=target.pose.position.y + self.press_y_offset,
+                z=target.pose.position.z + self.press_z_offset,
             )
-            press = self._make_goal(target)
+            press = self._make_goal(
+                target,
+                x=target.pose.position.x + self.press_x_offset,
+                y=target.pose.position.y + self.press_y_offset,
+                z=target.pose.position.z + self.press_z_offset,
+            )
 
             if not self._send_goal_and_wait('pre-contact', pre):
                 return

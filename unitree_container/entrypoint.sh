@@ -18,4 +18,7 @@ if [[ -n "${UNITREE_NET_IF:-}" ]]; then
   export CYCLONEDDS_URI="<CycloneDDS><Domain><General><Interfaces><NetworkInterface name=\"${UNITREE_NET_IF}\" priority=\"default\" multicast=\"default\" /></Interfaces></General></Domain></CycloneDDS>"
 fi
 
+# 确保 elevator_vision 脚本有可执行权限
+chmod +x /workspaces/unitree_dex3/elevator_vision/scripts/*.py 2>/dev/null || true
+
 exec "$@"

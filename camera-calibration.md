@@ -1,0 +1,35 @@
+# 标定采集数据
+
+robot_point  = tf2_echo 输出的 Translation [x, y, z]
+robot_quat   = tf2_echo 输出的 Rotation (Quaternion) [qx, qy, qz, qw]
+camera_point = v4l2_apriltag_trigger 日志的 tag=(x, y, z)
+
+格式：tag=(cx,cy,cz)  Translation:[rx,ry,rz]  Rotation:[qx,qy,qz,qw]
+
+---
+1.detect_only accepted=4/4 tag=(0.055, -0.072, 0.497),Translation: [0.387, -0.016, 0.096],Rotation: in Quaternion (xyzw) [0.004, -0.186, 0.175, 0.967]
+2.detect_only accepted=4/4 tag=(-0.140, -0.055, 0.470),Translation: [0.356, 0.125, 0.106],Rotation: in Quaternion (xyzw) [0.021, -0.072, 0.194, 0.978]
+3.detect_only accepted=4/4 tag=(-0.165, -0.095, 0.524),Translation: [0.414, 0.157, 0.109],Rotation: in Quaternion (xyzw) [-0.017, 0.024, 0.290, 0.957]
+4.detect_only accepted=4/4 tag=(0.157, -0.076, 0.489),Translation: [0.393, -0.143, 0.090],Rotation: in Quaternion (xyzw) [-0.038, -0.169, 0.148, 0.974]
+5.detect_only accepted=4/4 tag=(0.169, -0.083, 0.485),Translation: [0.395, -0.142, 0.092],Rotation: in Quaternion (xyzw) [0.058, -0.186, 0.082, 0.977]
+6.detect_only accepted=4/4 tag=(0.158, -0.188, 0.564),Translation: [0.500, -0.138, 0.128],Rotation: in Quaternion (xyzw) [-0.015, -0.077, 0.109, 0.991]
+7.detect_only accepted=4/4 tag=(0.109, -0.175, 0.558),Translation: [0.480, -0.098, 0.135],Rotation: in Quaternion (xyzw) [-0.035, -0.168, 0.079, 0.982]
+8.detect_only accepted=4/4 tag=(0.067, -0.164, 0.541),Translation: [0.478, -0.069, 0.128],Rotation: in Quaternion (xyzw) [-0.045, -0.157, 0.161, 0.973]
+9.detect_only accepted=4/4 tag=(-0.053, -0.164, 0.551),Translation: [0.477, 0.047, 0.124],Rotation: in Quaternion (xyzw) [-0.005, -0.048, 0.320, 0.946]
+10.detect_only accepted=4/4 tag=(-0.149, -0.116, 0.512),Translation: [0.443, 0.137, 0.109],Rotation: in Quaternion (xyzw) [-0.010, 0.015, 0.349, 0.937]
+11.detect_only accepted=4/4 tag=(-0.029, -0.096, 0.567),Translation: [0.435, 0.037, 0.074],Rotation: in Quaternion (xyzw) [0.019, -0.065, 0.213, 0.975]
+12.detect_only accepted=4/4 tag=(-0.192, -0.085, 0.563),Translation: [0.427, 0.104, 0.094],Rotation: in Quaternion (xyzw) [0.047, 0.105, 0.057, 0.992]
+13.detect_only accepted=4/4 tag=(-0.143, -0.096, 0.548),Translation: [0.430, 0.140, 0.083],Rotation: in Quaternion (xyzw) [-0.004, 0.060, 0.299, 0.952]
+14.detect_only accepted=4/4 tag=(0.232, -0.185, 0.608),Translation: [0.523, -0.197, 0.093],Rotation: in Quaternion (xyzw) [0.031, 0.053, -0.006, 0.998]
+15.detect_only accepted=4/4 tag=(0.019, -0.152, 0.604),Translation: [0.500, -0.007, 0.082],Rotation: in Quaternion (xyzw) [0.005, 0.035, 0.085, 0.996]
+16.detect_only accepted=4/4 tag=(0.001, -0.038, 0.309),Translation: [0.248, 0.004, 0.206],Rotation: in Quaternion (xyzw) [0.022, -0.071, 0.284, 0.956]
+17.detect_only accepted=4/4 tag=(-0.116, -0.049, 0.326),Translation: [0.261, 0.126, 0.205],Rotation: in Quaternion (xyzw) [0.187, -0.215, 0.211, 0.935]
+18.detect_only accepted=4/4 tag=(0.125, -0.082, 0.359),Translation: [0.299, -0.134, 0.208],Rotation: in Quaternion (xyzw) [-0.007, -0.079, -0.011, 0.997]
+19.detect_only accepted=4/4 tag=(0.251, 0.143, 0.617),Translation: [0.288, -0.210, -0.118],Rotation: in Quaternion (xyzw) [-0.040, 0.122, -0.029, 0.991]
+20.detect_only accepted=4/4 tag=(0.050, 0.119, 0.651),Translation: [0.332, -0.027, -0.109],Rotation: in Quaternion (xyzw) [0.027, 0.143, 0.142, 0.979]
+21.detect_only accepted=4/4 tag=(-0.021, 0.106, 0.668),Translation: [0.337, 0.037, -0.106],Rotation: in Quaternion (xyzw) [-0.004, 0.179, 0.222, 0.958]
+22.detect_only accepted=4/4 tag=(-0.106, 0.125, 0.628),Translation: [0.308, 0.084, -0.096],Rotation: in Quaternion (xyzw) [-0.123, 0.147, 0.255, 0.948]
+23.detect_only accepted=4/4 tag=(-0.103, 0.108, 0.660),Translation: [0.351, 0.089, -0.091],Rotation: in Quaternion (xyzw) [-0.128, 0.203, 0.341, 0.909]
+24.detect_only accepted=4/4 tag=(0.065, -0.098, 0.355),Translation: [0.317, -0.040, 0.213],Rotation: in Quaternion (xyzw) [-0.029, -0.024, 0.091, 0.995]
+25.detect_only accepted=4/4 tag=(0.105, -0.102, 0.363),Translation: [0.321, -0.083, 0.211],Rotation: in Quaternion (xyzw) [-0.037, -0.094, 0.057, 0.993]
+26.detect_only accepted=4/4 tag=(-0.127, -0.092, 0.342),Translation: [0.304, 0.125, 0.219],Rotation: in Quaternion (xyzw) [-0.069, -0.127, 0.083, 0.986]
