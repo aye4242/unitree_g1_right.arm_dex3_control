@@ -64,6 +64,7 @@ class V4L2AprilTagTrigger(Node):
         self.declare_parameter('target_tag_id', 0)
         self.declare_parameter('offset_xyz', [0.0, 0.0, 0.0])
         self.declare_parameter('decision_margin_min', 25.0)
+        self.declare_parameter('quad_decimate', 2.0)
         self.declare_parameter('detect_scale', 0.5)
 
         self.declare_parameter('camera_matrix', [
@@ -233,7 +234,7 @@ class V4L2AprilTagTrigger(Node):
         self.detector = Detector(
             families=self.tag_family,
             nthreads=1,
-            quad_decimate=2.0,
+            quad_decimate=float(self.get_parameter('quad_decimate').value),
             refine_edges=1,
         )
 
@@ -640,9 +641,11 @@ class V4L2AprilTagTrigger(Node):
             self.tag_pose_pub.publish(final_tag_pose)
             self.target_pose_pub.publish(final_target_pose)
         if self.detect_only:
+            _o = best['tag_torso'].pose.orientation
             self.get_logger().info(
                 f'[v4l2_apriltag_trigger] detect_only accepted={len(accepted)}/{len(frames)} '
                 f'tag=({tag_avg_x:.3f}, {tag_avg_y:.3f}, {tag_avg_z:.3f}) '
+                f'tag_quat=({_o.x:.6f},{_o.y:.6f},{_o.z:.6f},{_o.w:.6f}) '
                 f'target=({avg_x:.3f}, {avg_y:.3f}, {avg_z:.3f}) '
                 f'delta=({avg_x - tag_avg_x:.3f}, {avg_y - tag_avg_y:.3f}, {avg_z - tag_avg_z:.3f}) '
                 f'@ {self.output_frame}, best_margin={best["decision_margin"]:.1f}, not publishing {self.goal_pose_topic}')
