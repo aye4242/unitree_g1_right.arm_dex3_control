@@ -55,8 +55,8 @@ ros2 launch unitree_g1_dex3_stack robot.launch.py \
 ```bash
 bash /home/unitree/Desktop/unitree_container/run.sh
 ros2 run tf2_ros static_transform_publisher \
-  0.057624 0.017529 0.429869 \
-  -0.659252 0.659252 -0.255707 0.255707 \
+  0.030168 0.053707 0.496973 \
+  -0.656780 0.663322 -0.255468 0.251755 \
   torso_link camera_color_optical_frame \
   --ros-args -r /tf:=/unitree_g1_dex3/tf -r /tf_static:=/unitree_g1_dex3/tf_static
 ```
@@ -290,8 +290,9 @@ colcon build --packages-select unitree_g1_dex3_stack
 
 ```
 torso_link → camera_color_optical_frame
-平移：0.057624, 0.017529, 0.429869
-四元数(x,y,z,w)：-0.659252, 0.659252, -0.255707, 0.255707
+平移：0.030168, 0.053707, 0.496973
+四元数(x,y,z,w)：-0.656780, 0.663322, -0.255468, 0.251755
 ```
+> 上一版备份（2024）：平移 0.057624, 0.017529, 0.429869  四元数 -0.659252, 0.659252, -0.255707, 0.255707
 
 > 标定后将新值更新于此，供下次重标定时参考。若标定后新值与上述值差异超过 **5 cm / 5°**，建议检查采集过程是否有误。
